@@ -1,0 +1,19 @@
+# Fabloom benchmark v0.1. CC BY 4.0, see benchmark/LICENSE.
+id: leaf-spine-ebgp-0008
+family: leaf-spine-ebgp
+request: 'Sixteen leaves and two spines, FRR, eBGP underlay over numbered point-to-point links. Standard
+  ASN plan: 65000 for spines, 65101+ for leaves. Loopbacks must be reachable from every leaf.'
+intent:
+  platform: frr
+  topology:
+    spines: 2
+    leaves: 16
+  bgp_mode: numbered
+  asn:
+    spine_asn: 65000
+    leaf_asn_base: 65101
+  addressing:
+    loopback_pool: 10.0.0.0/23
+    p2p_pool: 10.1.0.0/16
+  advertise_loopbacks: true
+  filters: []

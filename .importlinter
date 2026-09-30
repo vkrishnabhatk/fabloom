@@ -1,0 +1,80 @@
+# Plane boundaries (ADR-0001). Run by `make lint` and the CI lint job.
+# A contract that fails here is an architecture change: write an ADR, don't edit this file.
+
+[importlinter]
+root_package = fabloom
+include_external_packages = False
+
+[importlinter:contract:verification-independence]
+name = The model cannot influence what it is graded on: verify <-/-> llm, agent
+type = independence
+modules =
+    fabloom.verify
+    fabloom.llm
+    fabloom.agent
+ignore_imports =
+    # agent drives llm; independence is only required between verify and the other two.
+    fabloom.agent.** -> fabloom.llm
+    fabloom.agent.** -> fabloom.llm.**
+
+[importlinter:contract:contracts-are-the-bottom]
+name = contracts imports nothing else in fabloom
+type = forbidden
+source_modules =
+    fabloom.contracts
+forbidden_modules =
+    fabloom.checks
+    fabloom.verify
+    fabloom.llm
+    fabloom.agent
+    fabloom.scrub
+    fabloom.config
+    fabloom.provenance
+    fabloom.scenarios
+    fabloom.metrics
+    fabloom.log
+    fabloom.cli
+
+[importlinter:contract:checks-are-deterministic]
+name = checks depends only on contracts
+type = forbidden
+source_modules =
+    fabloom.checks
+forbidden_modules =
+    fabloom.verify
+    fabloom.llm
+    fabloom.agent
+    fabloom.scrub
+    fabloom.config
+    fabloom.provenance
+    fabloom.scenarios
+    fabloom.metrics
+    fabloom.log
+    fabloom.cli
+
+[importlinter:contract:scrub-is-standalone]
+name = scrub depends on nothing else in fabloom
+type = forbidden
+source_modules =
+    fabloom.scrub
+forbidden_modules =
+    fabloom.contracts
+    fabloom.checks
+    fabloom.verify
+    fabloom.llm
+    fabloom.agent
+    fabloom.config
+    fabloom.cli
+
+[importlinter:contract:only-the-cli-composes]
+name = Only the composition root wires planes together
+type = forbidden
+source_modules =
+    fabloom.contracts
+    fabloom.checks
+    fabloom.verify
+    fabloom.llm
+    fabloom.agent
+    fabloom.scrub
+forbidden_modules =
+    fabloom.cli

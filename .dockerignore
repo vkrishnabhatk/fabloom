@@ -1,0 +1,10 @@
+# Allow-list: the verifier/app images only need these.
+*
+!pyproject.toml
+!uv.lock
+!README.md
+!LICENSE
+!NOTICE
+!src/
+!docker/verifier/
+src/**/__pycache__

@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+dist/
+build/
+*.egg-info/
+
+# Tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+coverage.xml
+htmlcov/
+
+# Fabloom runtime output: event logs and generated configs (may contain user input)
+runs/
+mlruns/
+mlflow.db
+
+# Secrets: only sops-encrypted files are ever committed
+.env
+.env.*
+!.env.example
+*.agekey
+secrets/*.yaml
+!secrets/*.enc.yaml
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
+.claude/settings.local.json

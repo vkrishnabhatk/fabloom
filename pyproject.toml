@@ -1,0 +1,138 @@
+[project]
+name = "fabloom"
+version = "0.1.0.dev0"
+description = "Describe a data center network in plain language; get configs that are generated, verified with Batfish and repaired until they pass."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "Venkatakrishna Bhat K" }]
+requires-python = ">=3.11"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Telecommunications Industry",
+    "Intended Audience :: System Administrators",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Networking",
+    "Typing :: Typed",
+]
+dependencies = [
+    # openai 3.x speaks httpx2; tests mock Token Factory with httpx2.MockTransport (not respx,
+    # which only patches the original httpx).
+    "httpx2>=2.13",
+    "openai>=3.20",
+    "prometheus-client>=0.21",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "pyyaml>=6.0.2",
+    "structlog>=24.4",
+    "tenacity>=9.0",
+    "typer>=0.12",
+]
+
+[project.optional-dependencies]
+# The Batfish client is only needed where Batfish is actually driven: the local
+# backend and the verifier image. Kept optional so `pip install fabloom` stays light.
+batfish = ["pybatfish>=2024.10.30"]
+
+[project.scripts]
+fabloom = "fabloom.cli:app"
+# Entry point baked into the verifier image (docker/Dockerfile.verifier, ADR-0003).
+fabloom-verify = "fabloom.verify.entrypoint:main"
+
+[project.urls]
+Repository = "https://github.com/vkrishnabhatk/fabloom"
+
+[dependency-groups]
+dev = [
+    "codespell>=2.3",
+    "hypothesis>=6.115",
+    "import-linter>=2.1",
+    "mypy>=1.13",
+    "pre-commit>=4.0",
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=6.0",
+    "ruff>=0.7",
+    "types-pyyaml>=6.0",
+]
+
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/fabloom"]
+
+# --- ruff -------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "ASYNC", "S", "A", "C4", "DTZ", "T20", "PT", "RET", "TRY", "PL", "RUF"]
+ignore = [
+    "TRY003",   # long messages in exception constructors are how errors name their fix
+    "PLR0913",  # verifier/agent constructors take explicit dependencies by design
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "PLR2004", "S105", "S106"]
+# Spikes run remote shells in a sandbox by design; scripts are operator tools that print.
+"spikes/**" = ["T201", "S603", "S604", "S607", "S108", "PLR2004"]
+"scripts/**" = ["T201"]
+"src/fabloom/cli.py" = ["PLR2004"]
+
+# --- mypy -------------------------------------------------------------------
+[tool.mypy]
+strict = true
+# 3.12, not the 3.11 floor: numpy's bundled stubs (reached via openai's TYPE_CHECKING
+# imports) use 3.12 syntax, and follow_imports=skip does not apply to stubs. The 3.11 floor
+# is still enforced by ruff's target-version and by the 3.11 CI test job.
+python_version = "3.12"
+files = ["src", "tests"]
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+# Optional, untyped third-party code; not followed.
+module = ["pybatfish.*", "contree_sdk.*"]
+follow_imports = "skip"
+ignore_missing_imports = true
+
+# --- pytest (the only pytest config: no pytest.ini, see moodrift fix #1) -----
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = ["--strict-markers", "--strict-config", "-ra"]
+markers = [
+    "unit: pure, in-process, no I/O beyond tmp_path",
+    "integration: several planes wired together, still offline",
+    "sandbox: needs Nebius Sandboxes credentials (nightly/manual only)",
+    "llm: needs a live Token Factory key (nightly/manual only)",
+    "slow: takes more than a few seconds",
+]
+filterwarnings = ["error"]
+
+# --- coverage ---------------------------------------------------------------
+[tool.coverage.run]
+source = ["src/fabloom"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+skip_covered = true
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "\\.\\.\\.$",
+]
+
+# --- codespell --------------------------------------------------------------
+[tool.codespell]
+skip = "*.lock,*.html,LICENSE,benchmark/LICENSE,CODE_OF_CONDUCT.md,./.venv,./.git,./.mypy_cache,./.ruff_cache"
+ignore-words-list = "asn,afi"

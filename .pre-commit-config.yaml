@@ -10,6 +10,7 @@ repos:
       - id: check-added-large-files
         args: [--maxkb=500]
       - id: detect-private-key
+        exclude: ^tests/unit/test_scrub\.py$  # deliberate fake key under test
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.16.9
     hooks:

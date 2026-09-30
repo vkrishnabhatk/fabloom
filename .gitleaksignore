@@ -1,0 +1,3 @@
+# Deliberate fake PEM block in the scrubber's own tests, as committed before the inline
+# `gitleaks:allow` marker was added. Scanning history still sees this commit.
+bb29dbe17c36cb014093009d471977a97aed0fb3:tests/unit/test_scrub.py:private-key:39

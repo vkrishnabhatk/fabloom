@@ -36,7 +36,9 @@ def test_keyword_rules(line: str, kept: str) -> None:
 
 
 def test_pem_block() -> None:
-    text = "x\n-----BEGIN RSA PRIVATE KEY-----\nMIIEow\nabc\n-----END RSA PRIVATE KEY-----\ny"
+    # A fake key: the scrubber must redact PEM blocks.
+    pem = "-----BEGIN RSA PRIVATE KEY-----\nMIIEow\n-----END RSA PRIVATE KEY-----"  # gitleaks:allow
+    text = f"x\n{pem}\ny"
     result = scrub(text)
     assert "MIIEow" not in result.text
     assert result.text.startswith("x\n-----BEGIN RSA PRIVATE KEY-----<redacted>-----END")

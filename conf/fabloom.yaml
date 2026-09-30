@@ -1,0 +1,13 @@
+# Run defaults. Secrets and per-deployment values live in the environment (FABLOOM_*),
+# never here; see fabloom.config.Settings.
+
+run:
+  # Parallel repair candidates per round. 1 for the local backend (one Batfish server);
+  # raise once the sandbox backend fans candidates out across executions (ADR-0003).
+  repair_candidates: 1
+  budget:
+    max_repair_rounds: 3
+    max_tokens: 250000
+    max_usd: 0.25            # a Super run is ~$0.01; this is the runaway guard, not a target
+    max_wall_clock_s: 900
+    max_verifications: 12

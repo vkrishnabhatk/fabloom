@@ -1,0 +1,48 @@
+# Model routing (ADR-0005). Week-0 findings are a config change here, never a code change.
+#
+# IDs are from architecture §7 (29 Sep 2026). `price_verified: false` marks a price that
+# spikes/nemotron_probe.py has not confirmed yet; unconfirmed prices are set pessimistically
+# so the run budget over-estimates rather than under-estimates spend.
+# `fabloom doctor` asserts every ID below exists on Token Factory and answers in JSON mode.
+
+models:
+  nano:
+    id: nvidia/nvidia-nemotron-3-nano-30b-a3b
+    usd_per_m_input: 0.06
+    usd_per_m_output: 0.24
+    price_verified: false   # plan "Costs" table; confirm in the probe
+    max_output_tokens: 4096
+    temperature: 0.0        # planner output is structured; no creativity wanted
+  super:
+    id: nvidia/nemotron-3-super-120b-a12b
+    usd_per_m_input: 0.30
+    usd_per_m_output: 0.90
+    price_verified: false
+    max_output_tokens: 12000  # a 20-device fabric is ~10k tokens of config
+    temperature: 0.2
+  ultra:
+    id: nvidia/Nemotron-3-Ultra-550b-a55b
+    usd_per_m_input: 1.00   # placeholder, deliberately high until the probe records it
+    usd_per_m_output: 3.00
+    price_verified: false
+    max_output_tokens: 12000
+    temperature: 0.2
+  lightning:
+    # Optional step narration (not wired to a role yet): cheapest, 1M context.
+    id: nvidia/Nemotron-3_5-Lightning
+    usd_per_m_input: 0.10   # placeholder
+    usd_per_m_output: 0.40
+    price_verified: false
+    max_output_tokens: 512
+
+roles:
+  planner: nano
+  generator: super
+  repairer: super
+  repairer_escalated: ultra
+  explainer: nano
+
+# Escalate to repairer_escalated only on repeated failure.
+escalation:
+  from_round: 3            # any failure still present at round 3
+  critical_from_round: 2   # a parse failure (critical) that survived one repair

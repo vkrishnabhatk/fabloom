@@ -1,0 +1,39 @@
+# syntax=docker/dockerfile:1.7
+# fabloom-verifier: the L0 image of the Sandboxes ladder (ADR-0003).
+#   batfish/allinone (pinned by digest) + fabloom's verify plane + a baked JVM AOT cache.
+# ConTree imports sandbox images from an OCI registry: if this image is not published to
+# GHCR, sandboxes cannot run at all. Built and pushed by .github/workflows/ci.yml.
+
+ARG BATFISH_IMAGE=batfish/allinone:2026.08.27.3685@sha256:54cb0ed94fd9a3c1ca0985f73e5be479e955cee9b9f6a6799b66be3364fd8e5c
+
+# --- stage 1: build the fabloom wheel ------------------------------------------------------
+FROM python:3.12-slim AS build
+COPY --from=ghcr.io/astral-sh/uv:0.11.24 /uv /bin/uv
+WORKDIR /src
+COPY pyproject.toml uv.lock README.md LICENSE NOTICE ./
+COPY src ./src
+RUN uv build --wheel --out-dir /dist
+
+# --- stage 2: verifier ------------------------------------------------------------------
+FROM ${BATFISH_IMAGE}
+ARG GIT_SHA=unknown
+ARG BAKE_AOT=1
+LABEL org.opencontainers.image.source="https://github.com/vkrishnabhatk/fabloom" \
+      org.opencontainers.image.licenses="Apache-2.0" \
+      org.opencontainers.image.description="Batfish + fabloom-verify for Nebius Sandboxes"
+# The verify plane needs only pydantic beyond what the base image has (pybatfish ships in it,
+# version-matched to the server). --no-deps keeps the model-side dependencies out.
+COPY --from=build /dist/*.whl /tmp/
+RUN pip3 install --break-system-packages --no-cache-dir --no-deps /tmp/fabloom-*.whl \
+ && pip3 install --break-system-packages --no-cache-dir "pydantic>=2.9,<3" \
+ && rm /tmp/*.whl
+COPY docker/verifier/start-batfish.sh docker/verifier/bake-aot.sh /opt/fabloom/
+COPY docker/verifier/training/ /opt/fabloom/training/
+RUN if [ "$BAKE_AOT" = "1" ]; then /opt/fabloom/bake-aot.sh; fi
+
+RUN useradd --uid 10001 --no-create-home --home-dir /data fabloom \
+ && chown -R fabloom /data
+USER 10001
+ENV IMAGE_TAG=${GIT_SHA} \
+    FABLOOM_BATFISH_START_CMD=/opt/fabloom/start-batfish.sh
+ENTRYPOINT ["fabloom-verify"]

@@ -1,0 +1,612 @@
+{
+ "snapshot": {
+  "name": "training-leaf-spine-filters-0002",
+  "fabric": {
+   "platform": "arista_eos",
+   "bgp_mode": "numbered",
+   "devices": [
+    {
+     "name": "spine1",
+     "role": "spine",
+     "asn": 65000,
+     "loopback": "10.0.0.1/32",
+     "interfaces": [
+      {
+       "name": "Ethernet1",
+       "peer_device": "leaf1",
+       "peer_interface": "Ethernet1",
+       "address": "10.1.0.0/31"
+      },
+      {
+       "name": "Ethernet2",
+       "peer_device": "leaf2",
+       "peer_interface": "Ethernet1",
+       "address": "10.1.0.16/31"
+      }
+     ]
+    },
+    {
+     "name": "spine2",
+     "role": "spine",
+     "asn": 65000,
+     "loopback": "10.0.0.2/32",
+     "interfaces": [
+      {
+       "name": "Ethernet1",
+       "peer_device": "leaf1",
+       "peer_interface": "Ethernet2",
+       "address": "10.1.0.2/31"
+      },
+      {
+       "name": "Ethernet2",
+       "peer_device": "leaf2",
+       "peer_interface": "Ethernet2",
+       "address": "10.1.0.18/31"
+      }
+     ]
+    },
+    {
+     "name": "leaf1",
+     "role": "leaf",
+     "asn": 65101,
+     "loopback": "10.0.1.1/32",
+     "interfaces": [
+      {
+       "name": "Ethernet1",
+       "peer_device": "spine1",
+       "peer_interface": "Ethernet1",
+       "address": "10.1.0.1/31"
+      },
+      {
+       "name": "Ethernet2",
+       "peer_device": "spine2",
+       "peer_interface": "Ethernet1",
+       "address": "10.1.0.3/31"
+      }
+     ]
+    },
+    {
+     "name": "leaf2",
+     "role": "leaf",
+     "asn": 65102,
+     "loopback": "10.0.1.2/32",
+     "interfaces": [
+      {
+       "name": "Ethernet1",
+       "peer_device": "spine1",
+       "peer_interface": "Ethernet2",
+       "address": "10.1.0.17/31"
+      },
+      {
+       "name": "Ethernet2",
+       "peer_device": "spine2",
+       "peer_interface": "Ethernet2",
+       "address": "10.1.0.19/31"
+      }
+     ]
+    }
+   ],
+   "links": [
+    {
+     "a_device": "leaf1",
+     "a_interface": "Ethernet1",
+     "b_device": "spine1",
+     "b_interface": "Ethernet1",
+     "subnet": "10.1.0.0/31"
+    },
+    {
+     "a_device": "leaf1",
+     "a_interface": "Ethernet2",
+     "b_device": "spine2",
+     "b_interface": "Ethernet1",
+     "subnet": "10.1.0.2/31"
+    },
+    {
+     "a_device": "leaf2",
+     "a_interface": "Ethernet1",
+     "b_device": "spine1",
+     "b_interface": "Ethernet2",
+     "subnet": "10.1.0.16/31"
+    },
+    {
+     "a_device": "leaf2",
+     "a_interface": "Ethernet2",
+     "b_device": "spine2",
+     "b_interface": "Ethernet2",
+     "subnet": "10.1.0.18/31"
+    }
+   ],
+   "sessions": [
+    {
+     "a_device": "leaf1",
+     "a_interface": "Ethernet1",
+     "a_asn": 65101,
+     "a_ip": "10.1.0.1",
+     "b_device": "spine1",
+     "b_interface": "Ethernet1",
+     "b_asn": 65000,
+     "b_ip": "10.1.0.0"
+    },
+    {
+     "a_device": "leaf1",
+     "a_interface": "Ethernet2",
+     "a_asn": 65101,
+     "a_ip": "10.1.0.3",
+     "b_device": "spine2",
+     "b_interface": "Ethernet1",
+     "b_asn": 65000,
+     "b_ip": "10.1.0.2"
+    },
+    {
+     "a_device": "leaf2",
+     "a_interface": "Ethernet1",
+     "a_asn": 65102,
+     "a_ip": "10.1.0.17",
+     "b_device": "spine1",
+     "b_interface": "Ethernet2",
+     "b_asn": 65000,
+     "b_ip": "10.1.0.16"
+    },
+    {
+     "a_device": "leaf2",
+     "a_interface": "Ethernet2",
+     "a_asn": 65102,
+     "a_ip": "10.1.0.19",
+     "b_device": "spine2",
+     "b_interface": "Ethernet2",
+     "b_asn": 65000,
+     "b_ip": "10.1.0.18"
+    }
+   ]
+  }
+ },
+ "configs": {
+  "spine1": "hostname spine1\nservice routing protocols model multi-agent\nip routing\n!\nip access-list FABLOOM-PROTECT\n   10 deny tcp any any eq 23\n   20 permit ip any any\n!\ninterface Loopback0\n   ip address 10.0.0.1/32\n!\ninterface Ethernet1\n   no switchport\n   ip address 10.1.0.0/31\n   ip access-group FABLOOM-PROTECT in\n!\ninterface Ethernet2\n   no switchport\n   ip address 10.1.0.16/31\n   ip access-group FABLOOM-PROTECT in\n!\nrouter bgp 65000\n   router-id 10.0.0.1\n   neighbor 10.1.0.1 remote-as 65101\n   neighbor 10.1.0.17 remote-as 65102\n   network 10.0.0.1/32\n!\n",
+  "spine2": "hostname spine2\nservice routing protocols model multi-agent\nip routing\n!\nip access-list FABLOOM-PROTECT\n   10 deny tcp any any eq 23\n   20 permit ip any any\n!\ninterface Loopback0\n   ip address 10.0.0.2/32\n!\ninterface Ethernet1\n   no switchport\n   ip address 10.1.0.2/31\n   ip access-group FABLOOM-PROTECT in\n!\ninterface Ethernet2\n   no switchport\n   ip address 10.1.0.18/31\n   ip access-group FABLOOM-PROTECT in\n!\nrouter bgp 65000\n   router-id 10.0.0.2\n   neighbor 10.1.0.3 remote-as 65101\n   neighbor 10.1.0.19 remote-as 65102\n   network 10.0.0.2/32\n!\n",
+  "leaf1": "hostname leaf1\nservice routing protocols model multi-agent\nip routing\n!\nip access-list FABLOOM-PROTECT\n   10 deny tcp any any eq 23\n   20 permit ip any any\n!\ninterface Loopback0\n   ip address 10.0.1.1/32\n!\ninterface Ethernet1\n   no switchport\n   ip address 10.1.0.1/31\n   ip access-group FABLOOM-PROTECT in\n!\ninterface Ethernet2\n   no switchport\n   ip address 10.1.0.3/31\n   ip access-group FABLOOM-PROTECT in\n!\nrouter bgp 65101\n   router-id 10.0.1.1\n   neighbor 10.1.0.0 remote-as 65000\n   neighbor 10.1.0.2 remote-as 65000\n   network 10.0.1.1/32\n!\n",
+  "leaf2": "hostname leaf2\nservice routing protocols model multi-agent\nip routing\n!\nip access-list FABLOOM-PROTECT\n   10 deny tcp any any eq 23\n   20 permit ip any any\n!\ninterface Loopback0\n   ip address 10.0.1.2/32\n!\ninterface Ethernet1\n   no switchport\n   ip address 10.1.0.17/31\n   ip access-group FABLOOM-PROTECT in\n!\ninterface Ethernet2\n   no switchport\n   ip address 10.1.0.19/31\n   ip access-group FABLOOM-PROTECT in\n!\nrouter bgp 65102\n   router-id 10.0.1.2\n   neighbor 10.1.0.16 remote-as 65000\n   neighbor 10.1.0.18 remote-as 65000\n   network 10.0.1.2/32\n!\n"
+ },
+ "checks": [
+  {
+   "id": "parse_clean:spine1",
+   "kind": "parse_clean",
+   "severity": "critical",
+   "description": "spine1 parses with no unrecognized lines",
+   "params": {
+    "device": "spine1"
+   }
+  },
+  {
+   "id": "no_undefined_refs:spine1",
+   "kind": "no_undefined_refs",
+   "severity": "high",
+   "description": "spine1 references only defined structures",
+   "params": {
+    "device": "spine1"
+   }
+  },
+  {
+   "id": "parse_clean:spine2",
+   "kind": "parse_clean",
+   "severity": "critical",
+   "description": "spine2 parses with no unrecognized lines",
+   "params": {
+    "device": "spine2"
+   }
+  },
+  {
+   "id": "no_undefined_refs:spine2",
+   "kind": "no_undefined_refs",
+   "severity": "high",
+   "description": "spine2 references only defined structures",
+   "params": {
+    "device": "spine2"
+   }
+  },
+  {
+   "id": "parse_clean:leaf1",
+   "kind": "parse_clean",
+   "severity": "critical",
+   "description": "leaf1 parses with no unrecognized lines",
+   "params": {
+    "device": "leaf1"
+   }
+  },
+  {
+   "id": "no_undefined_refs:leaf1",
+   "kind": "no_undefined_refs",
+   "severity": "high",
+   "description": "leaf1 references only defined structures",
+   "params": {
+    "device": "leaf1"
+   }
+  },
+  {
+   "id": "parse_clean:leaf2",
+   "kind": "parse_clean",
+   "severity": "critical",
+   "description": "leaf2 parses with no unrecognized lines",
+   "params": {
+    "device": "leaf2"
+   }
+  },
+  {
+   "id": "no_undefined_refs:leaf2",
+   "kind": "no_undefined_refs",
+   "severity": "high",
+   "description": "leaf2 references only defined structures",
+   "params": {
+    "device": "leaf2"
+   }
+  },
+  {
+   "id": "bgp_compatible:leaf1--spine1",
+   "kind": "bgp_compatible",
+   "severity": "high",
+   "description": "BGP between leaf1 (AS65101) and spine1 (AS65000) is configured compatibly on both ends",
+   "params": {
+    "a_device": "leaf1",
+    "b_device": "spine1",
+    "a_interface": "Ethernet1",
+    "b_interface": "Ethernet1",
+    "a_ip": "10.1.0.1",
+    "b_ip": "10.1.0.0"
+   }
+  },
+  {
+   "id": "bgp_established:leaf1--spine1",
+   "kind": "bgp_established",
+   "severity": "high",
+   "description": "BGP between leaf1 and spine1 is established",
+   "params": {
+    "a_device": "leaf1",
+    "b_device": "spine1",
+    "a_interface": "Ethernet1",
+    "b_interface": "Ethernet1",
+    "a_ip": "10.1.0.1",
+    "b_ip": "10.1.0.0"
+   }
+  },
+  {
+   "id": "bgp_compatible:leaf1--spine2",
+   "kind": "bgp_compatible",
+   "severity": "high",
+   "description": "BGP between leaf1 (AS65101) and spine2 (AS65000) is configured compatibly on both ends",
+   "params": {
+    "a_device": "leaf1",
+    "b_device": "spine2",
+    "a_interface": "Ethernet2",
+    "b_interface": "Ethernet1",
+    "a_ip": "10.1.0.3",
+    "b_ip": "10.1.0.2"
+   }
+  },
+  {
+   "id": "bgp_established:leaf1--spine2",
+   "kind": "bgp_established",
+   "severity": "high",
+   "description": "BGP between leaf1 and spine2 is established",
+   "params": {
+    "a_device": "leaf1",
+    "b_device": "spine2",
+    "a_interface": "Ethernet2",
+    "b_interface": "Ethernet1",
+    "a_ip": "10.1.0.3",
+    "b_ip": "10.1.0.2"
+   }
+  },
+  {
+   "id": "bgp_compatible:leaf2--spine1",
+   "kind": "bgp_compatible",
+   "severity": "high",
+   "description": "BGP between leaf2 (AS65102) and spine1 (AS65000) is configured compatibly on both ends",
+   "params": {
+    "a_device": "leaf2",
+    "b_device": "spine1",
+    "a_interface": "Ethernet1",
+    "b_interface": "Ethernet2",
+    "a_ip": "10.1.0.17",
+    "b_ip": "10.1.0.16"
+   }
+  },
+  {
+   "id": "bgp_established:leaf2--spine1",
+   "kind": "bgp_established",
+   "severity": "high",
+   "description": "BGP between leaf2 and spine1 is established",
+   "params": {
+    "a_device": "leaf2",
+    "b_device": "spine1",
+    "a_interface": "Ethernet1",
+    "b_interface": "Ethernet2",
+    "a_ip": "10.1.0.17",
+    "b_ip": "10.1.0.16"
+   }
+  },
+  {
+   "id": "bgp_compatible:leaf2--spine2",
+   "kind": "bgp_compatible",
+   "severity": "high",
+   "description": "BGP between leaf2 (AS65102) and spine2 (AS65000) is configured compatibly on both ends",
+   "params": {
+    "a_device": "leaf2",
+    "b_device": "spine2",
+    "a_interface": "Ethernet2",
+    "b_interface": "Ethernet2",
+    "a_ip": "10.1.0.19",
+    "b_ip": "10.1.0.18"
+   }
+  },
+  {
+   "id": "bgp_established:leaf2--spine2",
+   "kind": "bgp_established",
+   "severity": "high",
+   "description": "BGP between leaf2 and spine2 is established",
+   "params": {
+    "a_device": "leaf2",
+    "b_device": "spine2",
+    "a_interface": "Ethernet2",
+    "b_interface": "Ethernet2",
+    "a_ip": "10.1.0.19",
+    "b_ip": "10.1.0.18"
+   }
+  },
+  {
+   "id": "l3_edges:leaf1[Ethernet1]--spine1[Ethernet1]",
+   "kind": "l3_edges",
+   "severity": "medium",
+   "description": "leaf1 Ethernet1 and spine1 Ethernet1 form a layer-3 edge on 10.1.0.0/31",
+   "params": {
+    "a_device": "leaf1",
+    "a_interface": "Ethernet1",
+    "b_device": "spine1",
+    "b_interface": "Ethernet1"
+   }
+  },
+  {
+   "id": "l3_edges:leaf1[Ethernet2]--spine2[Ethernet1]",
+   "kind": "l3_edges",
+   "severity": "medium",
+   "description": "leaf1 Ethernet2 and spine2 Ethernet1 form a layer-3 edge on 10.1.0.2/31",
+   "params": {
+    "a_device": "leaf1",
+    "a_interface": "Ethernet2",
+    "b_device": "spine2",
+    "b_interface": "Ethernet1"
+   }
+  },
+  {
+   "id": "l3_edges:leaf2[Ethernet1]--spine1[Ethernet2]",
+   "kind": "l3_edges",
+   "severity": "medium",
+   "description": "leaf2 Ethernet1 and spine1 Ethernet2 form a layer-3 edge on 10.1.0.16/31",
+   "params": {
+    "a_device": "leaf2",
+    "a_interface": "Ethernet1",
+    "b_device": "spine1",
+    "b_interface": "Ethernet2"
+   }
+  },
+  {
+   "id": "l3_edges:leaf2[Ethernet2]--spine2[Ethernet2]",
+   "kind": "l3_edges",
+   "severity": "medium",
+   "description": "leaf2 Ethernet2 and spine2 Ethernet2 form a layer-3 edge on 10.1.0.18/31",
+   "params": {
+    "a_device": "leaf2",
+    "a_interface": "Ethernet2",
+    "b_device": "spine2",
+    "b_interface": "Ethernet2"
+   }
+  },
+  {
+   "id": "route_present:spine1:10.0.1.1/32",
+   "kind": "route_present",
+   "severity": "medium",
+   "description": "spine1 has a route to leaf1's loopback 10.0.1.1/32",
+   "params": {
+    "node": "spine1",
+    "prefix": "10.0.1.1/32",
+    "owner": "leaf1"
+   }
+  },
+  {
+   "id": "route_present:spine1:10.0.1.2/32",
+   "kind": "route_present",
+   "severity": "medium",
+   "description": "spine1 has a route to leaf2's loopback 10.0.1.2/32",
+   "params": {
+    "node": "spine1",
+    "prefix": "10.0.1.2/32",
+    "owner": "leaf2"
+   }
+  },
+  {
+   "id": "route_present:spine2:10.0.1.1/32",
+   "kind": "route_present",
+   "severity": "medium",
+   "description": "spine2 has a route to leaf1's loopback 10.0.1.1/32",
+   "params": {
+    "node": "spine2",
+    "prefix": "10.0.1.1/32",
+    "owner": "leaf1"
+   }
+  },
+  {
+   "id": "route_present:spine2:10.0.1.2/32",
+   "kind": "route_present",
+   "severity": "medium",
+   "description": "spine2 has a route to leaf2's loopback 10.0.1.2/32",
+   "params": {
+    "node": "spine2",
+    "prefix": "10.0.1.2/32",
+    "owner": "leaf2"
+   }
+  },
+  {
+   "id": "route_present:leaf1:10.0.0.1/32",
+   "kind": "route_present",
+   "severity": "medium",
+   "description": "leaf1 has a route to spine1's loopback 10.0.0.1/32",
+   "params": {
+    "node": "leaf1",
+    "prefix": "10.0.0.1/32",
+    "owner": "spine1"
+   }
+  },
+  {
+   "id": "route_present:leaf1:10.0.0.2/32",
+   "kind": "route_present",
+   "severity": "medium",
+   "description": "leaf1 has a route to spine2's loopback 10.0.0.2/32",
+   "params": {
+    "node": "leaf1",
+    "prefix": "10.0.0.2/32",
+    "owner": "spine2"
+   }
+  },
+  {
+   "id": "route_present:leaf1:10.0.1.2/32",
+   "kind": "route_present",
+   "severity": "medium",
+   "description": "leaf1 has a route to leaf2's loopback 10.0.1.2/32",
+   "params": {
+    "node": "leaf1",
+    "prefix": "10.0.1.2/32",
+    "owner": "leaf2"
+   }
+  },
+  {
+   "id": "route_present:leaf2:10.0.0.1/32",
+   "kind": "route_present",
+   "severity": "medium",
+   "description": "leaf2 has a route to spine1's loopback 10.0.0.1/32",
+   "params": {
+    "node": "leaf2",
+    "prefix": "10.0.0.1/32",
+    "owner": "spine1"
+   }
+  },
+  {
+   "id": "route_present:leaf2:10.0.0.2/32",
+   "kind": "route_present",
+   "severity": "medium",
+   "description": "leaf2 has a route to spine2's loopback 10.0.0.2/32",
+   "params": {
+    "node": "leaf2",
+    "prefix": "10.0.0.2/32",
+    "owner": "spine2"
+   }
+  },
+  {
+   "id": "route_present:leaf2:10.0.1.1/32",
+   "kind": "route_present",
+   "severity": "medium",
+   "description": "leaf2 has a route to leaf1's loopback 10.0.1.1/32",
+   "params": {
+    "node": "leaf2",
+    "prefix": "10.0.1.1/32",
+    "owner": "leaf1"
+   }
+  },
+  {
+   "id": "reachability:leaf1->leaf2",
+   "kind": "reachability",
+   "severity": "high",
+   "description": "traffic from leaf1 loopback 10.0.1.1 reaches leaf2 loopback 10.0.1.2",
+   "params": {
+    "src_device": "leaf1",
+    "src_ip": "10.0.1.1",
+    "dst_device": "leaf2",
+    "dst_ip": "10.0.1.2"
+   }
+  },
+  {
+   "id": "reachability:leaf2->leaf1",
+   "kind": "reachability",
+   "severity": "high",
+   "description": "traffic from leaf2 loopback 10.0.1.2 reaches leaf1 loopback 10.0.1.1",
+   "params": {
+    "src_device": "leaf2",
+    "src_ip": "10.0.1.2",
+    "dst_device": "leaf1",
+    "dst_ip": "10.0.1.1"
+   }
+  },
+  {
+   "id": "filter_denies:spine1:tcp/23",
+   "kind": "filter_denies",
+   "severity": "high",
+   "description": "spine1 drops tcp/23 to itself",
+   "params": {
+    "device": "spine1",
+    "ingress_interfaces": [
+     "Ethernet1",
+     "Ethernet2"
+    ],
+    "dst_ip": "10.0.0.1",
+    "protocol": "tcp",
+    "dst_port": 23,
+    "src_ips": "0.0.0.0/0"
+   }
+  },
+  {
+   "id": "filter_denies:spine2:tcp/23",
+   "kind": "filter_denies",
+   "severity": "high",
+   "description": "spine2 drops tcp/23 to itself",
+   "params": {
+    "device": "spine2",
+    "ingress_interfaces": [
+     "Ethernet1",
+     "Ethernet2"
+    ],
+    "dst_ip": "10.0.0.2",
+    "protocol": "tcp",
+    "dst_port": 23,
+    "src_ips": "0.0.0.0/0"
+   }
+  },
+  {
+   "id": "filter_denies:leaf1:tcp/23",
+   "kind": "filter_denies",
+   "severity": "high",
+   "description": "leaf1 drops tcp/23 to itself",
+   "params": {
+    "device": "leaf1",
+    "ingress_interfaces": [
+     "Ethernet1",
+     "Ethernet2"
+    ],
+    "dst_ip": "10.0.1.1",
+    "protocol": "tcp",
+    "dst_port": 23,
+    "src_ips": "0.0.0.0/0"
+   }
+  },
+  {
+   "id": "filter_denies:leaf2:tcp/23",
+   "kind": "filter_denies",
+   "severity": "high",
+   "description": "leaf2 drops tcp/23 to itself",
+   "params": {
+    "device": "leaf2",
+    "ingress_interfaces": [
+     "Ethernet1",
+     "Ethernet2"
+    ],
+    "dst_ip": "10.0.1.2",
+    "protocol": "tcp",
+    "dst_port": 23,
+    "src_ips": "0.0.0.0/0"
+   }
+  },
+  {
+   "id": "no_forwarding_loops",
+   "kind": "no_forwarding_loops",
+   "severity": "high",
+   "description": "no forwarding loops anywhere",
+   "params": {}
+  }
+ ]
+}

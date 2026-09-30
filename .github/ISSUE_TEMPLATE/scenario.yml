@@ -1,0 +1,22 @@
+name: Benchmark scenario
+description: Propose a scenario for the benchmark (CC BY 4.0)
+labels: [benchmark]
+body:
+  - type: textarea
+    id: request
+    attributes:
+      label: The request, in plain language
+    validations: { required: true }
+  - type: textarea
+    id: intent
+    attributes:
+      label: Ground-truth intent (YAML)
+      render: yaml
+    validations: { required: true }
+  - type: checkboxes
+    id: licence
+    attributes:
+      label: Licence
+      options:
+        - label: I agree to license this scenario under CC BY 4.0
+          required: true

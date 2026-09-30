@@ -1,0 +1,18 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":semanticCommitTypeAll(chore)", "helpers:pinGitHubActionDigests"],
+  "labels": ["dependencies"],
+  "lockFileMaintenance": { "enabled": true, "schedule": ["before 6am on monday"] },
+  "packageRules": [
+    {
+      "description": "The Batfish image and pybatfish move together; review them as one change.",
+      "groupName": "batfish",
+      "matchPackageNames": ["batfish/allinone", "pybatfish"]
+    },
+    {
+      "description": "Freeze during the judging window: the submitted build must not drift.",
+      "matchBaseBranches": ["release/v0.1-hackathon"],
+      "enabled": false
+    }
+  ]
+}

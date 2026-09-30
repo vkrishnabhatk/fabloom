@@ -1,0 +1,20 @@
+name: Bug report
+description: Something fabloom does wrong
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what you expected
+    validations: { required: true }
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: The request text or scenario id, platform, and `fabloom version` output. Remove any secrets from configs first.
+    validations: { required: true }
+  - type: textarea
+    id: events
+    attributes:
+      label: Relevant lines from runs/<run_id>/events.jsonl
+      render: json

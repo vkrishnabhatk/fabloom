@@ -1,0 +1,43 @@
+name: nightly
+
+# A model ID retired, or a hosted model silently changing behaviour, during the 1-15 December
+# judging window would otherwise go unnoticed until a judge hit it (architecture §7, risks).
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  doctor:
+    name: fabloom doctor (every configured model exists and answers JSON)
+    runs-on: ubuntu-latest
+    environment: token-factory
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.24"
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: uv sync --frozen
+      - run: uv run fabloom doctor
+        env:
+          FABLOOM_TOKEN_FACTORY_API_KEY: ${{ secrets.TOKEN_FACTORY_API_KEY }}
+
+  live-tests:
+    name: llm/sandbox-marked tests
+    runs-on: ubuntu-latest
+    environment: token-factory
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.24"
+      - run: uv sync --frozen --extra batfish
+      # Exit code 5 = no tests collected; expected until week 2 adds live suites.
+      - run: uv run pytest -m "llm or sandbox" || [ $? -eq 5 ]
+        env:
+          FABLOOM_TOKEN_FACTORY_API_KEY: ${{ secrets.TOKEN_FACTORY_API_KEY }}

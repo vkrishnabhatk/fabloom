@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     batfish_host: str = "localhost"
     log_level: str = "INFO"
     log_json: bool = True
+    # SQLite store plus ./mlruns artifacts; both are backed up off the VM (architecture §11).
+    mlflow_tracking_uri: str = "sqlite:///mlflow.db"
+    mlflow_artifact_root: Path = Path("mlruns")
 
 
 def resolve(path: str | Path, base: Path = REPO_ROOT) -> Path:
@@ -100,6 +103,68 @@ class RunConfig(BaseModel):
 
     budget: RunBudget = RunBudget()
     repair_candidates: int = Field(default=1, ge=1, le=8)
+    # The benchmark turns this off: nothing grades the explanation, so it would only add cost.
+    explain_with_model: bool = True
+
+
+class ArmSpec(BaseModel):
+    """One benchmark arm: a routing override plus run-limit overrides."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    description: str
+    roles: dict[ModelRole, str] = Field(default_factory=dict)
+    max_repair_rounds: int | None = Field(default=None, ge=0)  # None: conf/fabloom.yaml's
+
+    def models(self, base: ModelsConfig) -> ModelsConfig:
+        unknown = sorted(set(self.roles.values()) - set(base.models))
+        if unknown:
+            raise ValueError(f"arm routes to models not in conf/models.yaml: {unknown}")
+        return base.model_copy(update={"roles": {**base.roles, **self.roles}})
+
+    def run_config(self, base: RunConfig) -> RunConfig:
+        budget = base.budget
+        if self.max_repair_rounds is not None:
+            budget = budget.model_copy(update={"max_repair_rounds": self.max_repair_rounds})
+        return base.model_copy(update={"budget": budget, "explain_with_model": False})
+
+
+class RegressionGateSpec(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    metrics: list[str] = Field(default_factory=lambda: ["final_pass_rate"])
+    max_drop: float = Field(default=0.10, ge=0, le=1)
+
+
+class GroundingGateSpec(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    arm: str = "super-repair-grounding"
+    control: str = "super-repair"
+    min_gain: float = Field(default=0.05, ge=0, le=1)
+    max_cost_ratio: float = Field(default=1.5, gt=0)
+
+
+class GatesSpec(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    regression: RegressionGateSpec = RegressionGateSpec()
+    grounding: GroundingGateSpec = GroundingGateSpec()
+
+
+class NightlySpec(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    arms: list[str] = Field(default_factory=lambda: ["routed"])
+    scenarios: int = Field(default=10, ge=1)
+
+
+class BenchConfig(BaseModel):
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    arms: dict[str, ArmSpec]
+    gates: GatesSpec = GatesSpec()
+    nightly: NightlySpec = NightlySpec()
 
 
 def models_config(conf_dir: Path | None = None) -> ModelsConfig:
@@ -108,3 +173,7 @@ def models_config(conf_dir: Path | None = None) -> ModelsConfig:
 
 def run_config(conf_dir: Path | None = None) -> RunConfig:
     return RunConfig.model_validate(load_config("fabloom", conf_dir).get("run", {}))
+
+
+def bench_config(conf_dir: Path | None = None) -> BenchConfig:
+    return BenchConfig.model_validate(load_config("bench", conf_dir))

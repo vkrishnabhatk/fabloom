@@ -5,7 +5,7 @@ Thanks for helping. Fabloom is Apache-2.0 (code) and CC BY 4.0 (benchmark scenar
 ## Setup
 
 ```bash
-make install        # uv sync --frozen --extra batfish, plus pre-commit hooks
+make install        # uv sync --frozen --extra batfish --extra eval, plus pre-commit hooks
 make check          # what CI runs: ruff, mypy --strict, import-linter, tests + coverage gate
 make batfish-up     # optional: a local Batfish for `fabloom generate`
 ```

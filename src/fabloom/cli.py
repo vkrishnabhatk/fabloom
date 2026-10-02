@@ -13,9 +13,25 @@ from fabloom import __version__
 from fabloom.agent import RunMachine, RunRequest, RunResult, tail_events
 from fabloom.agent.events import EVENTS_FILE, read_events
 from fabloom.checks import allocate, compile_checks
-from fabloom.config import Settings, models_config, run_config
+from fabloom.config import REPO_ROOT, Settings, bench_config, models_config, run_config
 from fabloom.contracts import Platform, RunBudget, Verifier
 from fabloom.contracts.run import RunEvent
+from fabloom.eval import (
+    BenchMismatchError,
+    BenchResults,
+    BenchRunner,
+    MlflowTracker,
+    RunRecord,
+    all_passed,
+    collect,
+    evaluate,
+    resolve_arms,
+    select_scenarios,
+    worst_case_usd,
+    write_report,
+)
+from fabloom.eval.gates import Gate
+from fabloom.eval.runner import RESULTS_FILE
 from fabloom.llm import ModelRouter, TokenFactoryClient
 from fabloom.llm.prompts import render_plan
 from fabloom.log import configure_logging
@@ -25,6 +41,13 @@ from fabloom.scenarios import DEFAULT_BENCHMARK_DIR, load_scenario, load_scenari
 app = typer.Typer(no_args_is_help=True, add_completion=False, help=__doc__)
 scenarios_app = typer.Typer(no_args_is_help=True, help="Benchmark scenario tools.")
 app.add_typer(scenarios_app, name="scenarios")
+bench_app = typer.Typer(
+    no_args_is_help=True, help="Benchmark: arms x scenarios, tracked, gated and reported."
+)
+app.add_typer(bench_app, name="bench")
+
+BASELINES_DIR = REPO_ROOT / "benchmark" / "baselines"
+REPORT_FILE = "report.md"
 
 
 def _echo_json(obj: object) -> None:
@@ -178,6 +201,209 @@ def events(
     else:
         for e in read_events(path):
             typer.echo(format_event(e))
+
+
+def _baseline_path(benchmark: str) -> Path:
+    return BASELINES_DIR / f"{benchmark}.json"
+
+
+def _load_baseline(path: Path | None, benchmark: str) -> BenchResults | None:
+    path = path or _baseline_path(benchmark)
+    return BenchResults.read(path) if path.exists() else None
+
+
+def _print_gates(gates: list[Gate]) -> None:
+    colours = {"passed": typer.colors.GREEN, "failed": typer.colors.RED}
+    for g in gates:
+        mark = typer.style(f"{g.status:<7}", fg=colours.get(g.status, typer.colors.YELLOW))
+        typer.echo(f"{mark} {g.label}: {g.detail}")
+
+
+def _finish_bench(
+    out: Path,
+    results: BenchResults,
+    *,
+    settings: Settings,
+    baseline: Path | None,
+    report: Path | None,
+    track: bool,
+    check_gates: bool,
+) -> None:
+    """Shared tail of `bench run` and `bench report`: report, gates, tracking, exit code."""
+    gates = evaluate(
+        results,
+        _load_baseline(baseline, results.meta.benchmark),
+        bench_config(settings.conf_dir).gates,
+    )
+    report_path = report or out / REPORT_FILE
+    write_report(report_path, results, gates, source=str(out))
+    for arm, s in results.summaries().items():
+        typer.echo(
+            f"{arm:<16} first-pass {s.first_passed}/{s.n}  final {s.passed}/{s.n}  "
+            f"${s.usd_total:.4f}"
+        )
+    _print_gates(gates)
+    typer.echo(f"report: {report_path}")
+    if track:
+        try:
+            tracker = MlflowTracker(settings.mlflow_tracking_uri, settings.mlflow_artifact_root)
+        except ImportError as exc:
+            typer.secho(f"not tracked: {exc}", fg=typer.colors.YELLOW, err=True)
+        else:
+            created = tracker.log_bench(results, report_path)
+            typer.echo(f"mlflow: {created} run(s) logged to {settings.mlflow_tracking_uri}")
+    if check_gates and not all_passed(gates):
+        raise typer.Exit(1)
+
+
+@bench_app.command("run")
+def bench_run(  # noqa: PLR0917 - one parameter per CLI option
+    arm: Annotated[
+        list[str] | None, typer.Option(help="Arm from conf/bench.yaml (repeatable). Default: all.")
+    ] = None,
+    scenario: Annotated[list[str] | None, typer.Option(help="Scenario ID (repeatable).")] = None,
+    family: Annotated[list[str] | None, typer.Option(help="Family glob (repeatable).")] = None,
+    limit: Annotated[
+        int | None, typer.Option(min=1, help="At most N scenarios, taking families in turn.")
+    ] = None,
+    nightly: Annotated[
+        bool, typer.Option(help="The nightly subset and arms from conf/bench.yaml.")
+    ] = False,
+    scenarios_dir: Annotated[Path, typer.Option(file_okay=False)] = DEFAULT_BENCHMARK_DIR,
+    out: Annotated[
+        Path | None, typer.Option(help="Bench directory; an existing one is resumed.")
+    ] = None,
+    concurrency: Annotated[
+        int, typer.Option(min=1, help="Runs in flight. Keep 1 for a single local Batfish.")
+    ] = 1,
+    baseline: Annotated[Path | None, typer.Option(dir_okay=False)] = None,
+    report: Annotated[Path | None, typer.Option(dir_okay=False)] = None,
+    track: Annotated[bool, typer.Option(help="Log to MLflow.")] = True,
+    check_gates: Annotated[bool, typer.Option(help="Exit 1 unless every gate passes.")] = False,
+    dry_run: Annotated[
+        bool, typer.Option(help="Show the matrix and worst-case spend, run nothing.")
+    ] = False,
+) -> None:
+    """Run arms x scenarios through the real loop, then report, gate and track."""
+    settings = Settings()
+    configure_logging(settings.log_level, settings.log_json)
+    bench = bench_config(settings.conf_dir)
+    arms_wanted = arm or []
+    if nightly:
+        arms_wanted = arms_wanted or bench.nightly.arms
+        limit = limit or bench.nightly.scenarios
+    try:
+        arms = resolve_arms(
+            bench, models_config(settings.conf_dir), run_config(settings.conf_dir), arms_wanted
+        )
+        scenarios = select_scenarios(
+            load_scenarios(scenarios_dir), ids=scenario or (), families=family or (), limit=limit
+        )
+    except ValueError as exc:
+        typer.secho(str(exc), fg=typer.colors.RED, err=True)
+        raise typer.Exit(2) from exc
+    if not scenarios:
+        typer.secho("no scenarios selected", fg=typer.colors.RED, err=True)
+        raise typer.Exit(2)
+    typer.echo(
+        f"{len(arms)} arm(s) x {len(scenarios)} scenario(s) = {len(arms) * len(scenarios)} runs; "
+        f"worst case ${worst_case_usd(arms, scenarios):.2f} (sum of run caps)"
+    )
+    if dry_run:
+        for a in arms:
+            typer.echo(f"  {a.name:<16} {a.spec.description}")
+        for s in scenarios:
+            typer.echo(f"  {s.id}")
+        return
+
+    done = 0
+    total = len(arms) * len(scenarios)
+
+    def progress(r: RunRecord, reused: bool) -> None:
+        nonlocal done
+        done += 1
+        tag = " (reused)" if reused else ""
+        typer.echo(
+            f"[{done:>3}/{total}] {r.arm:<16} {r.scenario_id:<36} {r.outcome:<9} "
+            f"first-pass={str(r.first_pass).lower():<5} rounds={r.repair_rounds} "
+            f"${r.cost_usd:.4f}{tag}"
+        )
+
+    runner = BenchRunner(
+        client=build_client(settings),
+        verifier=build_verifier(settings),
+        arms=arms,
+        scenarios=scenarios,
+        out_dir=out,
+        bench_root=settings.runs_dir / "bench",
+        benchmark=scenarios_dir.name,
+        concurrency=concurrency,
+        on_record=progress,
+    )
+    try:
+        results = asyncio.run(runner.run())
+    except BenchMismatchError as exc:
+        typer.secho(str(exc), fg=typer.colors.RED, err=True)
+        raise typer.Exit(2) from exc
+    typer.echo(f"bench dir: {runner.out_dir}")
+    _finish_bench(
+        runner.out_dir,
+        results,
+        settings=settings,
+        baseline=baseline,
+        report=report,
+        track=track,
+        check_gates=check_gates,
+    )
+
+
+@bench_app.command("report")
+def bench_report(
+    bench_dir: Annotated[Path, typer.Argument(exists=True, file_okay=False)],
+    baseline: Annotated[Path | None, typer.Option(dir_okay=False)] = None,
+    report: Annotated[
+        Path | None,
+        typer.Option(dir_okay=False, help="e.g. docs/benchmark/v0.1.md to publish."),
+    ] = None,
+    track: Annotated[bool, typer.Option(help="Log to MLflow (skips arms already logged).")] = False,
+    check_gates: Annotated[bool, typer.Option(help="Exit 1 unless every gate passes.")] = False,
+) -> None:
+    """Rebuild results, gates and the report from a bench directory's event logs. No model."""
+    settings = Settings()
+    results = collect(bench_dir)
+    results.write(bench_dir / RESULTS_FILE)
+    _finish_bench(
+        bench_dir,
+        results,
+        settings=settings,
+        baseline=baseline,
+        report=report,
+        track=track,
+        check_gates=check_gates,
+    )
+
+
+@bench_app.command("baseline")
+def bench_baseline(
+    bench_dir: Annotated[Path, typer.Argument(exists=True, file_okay=False)],
+    to: Annotated[Path | None, typer.Option(dir_okay=False)] = None,
+    force: Annotated[bool, typer.Option(help="Replace an existing baseline.")] = False,
+) -> None:
+    """Freeze a finished bench as the baseline the regression gate compares against."""
+    results = collect(bench_dir)
+    if results.incomplete:
+        typer.secho(
+            f"{len(results.incomplete)} run(s) unfinished; resume the bench first",
+            fg=typer.colors.RED,
+            err=True,
+        )
+        raise typer.Exit(2)
+    path = to or _baseline_path(results.meta.benchmark)
+    if path.exists() and not force:
+        typer.secho(f"{path} exists; pass --force to replace it", fg=typer.colors.RED, err=True)
+        raise typer.Exit(2)
+    results.write(path)
+    typer.echo(f"baseline {results.meta.bench_id} frozen at {path}")
 
 
 @app.command()

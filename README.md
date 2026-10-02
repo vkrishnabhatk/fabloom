@@ -10,10 +10,13 @@ passes, or an honest report of what could not be fixed.
 
 ## Results
 
-**No benchmark numbers yet.** The v0.1 benchmark (40–60 scenarios, seven ablation arms: raw
-Nano/Super/Ultra, verify-only, repair loop, repair + doc grounding, routed) runs in week 2.
-Its report will be generated into `docs/benchmark/v0.1.md`, with every number annotated with
-how it was measured and negative results included.
+**No benchmark numbers yet.** The harness is built and tested offline; it has not run
+against real models or a real Batfish. The v0.1 benchmark (40–60 scenarios) compares five
+arms from `conf/bench.yaml`: raw Nano, Super and Ultra, Super with the repair loop, and the
+routed product. The verify-only result is the repair arm's first-pass rate; repair + doc
+grounding is added with the Tavily step. Its report is generated into
+`docs/benchmark/v0.1.md`, with every number annotated with how it was measured and negative
+results included.
 
 What exists and is tested today (offline, `make check`):
 
@@ -23,6 +26,7 @@ What exists and is tested today (offline, `make check`):
 | Run state machine, budget, event log | Tested with scripted models and verifiers; golden path end to end |
 | Token Factory client | Strict JSON output, retries, refusal/truncation detection, cost accounting, secret scrubbing |
 | Batfish verifier | Question mapping tested against **synthetic** answers only; real recordings come from the week-0 spike |
+| Benchmark harness | Arms x scenarios through the real loop, resumable; records derived from event logs; MLflow tracking; regression and grounding gates; generated report |
 | Nebius Sandboxes backend | Not built. Spike script ready (`spikes/batfish_in_sandbox.py`) |
 
 ## The one rule
@@ -52,16 +56,21 @@ what this release targets. L0 means nothing could be checked.
 ## Quick start
 
 ```bash
-make install                     # uv sync --frozen --extra batfish + pre-commit
+make install                     # uv sync --frozen --extra batfish --extra eval + pre-commit
 cp .env.example .env             # add FABLOOM_TOKEN_FACTORY_API_KEY
 make batfish-up                  # local Batfish on :9996
 
 uv run fabloom plan benchmark/v0.1/leaf-spine-ebgp-0004.yaml    # no model, no network
 uv run fabloom generate "2 spines, 4 leaves, eBGP underlay, one private ASN per leaf" --platform frr
 uv run fabloom doctor            # every configured Nemotron model exists and answers JSON
+
+uv run fabloom bench run --dry-run                 # the arm x scenario matrix and its worst-case spend
+uv run fabloom bench run --arm super-repair        # runs, reports, gates, logs to MLflow
+uv run fabloom bench report runs/bench/<id> --report docs/benchmark/v0.1.md   # no model
 ```
 
-Models, prices and routing: `conf/models.yaml`. Run budget: `conf/fabloom.yaml`.
+Models, prices and routing: `conf/models.yaml`. Run budget: `conf/fabloom.yaml`. Benchmark
+arms and gates: `conf/bench.yaml`.
 
 ## Known limitations
 

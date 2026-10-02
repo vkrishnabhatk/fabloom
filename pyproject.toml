@@ -34,6 +34,14 @@ dependencies = [
 # The Batfish client is only needed where Batfish is actually driven: the local
 # backend and the verifier image. Kept optional so `pip install fabloom` stays light.
 batfish = ["pybatfish>=2024.10.30"]
+# Benchmark tracking (`fabloom bench`). mlflow-skinny plus the two packages its SQLite store
+# needs: full mlflow would add pandas, scikit-learn, Flask and more just to write mlflow.db, and
+# skinny alone only offers the file store, which MLflow 3 has put in maintenance mode.
+eval = [
+    "alembic>=1.13",
+    "mlflow-skinny>=3.16",
+    "sqlalchemy>=2.0",
+]
 
 [project.scripts]
 fabloom = "fabloom.cli:app"

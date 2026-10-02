@@ -33,6 +33,7 @@ forbidden_modules =
     fabloom.scenarios
     fabloom.metrics
     fabloom.log
+    fabloom.eval
     fabloom.cli
 
 [importlinter:contract:checks-are-deterministic]
@@ -50,6 +51,7 @@ forbidden_modules =
     fabloom.scenarios
     fabloom.metrics
     fabloom.log
+    fabloom.eval
     fabloom.cli
 
 [importlinter:contract:scrub-is-standalone]
@@ -64,6 +66,7 @@ forbidden_modules =
     fabloom.llm
     fabloom.agent
     fabloom.config
+    fabloom.eval
     fabloom.cli
 
 [importlinter:contract:only-the-cli-composes]
@@ -76,5 +79,24 @@ source_modules =
     fabloom.llm
     fabloom.agent
     fabloom.scrub
+    fabloom.eval
 forbidden_modules =
     fabloom.cli
+
+[importlinter:contract:eval-measures-not-grades]
+name = The benchmark is handed a verifier like the agent is: eval never imports verify
+type = forbidden
+source_modules =
+    fabloom.eval
+forbidden_modules =
+    fabloom.verify
+
+[importlinter:contract:eval-is-on-top]
+name = Planes below the benchmark never import it
+type = forbidden
+source_modules =
+    fabloom.verify
+    fabloom.llm
+    fabloom.agent
+forbidden_modules =
+    fabloom.eval

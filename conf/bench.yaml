@@ -1,0 +1,48 @@
+# Benchmark arms and gates (`fabloom bench`, architecture §8).
+#
+# Every arm grades against the scenario's ground-truth intent, never the planner's reading of
+# the request, so arms differ only in who writes and repairs the configs. Model names refer to
+# conf/models.yaml; `roles` overrides that file's routing for this arm only.
+#
+# "Super + verify-only" from the architecture is not a separate arm: its pass rate is the
+# first-pass rate of super-repair, which the report already shows.
+# "Super + repair + Tavily grounding" lands with llm/grounding.py; until then the grounding
+# gate below is reported as skipped.
+
+arms:
+  nano-raw:
+    description: Nano writes the configs once; no repair.
+    roles: {generator: nano}
+    max_repair_rounds: 0
+  super-raw:
+    description: Super writes the configs once; no repair.
+    roles: {generator: super}
+    max_repair_rounds: 0
+  ultra-raw:
+    description: Ultra writes the configs once; no repair.
+    roles: {generator: ultra}
+    max_repair_rounds: 0
+  super-repair:
+    description: Super writes, Batfish verifies, Super repairs; never escalates.
+    roles: {generator: super, repairer: super, repairer_escalated: super}
+  routed:
+    description: The product's routing from conf/models.yaml, Ultra on repeated failure.
+    roles: {}
+
+gates:
+  regression:
+    # Compared per arm on the scenarios both runs share, against the frozen baseline.
+    # On a 10-scenario nightly one scenario is 10 points, so 0.10 tolerates one flip.
+    metrics: [final_pass_rate, first_pass_rate]
+    max_drop: 0.10
+  grounding:
+    # Grounding ships only if it lifts the final pass rate without blowing up the cost.
+    arm: super-repair-grounding
+    control: super-repair
+    min_gain: 0.05
+    max_cost_ratio: 1.5
+
+# `fabloom bench run --nightly`: a small, family-balanced subset on one arm.
+nightly:
+  arms: [routed]
+  scenarios: 10

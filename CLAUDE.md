@@ -8,6 +8,7 @@ before structural changes. Decisions live in `docs/decisions/`.
 - `make check`: ruff, mypy --strict (src + tests), import-linter, tests with the 80% coverage gate
 - `make test`: offline tests only (`-m "unit or integration"`); never needs network or credits
 - `uv run fabloom plan benchmark/v0.1/<id>.yaml`: deterministic plan + checks, no model
+- `uv run fabloom bench run --dry-run`: benchmark arms x scenarios and worst-case spend, no model
 
 ## Rules
 
@@ -18,6 +19,8 @@ before structural changes. Decisions live in `docs/decisions/`.
 - Checks are compiled from the intent (`checks/compile.py`); nothing a model outputs may
   alter a check or its evaluation.
 - Every model call and every verifier execution goes through `agent/budget.py`.
+- `eval/` never imports `verify/`; benchmark numbers are derived from run event logs only
+  (ADR-0007).
 - Model IDs and prices live in `conf/models.yaml`, never in code (ADR-0005).
 - Tests must pass offline: use `tests/fakes` (FakeVerifier, FakeChatClient, synthetic Batfish
   answers) and `httpx2.MockTransport` for the Token Factory client. openai 3.x uses httpx2,

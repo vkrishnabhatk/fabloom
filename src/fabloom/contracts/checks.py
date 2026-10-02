@@ -102,6 +102,7 @@ class VerificationReport(BaseModel):
             "failed": [c.id for c in self.failed_checks],
             "unrecognized_lines": len(self.unrecognized_lines),
             "verifier": self.verifier_name,
+            "backend_executed": self.backend_executed,
             "duration_ms": self.duration_ms,
         }
 

@@ -299,7 +299,8 @@ class RunMachine:
             run.transition(final, reason=stop_reason or "")
             run.transition(S.EXPLAINING)
             # Once the budget has stopped the run, explaining it must not spend more.
-            await run.explain(outcome, stop_reason, use_model=not budget_stop)
+            use_model = self.run_config.explain_with_model and not budget_stop
+            await run.explain(outcome, stop_reason, use_model=use_model)
             run.transition(S.DONE)
             r.outcome = outcome
         except Exception as exc:

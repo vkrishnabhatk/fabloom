@@ -115,6 +115,19 @@ async def test_repairs_until_pass_and_keeps_best(
     assert "Failed checks" in client.calls[1][1][1]["content"]
 
 
+async def test_explain_with_model_off_spends_nothing_on_the_explanation(
+    frr_intent: Intent, frr_fabric: FabricPlan, router: ModelRouter, runs_dir: Path
+) -> None:
+    rc = RunConfig(budget=RunBudget(max_usd=1.0), explain_with_model=False)
+    machine, client = _machine(
+        [_blocks(frr_intent, frr_fabric)], FakeVerifier([0]), router, runs_dir, rc
+    )
+    result = await machine.run(RunRequest("x" * 10, intent=frr_intent))
+    assert result.outcome == "passed"
+    assert [m for m, _ in client.calls] == [router.spec(ModelRole.GENERATOR).id]
+    assert result.explanation.startswith("Level L2")
+
+
 async def test_exhausts_after_max_rounds_with_deterministic_fallback(
     frr_intent: Intent,
     frr_fabric: FabricPlan,

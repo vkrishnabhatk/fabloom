@@ -1,0 +1,19 @@
+# Fabloom benchmark v0.1. CC BY 4.0, see benchmark/LICENSE.
+id: leaf-spine-ebgp-0011
+family: leaf-spine-ebgp
+request: Build me a 4-spine, 12-leaf FRR fabric with an eBGP underlay on point-to-point /31 links. Spines
+  share AS 65000; leaves get one ASN each. Loopbacks advertised.
+intent:
+  platform: frr
+  topology:
+    spines: 4
+    leaves: 12
+  bgp_mode: numbered
+  asn:
+    spine_asn: 65000
+    leaf_asn_base: 65101
+  addressing:
+    loopback_pool: 10.0.0.0/23
+    p2p_pool: 10.1.0.0/16
+  advertise_loopbacks: true
+  filters: []

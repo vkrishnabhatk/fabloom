@@ -1,0 +1,25 @@
+# Fabloom benchmark v0.1. CC BY 4.0, see benchmark/LICENSE.
+id: leaf-spine-filters-0007
+family: leaf-spine-filters
+request: 'Arista EOS, 2 spines and 2 leaves, eBGP underlay. Only leaf1 needs protecting: deny SSH to it
+  from outside 10.0.0.0/8. Loopbacks advertised.'
+intent:
+  platform: arista_eos
+  topology:
+    spines: 2
+    leaves: 2
+  bgp_mode: numbered
+  asn:
+    spine_asn: 65000
+    leaf_asn_base: 65101
+  addressing:
+    loopback_pool: 10.0.0.0/23
+    p2p_pool: 10.1.0.0/16
+  advertise_loopbacks: true
+  filters:
+  - action: deny
+    devices: leaf1
+    protocol: tcp
+    dst_port: 22
+    src_not_in: 10.0.0.0/8
+notes: One device matches; the other leaf must stay unfiltered.

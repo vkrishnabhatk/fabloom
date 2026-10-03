@@ -1,0 +1,19 @@
+# Fabloom benchmark v0.1. CC BY 4.0, see benchmark/LICENSE.
+id: leaf-spine-eos-0007
+family: leaf-spine-eos
+request: 'Arista EOS data-centre fabric: 4 spines, 8 leaves, eBGP underlay over /31 point-to-point links.
+  Spine ASN 65000, leaves each get one. Advertise loopbacks.'
+intent:
+  platform: arista_eos
+  topology:
+    spines: 4
+    leaves: 8
+  bgp_mode: numbered
+  asn:
+    spine_asn: 65000
+    leaf_asn_base: 65101
+  addressing:
+    loopback_pool: 10.0.0.0/23
+    p2p_pool: 10.1.0.0/16
+  advertise_loopbacks: true
+  filters: []

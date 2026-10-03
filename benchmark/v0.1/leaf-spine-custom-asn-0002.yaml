@@ -1,0 +1,19 @@
+# Fabloom benchmark v0.1. CC BY 4.0, see benchmark/LICENSE.
+id: leaf-spine-custom-asn-0002
+family: leaf-spine-custom-asn
+request: Arista EOS, 2 spines and 4 leaves. Spines use AS 64600 and the leaves start at AS 64701. eBGP
+  underlay over /31s, advertise loopbacks.
+intent:
+  platform: arista_eos
+  topology:
+    spines: 2
+    leaves: 4
+  bgp_mode: numbered
+  asn:
+    spine_asn: 64600
+    leaf_asn_base: 64701
+  addressing:
+    loopback_pool: 10.0.0.0/23
+    p2p_pool: 10.1.0.0/16
+  advertise_loopbacks: true
+  filters: []

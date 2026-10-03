@@ -1,0 +1,20 @@
+# Fabloom benchmark v0.1. CC BY 4.0, see benchmark/LICENSE.
+id: leaf-spine-custom-asn-0003
+family: leaf-spine-custom-asn
+request: FRR, 2 spines and 4 leaves. Put the spines in AS 65500 and number the leaves from AS 65001. eBGP
+  underlay, loopbacks advertised.
+intent:
+  platform: frr
+  topology:
+    spines: 2
+    leaves: 4
+  bgp_mode: numbered
+  asn:
+    spine_asn: 65500
+    leaf_asn_base: 65001
+  addressing:
+    loopback_pool: 10.0.0.0/23
+    p2p_pool: 10.1.0.0/16
+  advertise_loopbacks: true
+  filters: []
+notes: 'Spine ASN above the leaf range: catches configs that assume spines sort first.'

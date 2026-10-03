@@ -1,0 +1,19 @@
+# Fabloom benchmark v0.1. CC BY 4.0, see benchmark/LICENSE.
+id: leaf-spine-ebgp-0009
+family: leaf-spine-ebgp
+request: FRR underlay with a single spine and four leaves, eBGP over /31s. Spine is AS 65000, every leaf
+  its own private AS. All loopbacks advertised.
+intent:
+  platform: frr
+  topology:
+    spines: 1
+    leaves: 4
+  bgp_mode: numbered
+  asn:
+    spine_asn: 65000
+    leaf_asn_base: 65101
+  addressing:
+    loopback_pool: 10.0.0.0/23
+    p2p_pool: 10.1.0.0/16
+  advertise_loopbacks: true
+  filters: []

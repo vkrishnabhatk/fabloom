@@ -1,0 +1,20 @@
+# Fabloom benchmark v0.1. CC BY 4.0, see benchmark/LICENSE.
+id: leaf-spine-unnumbered-0008
+family: leaf-spine-unnumbered
+request: 4 spines, 8 leaves on FRR with interface-based (unnumbered) eBGP peering. Spines share AS 65000,
+  each leaf has its own AS. Loopbacks advertised.
+intent:
+  platform: frr
+  topology:
+    spines: 4
+    leaves: 8
+  bgp_mode: unnumbered
+  asn:
+    spine_asn: 65000
+    leaf_asn_base: 65101
+  addressing:
+    loopback_pool: 10.0.0.0/23
+    p2p_pool: 10.1.0.0/16
+  advertise_loopbacks: true
+  filters: []
+notes: Needs batfish/layer1_topology.json or sessions silently stay down (arch. risk register).

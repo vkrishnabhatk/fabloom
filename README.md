@@ -22,7 +22,7 @@ What exists and is tested today (offline, `make check`):
 
 | Piece | State |
 |---|---|
-| Deterministic fabric plan + check compiler | 20 pilot scenarios compile; allocator property-tested (no overlaps, order-independent, never renumbers) |
+| Deterministic fabric plan + check compiler | 49 v0.1 scenarios in 7 families (23 on Arista EOS) compile; allocator property-tested (no overlaps, order-independent, never renumbers) |
 | Run state machine, budget, event log | Tested with scripted models and verifiers; golden path end to end |
 | Token Factory client | Strict JSON output, retries, refusal/truncation detection, cost accounting, secret scrubbing |
 | Batfish verifier | Question mapping tested against **synthetic** answers only; real recordings come from the week-0 spike |
@@ -85,7 +85,8 @@ arms and gates: `conf/bench.yaml`.
   recordings, which `tests/integration/test_recorded_fixtures.py` then replays.
 - **FRR packaging for Batfish** (Cumulus concatenated format) is unconfirmed against a live
   server.
-- Leaf-spine eBGP underlays only: FRR and Arista EOS, numbered and unnumbered.
+- Leaf-spine eBGP underlays only: FRR and Arista EOS numbered, FRR unnumbered. The EOS
+  generator rules have no unnumbered peering yet, so no EOS scenario uses it.
 
 ## Privacy
 

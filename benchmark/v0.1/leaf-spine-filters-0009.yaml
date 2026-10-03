@@ -1,0 +1,29 @@
+# Fabloom benchmark v0.1. CC BY 4.0, see benchmark/LICENSE.
+id: leaf-spine-filters-0009
+family: leaf-spine-filters
+request: Arista EOS with 4 spines and 8 leaves, eBGP underlay. Deny SSH to the spines from outside 10.0.0.0/8
+  and block TFTP (udp 69) to the leaves entirely. Loopbacks advertised.
+intent:
+  platform: arista_eos
+  topology:
+    spines: 4
+    leaves: 8
+  bgp_mode: numbered
+  asn:
+    spine_asn: 65000
+    leaf_asn_base: 65101
+  addressing:
+    loopback_pool: 10.0.0.0/23
+    p2p_pool: 10.1.0.0/16
+  advertise_loopbacks: true
+  filters:
+  - action: deny
+    devices: spine*
+    protocol: tcp
+    dst_port: 22
+    src_not_in: 10.0.0.0/8
+  - action: deny
+    devices: leaf*
+    protocol: udp
+    dst_port: 69
+    src_not_in: null

@@ -1,0 +1,20 @@
+# Fabloom benchmark v0.1. CC BY 4.0, see benchmark/LICENSE.
+id: leaf-spine-unnumbered-0007
+family: leaf-spine-unnumbered
+request: 'FRR leaf-spine with 2 spines and 6 leaves using unnumbered eBGP: the fabric links have no IPv4
+  addresses. Spines AS 65000, per-leaf ASNs. Advertise all loopbacks.'
+intent:
+  platform: frr
+  topology:
+    spines: 2
+    leaves: 6
+  bgp_mode: unnumbered
+  asn:
+    spine_asn: 65000
+    leaf_asn_base: 65101
+  addressing:
+    loopback_pool: 10.0.0.0/23
+    p2p_pool: 10.1.0.0/16
+  advertise_loopbacks: true
+  filters: []
+notes: Needs batfish/layer1_topology.json or sessions silently stay down (arch. risk register).

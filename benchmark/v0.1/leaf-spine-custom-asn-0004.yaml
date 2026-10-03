@@ -1,0 +1,20 @@
+# Fabloom benchmark v0.1. CC BY 4.0, see benchmark/LICENSE.
+id: leaf-spine-custom-asn-0004
+family: leaf-spine-custom-asn
+request: EOS fabric, 2 spines and 4 leaves. Spines are AS 64512; leaves take AS 65531 through 65534. eBGP
+  on /31s, advertise all loopbacks.
+intent:
+  platform: arista_eos
+  topology:
+    spines: 2
+    leaves: 4
+  bgp_mode: numbered
+  asn:
+    spine_asn: 64512
+    leaf_asn_base: 65531
+  addressing:
+    loopback_pool: 10.0.0.0/23
+    p2p_pool: 10.1.0.0/16
+  advertise_loopbacks: true
+  filters: []
+notes: 'Both ends of the 16-bit private range: 64512 and 65534.'

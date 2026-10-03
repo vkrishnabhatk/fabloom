@@ -1,0 +1,36 @@
+# Fabloom benchmark v0.1. CC BY 4.0, see benchmark/LICENSE.
+id: leaf-spine-filters-0008
+family: leaf-spine-filters
+request: 'EOS leaf-spine, 2 spines and 4 leaves, eBGP underlay. Three rules: SSH to the leaves only from
+  10.0.0.0/8, SNMP (udp 161) to every switch only from 10.0.0.0/8, and no Telnet to anything. Advertise
+  loopbacks.'
+intent:
+  platform: arista_eos
+  topology:
+    spines: 2
+    leaves: 4
+  bgp_mode: numbered
+  asn:
+    spine_asn: 65000
+    leaf_asn_base: 65101
+  addressing:
+    loopback_pool: 10.0.0.0/23
+    p2p_pool: 10.1.0.0/16
+  advertise_loopbacks: true
+  filters:
+  - action: deny
+    devices: leaf*
+    protocol: tcp
+    dst_port: 22
+    src_not_in: 10.0.0.0/8
+  - action: deny
+    devices: '*'
+    protocol: udp
+    dst_port: 161
+    src_not_in: 10.0.0.0/8
+  - action: deny
+    devices: '*'
+    protocol: tcp
+    dst_port: 23
+    src_not_in: null
+notes: Leaves get three rules in one ACL, spines two.

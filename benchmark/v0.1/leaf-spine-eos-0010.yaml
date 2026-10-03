@@ -1,0 +1,19 @@
+# Fabloom benchmark v0.1. CC BY 4.0, see benchmark/LICENSE.
+id: leaf-spine-eos-0010
+family: leaf-spine-eos
+request: 'Large Arista EOS fabric: 4 spines and 12 leaves, eBGP on /31s, spines in AS 65000 and one private
+  ASN per leaf. All loopbacks advertised.'
+intent:
+  platform: arista_eos
+  topology:
+    spines: 4
+    leaves: 12
+  bgp_mode: numbered
+  asn:
+    spine_asn: 65000
+    leaf_asn_base: 65101
+  addressing:
+    loopback_pool: 10.0.0.0/23
+    p2p_pool: 10.1.0.0/16
+  advertise_loopbacks: true
+  filters: []

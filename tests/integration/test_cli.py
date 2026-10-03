@@ -9,9 +9,10 @@ import pytest
 from typer.testing import CliRunner
 
 from fabloom import cli
-from fabloom.checks import allocate
-from fabloom.config import REPO_ROOT, Settings
-from fabloom.contracts import Intent, Platform, TopologySpec
+from fabloom.agent.budget import CHARS_PER_TOKEN_ESTIMATE
+from fabloom.checks import allocate, compile_checks
+from fabloom.config import REPO_ROOT, Settings, models_config
+from fabloom.contracts import BgpMode, Intent, ModelRole, Platform, TopologySpec
 from fabloom.llm import TokenFactoryClient
 from fabloom.scenarios import load_scenarios
 from fabloom.verify import PrelintGate
@@ -54,15 +55,48 @@ def test_plan_reports_unverifiable(tmp_path: Path) -> None:
 def test_scenarios_validate() -> None:
     result = runner.invoke(cli.app, ["scenarios", "validate"])
     assert result.exit_code == 0, result.output
-    assert "20 scenarios OK" in result.output
+    assert "49 scenarios OK" in result.output
 
 
-def test_all_pilot_scenarios_well_formed() -> None:
+def test_benchmark_scenarios_well_formed() -> None:
     scenarios = load_scenarios()
-    assert len(scenarios) == 20
+    assert 40 <= len(scenarios) <= 60  # the v0.1 target (architecture §8)
     families = {s.family for s in scenarios}
     assert {"leaf-spine-ebgp", "leaf-spine-unnumbered", "leaf-spine-filters"} <= families
     assert {s.intent.platform for s in scenarios} == set(Platform)
+    eos = [s for s in scenarios if s.intent.platform is Platform.ARISTA_EOS]
+    assert len(eos) * 3 >= len(scenarios)  # EOS is a first-class platform, not a token one
+
+
+def test_filter_scenarios_are_gradeable() -> None:
+    # Only the unverifiable family may carry a filter the verifier cannot see (ADR-0006);
+    # anywhere else it would quietly shrink the rubric instead of testing the filter.
+    for sc in load_scenarios():
+        checkset = compile_checks(sc.intent, allocate(sc.intent))
+        if sc.family == "leaf-spine-unverifiable":
+            assert sc.intent.filters
+            assert checkset.unverifiable, sc.id
+        else:
+            assert not checkset.unverifiable, sc.id
+
+
+def test_no_eos_unnumbered_scenarios() -> None:
+    # The EOS generator rules describe numbered peering only; an unnumbered EOS scenario
+    # would grade the prompt's omission, not the model.
+    for sc in load_scenarios():
+        if sc.intent.platform is Platform.ARISTA_EOS:
+            assert sc.intent.bgp_mode is BgpMode.NUMBERED, sc.id
+
+
+def test_scenarios_fit_the_generator_output_cap() -> None:
+    # A model's config is wordier than the minimal reference render. The 2x allowance is an
+    # unmeasured guess; recalibrate it from completion_tokens in real events.jsonl runs.
+    cap = models_config().for_role(ModelRole.GENERATOR).max_output_tokens
+    for sc in load_scenarios():
+        blocks = as_device_blocks(
+            render_good_configs(sc.intent, allocate(sc.intent)), sc.intent.platform
+        )
+        assert 2 * len(blocks) // CHARS_PER_TOKEN_ESTIMATE <= cap, sc.id
 
 
 def test_scenario_id_must_match_filename(tmp_path: Path) -> None:

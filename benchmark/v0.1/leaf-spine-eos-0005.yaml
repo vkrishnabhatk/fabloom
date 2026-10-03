@@ -1,0 +1,19 @@
+# Fabloom benchmark v0.1. CC BY 4.0, see benchmark/LICENSE.
+id: leaf-spine-eos-0005
+family: leaf-spine-eos
+request: I need an EOS leaf-spine with 2 spines and 6 leaves. Underlay is eBGP over routed /31s; spines
+  are AS 65000 and each leaf has its own AS. Loopbacks in BGP.
+intent:
+  platform: arista_eos
+  topology:
+    spines: 2
+    leaves: 6
+  bgp_mode: numbered
+  asn:
+    spine_asn: 65000
+    leaf_asn_base: 65101
+  addressing:
+    loopback_pool: 10.0.0.0/23
+    p2p_pool: 10.1.0.0/16
+  advertise_loopbacks: true
+  filters: []

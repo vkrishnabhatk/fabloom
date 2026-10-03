@@ -1,0 +1,19 @@
+# Fabloom benchmark v0.1. CC BY 4.0, see benchmark/LICENSE.
+id: leaf-spine-eos-0008
+family: leaf-spine-eos
+request: On EOS, two spines and twelve leaves with an eBGP routed underlay. Spines share AS 65000, leaves
+  are unique private ASNs. Every Loopback0 must be advertised.
+intent:
+  platform: arista_eos
+  topology:
+    spines: 2
+    leaves: 12
+  bgp_mode: numbered
+  asn:
+    spine_asn: 65000
+    leaf_asn_base: 65101
+  addressing:
+    loopback_pool: 10.0.0.0/23
+    p2p_pool: 10.1.0.0/16
+  advertise_loopbacks: true
+  filters: []

@@ -1,0 +1,26 @@
+# Fabloom benchmark v0.1. CC BY 4.0, see benchmark/LICENSE.
+id: leaf-spine-unverifiable-0001
+family: leaf-spine-unverifiable
+request: FRR leaf-spine, 2 spines and 4 leaves, eBGP underlay. Block SSH to the leaves from outside 10.0.0.0/8.
+  Advertise loopbacks.
+intent:
+  platform: frr
+  topology:
+    spines: 2
+    leaves: 4
+  bgp_mode: numbered
+  asn:
+    spine_asn: 65000
+    leaf_asn_base: 65101
+  addressing:
+    loopback_pool: 10.0.0.0/23
+    p2p_pool: 10.1.0.0/16
+  advertise_loopbacks: true
+  filters:
+  - action: deny
+    devices: leaf*
+    protocol: tcp
+    dst_port: 22
+    src_not_in: 10.0.0.0/8
+notes: frr.conf has no packet filter, so the filter is reported unverifiable (ADR-0006). Graded on everything
+  else; must not emit iptables or nftables.

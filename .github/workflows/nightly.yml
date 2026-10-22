@@ -39,7 +39,7 @@ jobs:
     environment: token-factory
     steps:
       - uses: actions/checkout@v5
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@v10
         with:
           version: "0.11.24"
           enable-cache: true
@@ -57,10 +57,11 @@ jobs:
     environment: token-factory
     steps:
       - uses: actions/checkout@v5
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@v10
         with:
           version: "0.11.24"
-      - run: uv sync --frozen --extra batfish
+      # Same extras as CI's test job: collection imports every test module, web included.
+      - run: uv sync --frozen --extra batfish --extra eval --extra web
       # Exit code 5 = no tests collected; expected until week 2 adds live suites.
       - run: uv run pytest -m "llm or sandbox" || [ $? -eq 5 ]
         env:

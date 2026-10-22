@@ -11,8 +11,30 @@ permissions:
   contents: read
 
 jobs:
+  # Secrets cannot appear in a job-level `if`, so one job reads it and exposes a boolean.
+  # Without the key the probes cannot run; skip them instead of failing every night.
+  key:
+    name: Token Factory key present
+    runs-on: ubuntu-latest
+    environment: token-factory
+    outputs:
+      present: ${{ steps.check.outputs.present }}
+    steps:
+      - id: check
+        env:
+          KEY: ${{ secrets.TOKEN_FACTORY_API_KEY }}
+        run: |
+          if [ -n "$KEY" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::TOKEN_FACTORY_API_KEY is not set in the token-factory environment; skipping the nightly probes."
+          fi
+
   doctor:
     name: fabloom doctor (every configured model exists and answers JSON)
+    needs: key
+    if: needs.key.outputs.present == 'true'
     runs-on: ubuntu-latest
     environment: token-factory
     steps:
@@ -29,6 +51,8 @@ jobs:
 
   live-tests:
     name: llm/sandbox-marked tests
+    needs: key
+    if: needs.key.outputs.present == 'true'
     runs-on: ubuntu-latest
     environment: token-factory
     steps:

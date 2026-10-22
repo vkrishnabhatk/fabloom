@@ -13,7 +13,14 @@ import pytest
 import structlog
 
 from fabloom.checks import allocate, compile_checks
-from fabloom.config import ensure_parent, load_config, models_config, resolve, run_config
+from fabloom.config import (
+    Settings,
+    ensure_parent,
+    load_config,
+    models_config,
+    resolve,
+    run_config,
+)
 from fabloom.contracts import Intent, Platform, Snapshot, TopologySpec
 from fabloom.log import configure_logging
 from fabloom.provenance import content_key, file_digest, git_sha, set_seeds
@@ -42,6 +49,14 @@ def test_config_must_be_a_mapping(tmp_path: Path) -> None:
 def test_every_configured_price_is_flagged_until_probed() -> None:
     # Flip price_verified to true only after spikes/nemotron_probe.py records the price.
     assert all(not m.price_verified for m in models_config(CONF_DIR).models.values())
+
+
+@pytest.mark.parametrize("value", ["", "  "])
+def test_blank_key_counts_as_missing(value: str, monkeypatch: pytest.MonkeyPatch) -> None:
+    # Actions passes "" for a secret that was never set; that must read as "no key".
+    monkeypatch.delenv("NEBIUS_API_KEY", raising=False)
+    monkeypatch.setenv("FABLOOM_TOKEN_FACTORY_API_KEY", value)
+    assert Settings(_env_file=None).token_factory_api_key is None
 
 
 def test_paths(tmp_path: Path) -> None:

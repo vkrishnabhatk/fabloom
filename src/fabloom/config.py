@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 import yaml
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field, SecretStr
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from fabloom.contracts import ModelRole, RunBudget
@@ -37,6 +37,13 @@ class Settings(BaseSettings):
     # SQLite store plus ./mlruns artifacts; both are backed up off the VM (architecture §11).
     mlflow_tracking_uri: str = "sqlite:///mlflow.db"
     mlflow_artifact_root: Path = Path("mlruns")
+
+    @field_validator("token_factory_api_key", mode="before")
+    @classmethod
+    def _blank_key_is_missing(cls, v: object) -> object:
+        # GitHub Actions expands an unset secret to "", which would otherwise pass the
+        # `is None` guard in build_client and fail later as a 401 from Token Factory.
+        return None if isinstance(v, str) and not v.strip() else v
 
 
 def resolve(path: str | Path, base: Path = REPO_ROOT) -> Path:

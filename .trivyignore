@@ -1,0 +1,21 @@
+# Trivy findings accepted on purpose, each with its reason. Read by the verifier-image and
+# app-image scans in .github/workflows/ci.yml; anything not listed here still fails CI.
+# Review when BATFISH_IMAGE (Makefile, Dockerfile.verifier, docker-compose.yml) is bumped:
+# a newer Batfish release that ships fixed libraries makes these entries obsolete.
+#
+# Java libraries shaded inside batfish/allinone's allinone-bundle.jar. They cannot be
+# patched without rebuilding Batfish from source. Exposure in Fabloom: the Batfish server
+# runs inside a single-tenant sandbox (or on localhost / a compose-internal network for the
+# local backend), is never reachable from the internet, and only receives snapshots that
+# fabloom-verify uploads. The JSON and LZ4 inputs these CVEs concern come from that one
+# trusted client, not from visitors. Recorded 2026-10-23.
+
+# jackson-core 2.22.1 (fixed in 2.22.3)
+CVE-2026-89407
+CVE-2026-89425
+# jackson-databind (fixed in 2.22.2 / 2.22.3)
+CVE-2026-68497
+CVE-2026-91776
+CVE-2026-91777
+# lz4-java 1.11.2 (fixed in 1.11.4)
+CVE-2026-106451

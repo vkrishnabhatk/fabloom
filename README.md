@@ -82,12 +82,12 @@ arms and gates: `conf/bench.yaml`.
 
 ## Known limitations
 
-- **Doc grounding is unmeasured.** It is built and tested offline, but no search has run
-  against Tavily and its benchmark arm has no result. It stays off in the product until the
+- **Doc grounding is unmeasured.** Live Tavily searches return the vendors' command
+  references, but its benchmark arm has no result yet. It stays off in the product until the
   grounding gate passes, and the result is published either way.
-- **Prices and model IDs are unconfirmed.** Every entry in `conf/models.yaml` is
-  `price_verified: false` until `spikes/nemotron_probe.py` runs; unknown prices are set
-  pessimistically so the budget guard over-estimates spend.
+- **Costs use list prices.** Model IDs and per-token prices in `conf/models.yaml` were
+  confirmed against Token Factory on 22 Oct 2026 ([ADR-0005](docs/decisions/ADR-0005-model-routing-in-config.md)).
+  Reported spend is tokens × those prices, not an invoice.
 - **FRR traffic filters cannot be verified.** `frr.conf` has no packet filter and Batfish
   does not model iptables, so "block SSH" on FRR is reported as *not verifiable* rather than
   passed. Filter scenarios use Arista EOS ([ADR-0006](docs/decisions/ADR-0006-deterministic-fabric-plan.md)).

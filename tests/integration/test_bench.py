@@ -111,7 +111,7 @@ async def test_bench_measures_what_each_arm_does(
 
     assert not results.incomplete
     assert results.meta.arms["nano-raw"].models["generator"] == models.models["nano"].id
-    assert not results.meta.prices_verified  # conf/models.yaml prices are unconfirmed
+    assert results.meta.prices_verified  # confirmed against Token Factory (ADR-0005)
     # Benchmark runs neither plan (ground-truth intent) nor explain (nothing grades it).
     assert {kind for _, kind in client.calls} == {"generate", "repair"}
     assert len(client.calls) == len(ARMS) * n + 2 * eos

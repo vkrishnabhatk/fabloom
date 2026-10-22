@@ -1,0 +1,51 @@
+{
+  "at": "2026-10-22T21:46:53.090085+00:00",
+  "nvidia_models": [
+    "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+    "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "nvidia/Nemotron-3.5-Super-VL",
+    "nvidia/Nemotron-3_5-Lightning",
+    "nvidia/nemotron-3-super-120b-a12b"
+  ],
+  "configured": {
+    "nano": {
+      "id": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+      "ok": true,
+      "error": null,
+      "ms": 889
+    },
+    "super": {
+      "id": "nvidia/nemotron-3-super-120b-a12b",
+      "ok": true,
+      "error": null,
+      "ms": 723
+    },
+    "ultra": {
+      "id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+      "ok": true,
+      "error": null,
+      "ms": 654
+    },
+    "lightning": {
+      "id": "nvidia/Nemotron-3_5-Lightning",
+      "ok": true,
+      "error": null,
+      "ms": 727
+    }
+  },
+  "generation": {
+    "scenario": "leaf-spine-ebgp-0002",
+    "model": "nvidia/nemotron-3-super-120b-a12b",
+    "prompt_tokens": 852,
+    "completion_tokens": 2753,
+    "cost_usd_at_configured_price": 0.002733,
+    "duration_ms": 11340,
+    "devices_returned": [
+      "leaf1",
+      "leaf2",
+      "spine1",
+      "spine2"
+    ],
+    "prelint_failures": {}
+  }
+}

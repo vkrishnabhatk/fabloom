@@ -46,9 +46,11 @@ def test_config_must_be_a_mapping(tmp_path: Path) -> None:
         load_config("bad", tmp_path)
 
 
-def test_every_configured_price_is_flagged_until_probed() -> None:
-    # Flip price_verified to true only after spikes/nemotron_probe.py records the price.
-    assert all(not m.price_verified for m in models_config(CONF_DIR).models.values())
+def test_every_configured_price_is_verified() -> None:
+    # Benchmark costs are only as real as these prices. A model added with a guessed price
+    # fails here until it is checked against Token Factory (ADR-0005).
+    unverified = [n for n, m in models_config(CONF_DIR).models.items() if not m.price_verified]
+    assert unverified == []
 
 
 @pytest.mark.parametrize("value", ["", "  "])

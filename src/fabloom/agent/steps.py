@@ -19,8 +19,9 @@ from fabloom.contracts import (
     Platform,
     VerificationReport,
 )
-from fabloom.contracts.run import LlmCall
+from fabloom.contracts.run import GroundingLookup, LlmCall
 from fabloom.llm import ChatClient, Completion, LlmOutputError, ModelRouter
+from fabloom.llm.grounding import Excerpt, Grounder
 from fabloom.llm.parsing import parse_device_blocks
 from fabloom.llm.prompts import (
     explainer_messages,
@@ -34,12 +35,18 @@ M = TypeVar("M", bound=BaseModel)
 
 class LlmSteps:
     def __init__(
-        self, client: ChatClient, router: ModelRouter, log: EventLog, budget: BudgetTracker
+        self,
+        client: ChatClient,
+        router: ModelRouter,
+        log: EventLog,
+        budget: BudgetTracker,
+        grounder: Grounder | None = None,
     ) -> None:
         self._client = client
         self._router = router
         self._log = log
         self._budget = budget
+        self._grounder = grounder
 
     def _account(self, role: ModelRole, c: Completion[Any]) -> None:
         self._budget.record_llm(c.prompt_tokens, c.completion_tokens, c.cost_usd)
@@ -104,9 +111,30 @@ class LlmSteps:
         checkset: CheckSet,
     ) -> dict[str, str]:
         role = self._router.repairer(round_, report.failed_checks)
-        messages = repair_messages(intent, fabric, configs, report, checkset)
+        references = await self._ground(round_, fabric.platform, report)
+        messages = repair_messages(intent, fabric, configs, report, checkset, references=references)
         changed = parse_device_blocks(await self._text(role, self._router.spec(role), messages))
         return {**configs, **changed}
+
+    async def _ground(
+        self, round_: int, platform: Platform, report: VerificationReport
+    ) -> list[Excerpt]:
+        if self._grounder is None or not report.unrecognized_lines:
+            return []
+        g = await self._grounder.lookup(
+            platform, report.unrecognized_lines, self._budget.grounding_allowance()
+        )
+        self._budget.record_grounding(g.searched)
+        self._log.emit(
+            GroundingLookup,
+            round=round_,
+            queries=g.queries,
+            searched=g.searched,
+            excerpts=len(g.excerpts),
+            urls=sorted({x.url for x in g.excerpts}),
+            error=g.error,
+        )
+        return g.excerpts
 
     async def explain(
         self,

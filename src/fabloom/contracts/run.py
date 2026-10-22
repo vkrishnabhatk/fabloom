@@ -24,6 +24,8 @@ class RunBudget(BaseModel):
     max_usd: float = Field(default=0.10, gt=0)
     max_wall_clock_s: float = Field(default=600.0, gt=0)
     max_verifications: int = Field(default=12, ge=1)  # sandbox executions, or local verifies
+    # Doc searches (Tavily) a run may make; cache hits are free and not counted.
+    max_grounding_queries: int = Field(default=6, ge=0)
 
 
 class Usage(BaseModel):
@@ -35,6 +37,7 @@ class Usage(BaseModel):
     llm_calls: int = 0
     verifications: int = 0
     verification_cache_hits: int = 0
+    grounding_queries: int = 0
 
     @property
     def total_tokens(self) -> int:
@@ -105,6 +108,18 @@ class VerificationCompleted(RunEventBase):
     summary: dict[str, Any]
 
 
+class GroundingLookup(RunEventBase):
+    """Vendor-doc excerpts fetched for unrecognised lines before a repair (architecture §8)."""
+
+    type: Literal["grounding_lookup"] = "grounding_lookup"
+    round: int
+    queries: list[str]
+    searched: int  # queries that went to the search API; the rest came from the cache
+    excerpts: int
+    urls: list[str]
+    error: str | None = None
+
+
 class BudgetExhausted(RunEventBase):
     type: Literal["budget_exhausted"] = "budget_exhausted"
     limit: str
@@ -139,6 +154,7 @@ RunEvent = Annotated[
     | LlmCall
     | CandidateGenerated
     | VerificationCompleted
+    | GroundingLookup
     | BudgetExhausted
     | ExplanationReady
     | RunFinished

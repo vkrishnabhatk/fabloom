@@ -15,7 +15,7 @@ import yaml
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from fabloom.contracts import ModelRole, RunBudget
+from fabloom.contracts import ModelRole, Platform, RunBudget
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -32,13 +32,17 @@ class Settings(BaseSettings):
     runs_dir: Path = Path("runs")
     verifier: Literal["local"] = "local"
     batfish_host: str = "localhost"
+    tavily_api_key: SecretStr | None = Field(
+        default=None, validation_alias=AliasChoices("FABLOOM_TAVILY_API_KEY", "TAVILY_API_KEY")
+    )
+    grounding_cache_dir: Path = Path(".cache/grounding")
     log_level: str = "INFO"
     log_json: bool = True
     # SQLite store plus ./mlruns artifacts; both are backed up off the VM (architecture §11).
     mlflow_tracking_uri: str = "sqlite:///mlflow.db"
     mlflow_artifact_root: Path = Path("mlruns")
 
-    @field_validator("token_factory_api_key", mode="before")
+    @field_validator("token_factory_api_key", "tavily_api_key", mode="before")
     @classmethod
     def _blank_key_is_missing(cls, v: object) -> object:
         # GitHub Actions expands an unset secret to "", which would otherwise pass the
@@ -105,6 +109,21 @@ class ModelsConfig(BaseModel):
         return self.models[self.roles[role]]
 
 
+class GroundingConfig(BaseModel):
+    """Doc-grounded repair (architecture §8): what to search, and how hard."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    # Off by default: it ships only if its benchmark arm passes the grounding gate.
+    enabled: bool = False
+    # Search only vendor documentation, so an excerpt is the vendor's syntax, not a forum guess.
+    domains: dict[Platform, list[str]] = Field(default_factory=dict)
+    max_results: int = Field(default=3, ge=1, le=10)
+    max_excerpt_chars: int = Field(default=800, ge=100)
+    min_interval_s: float = Field(default=1.0, ge=0)  # between uncached searches, per process
+    timeout_s: float = Field(default=15.0, gt=0)
+
+
 class RunConfig(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
@@ -112,6 +131,7 @@ class RunConfig(BaseModel):
     repair_candidates: int = Field(default=1, ge=1, le=8)
     # The benchmark turns this off: nothing grades the explanation, so it would only add cost.
     explain_with_model: bool = True
+    grounding: GroundingConfig = GroundingConfig()
 
 
 class ArmSpec(BaseModel):
@@ -122,6 +142,7 @@ class ArmSpec(BaseModel):
     description: str
     roles: dict[ModelRole, str] = Field(default_factory=dict)
     max_repair_rounds: int | None = Field(default=None, ge=0)  # None: conf/fabloom.yaml's
+    grounding: bool = False  # doc-grounded repair; only the grounding ablation arm sets it
 
     def models(self, base: ModelsConfig) -> ModelsConfig:
         unknown = sorted(set(self.roles.values()) - set(base.models))
@@ -133,7 +154,10 @@ class ArmSpec(BaseModel):
         budget = base.budget
         if self.max_repair_rounds is not None:
             budget = budget.model_copy(update={"max_repair_rounds": self.max_repair_rounds})
-        return base.model_copy(update={"budget": budget, "explain_with_model": False})
+        grounding = base.grounding.model_copy(update={"enabled": self.grounding})
+        return base.model_copy(
+            update={"budget": budget, "explain_with_model": False, "grounding": grounding}
+        )
 
 
 class RegressionGateSpec(BaseModel):

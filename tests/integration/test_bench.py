@@ -7,11 +7,12 @@ import json
 from pathlib import Path
 
 import pytest
+from pydantic import SecretStr
 from typer.testing import CliRunner
 
 from fabloom import cli
 from fabloom.agent.events import EVENTS_FILE
-from fabloom.config import ModelsConfig, RunConfig, bench_config
+from fabloom.config import ModelsConfig, RunConfig, Settings, bench_config, run_config
 from fabloom.contracts import Intent, Platform, Scenario
 from fabloom.eval import (
     BenchMismatchError,
@@ -22,6 +23,7 @@ from fabloom.eval import (
     resolve_arms,
 )
 from fabloom.eval.runner import BENCH_FILE, RESULTS_FILE, RUNS_SUBDIR
+from fabloom.llm.grounding import DocGrounder
 from fabloom.scenarios import load_scenarios
 from tests.conftest import CONF_DIR
 from tests.fakes.bench import MarkerVerifier, PlanAwareChatClient
@@ -226,6 +228,43 @@ def test_cli_dry_run_shows_the_bill_and_spends_nothing(monkeypatch: pytest.Monke
     nightly = bench_config(CONF_DIR).nightly
     assert f"{len(nightly.arms)} arm(s) x {nightly.scenarios} scenario(s)" in result.output
     assert "worst case $" in result.output
+
+
+def test_cli_grounding_arm_needs_a_tavily_key(monkeypatch: pytest.MonkeyPatch) -> None:
+    # Blank reads as unset, so a real key in the developer's environment cannot leak in.
+    monkeypatch.setenv("FABLOOM_TAVILY_API_KEY", "")
+    monkeypatch.setenv("TAVILY_API_KEY", "")
+    args = ["bench", "run", "--arm", "super-repair-grounding", "--nightly"]
+    result = runner_cli.invoke(cli.app, [*args, "--dry-run"])
+    assert result.exit_code == 0, result.output
+    assert "[needs FABLOOM_TAVILY_API_KEY]" in result.output
+
+    def no_client(_: object) -> None:
+        raise AssertionError("a run that cannot ground must stop before building a client")
+
+    monkeypatch.setattr(cli, "build_client", no_client)
+    result = runner_cli.invoke(cli.app, args)
+    assert result.exit_code == 2
+    assert "need FABLOOM_TAVILY_API_KEY" in result.output
+
+
+def test_build_grounder_only_with_a_key() -> None:
+    config = run_config(CONF_DIR).grounding
+    assert cli.build_grounder(Settings(_env_file=None, tavily_api_key=None), config) is None
+    with_key = Settings(_env_file=None, tavily_api_key=SecretStr("tvly-k"))
+    assert isinstance(cli.build_grounder(with_key, config), DocGrounder)
+
+
+def test_runner_refuses_a_grounding_arm_without_a_grounder(
+    scenarios: list[Scenario], models: ModelsConfig
+) -> None:
+    [arm] = resolve_arms(bench_config(CONF_DIR), models, RunConfig(), ["super-repair-grounding"])
+    assert arm.meta().grounding
+    with pytest.raises(ValueError, match="TAVILY"):
+        BenchRunner(
+            client=_client(scenarios, models), verifier=MarkerVerifier(), arms=[arm],
+            scenarios=scenarios[:1],
+        )  # fmt: skip
 
 
 def test_cli_refuses_unknown_arms_and_empty_selections() -> None:

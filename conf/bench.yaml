@@ -6,8 +6,9 @@
 #
 # "Super + verify-only" from the architecture is not a separate arm: its pass rate is the
 # first-pass rate of super-repair, which the report already shows.
-# "Super + repair + Tavily grounding" lands with llm/grounding.py; until then the grounding
-# gate below is reported as skipped.
+# super-repair-grounding is super-repair plus doc-grounded repair (llm/grounding.py): the
+# only difference between the two arms, so the grounding gate below measures grounding alone.
+# It needs FABLOOM_TAVILY_API_KEY; leave it out with --arm when there is no key.
 
 arms:
   nano-raw:
@@ -25,6 +26,10 @@ arms:
   super-repair:
     description: Super writes, Batfish verifies, Super repairs; never escalates.
     roles: {generator: super, repairer: super, repairer_escalated: super}
+  super-repair-grounding:
+    description: super-repair, plus vendor-doc excerpts for unrecognised lines (Tavily).
+    roles: {generator: super, repairer: super, repairer_escalated: super}
+    grounding: true
   routed:
     description: The product's routing from conf/models.yaml, Ultra on repeated failure.
     roles: {}

@@ -33,3 +33,6 @@ secrets/*.yaml
 .idea/
 .vscode/
 .claude/settings.local.json
+
+# Doc-grounding search cache (llm/grounding.py); safe to delete
+.cache/

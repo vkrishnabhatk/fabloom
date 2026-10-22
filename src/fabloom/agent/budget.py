@@ -85,3 +85,12 @@ class BudgetTracker:
 
     def record_cache_hit(self) -> None:
         self.usage.verification_cache_hits += 1
+
+    def grounding_allowance(self) -> int:
+        """Doc searches still allowed. Running out skips grounding; it never stops the run,
+        because grounding is an aid to the repairer, not part of the loop's contract."""
+        self._check_wall_clock()
+        return max(0, self.budget.max_grounding_queries - self.usage.grounding_queries)
+
+    def record_grounding(self, searched: int) -> None:
+        self.usage.grounding_queries += searched

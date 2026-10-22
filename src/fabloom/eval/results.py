@@ -57,6 +57,7 @@ class RunRecord(_Frozen):
     cache_hits: int
     escalations: int  # calls routed to repairer_escalated
     wall_s: float
+    grounding_searches: int = 0  # doc searches that reached Tavily (cache hits excluded)
     budget_limit: str | None = None
     error: str | None = None
 
@@ -125,6 +126,7 @@ def record_from_events(
         cache_hits=usage.verification_cache_hits,
         escalations=escalations,
         wall_s=(finished.ts - started.ts).total_seconds(),
+        grounding_searches=usage.grounding_queries,
         budget_limit=budget_limit,
         error=error,
     )
@@ -173,6 +175,7 @@ class ArmSummary(_Frozen):
     errors: int
     budget_stops: int
     escalated_runs: int
+    grounding_searches: int = 0
 
     def metrics(self) -> dict[str, float]:
         """The numeric metrics that exist, for tracking."""
@@ -219,6 +222,7 @@ def summarize(arm: str, records: Collection[RunRecord]) -> ArmSummary:
         errors=sum(r.error is not None for r in records),
         budget_stops=sum(r.budget_limit is not None for r in records),
         escalated_runs=sum(r.escalations > 0 for r in records),
+        grounding_searches=sum(r.grounding_searches for r in records),
     )
 
 
@@ -229,6 +233,7 @@ class ArmMeta(_Frozen):
     max_repair_rounds: int
     repair_candidates: int
     max_usd: float
+    grounding: bool = False
 
 
 class BenchMeta(_Frozen):

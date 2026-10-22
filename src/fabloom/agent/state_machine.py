@@ -52,6 +52,7 @@ from fabloom.contracts.run import (
     VerificationCompleted,
 )
 from fabloom.llm import ChatClient, ModelRouter
+from fabloom.llm.grounding import Grounder
 from fabloom.provenance import content_key
 
 log = structlog.get_logger(__name__)
@@ -121,7 +122,8 @@ class _Run:
         self.run_id = run_id
         self.log = EventLog(run_dir, run_id)
         self.budget = BudgetTracker(machine.run_config.budget)
-        self.steps = LlmSteps(machine.client, machine.router, self.log, self.budget)
+        grounder = machine.grounder if machine.run_config.grounding.enabled else None
+        self.steps = LlmSteps(machine.client, machine.router, self.log, self.budget, grounder)
         self.cache: dict[str, VerificationReport] = {}
         self.result = RunResult(
             run_id=run_id,
@@ -264,12 +266,16 @@ class RunMachine:
         verifier: Verifier,
         run_config: RunConfig,
         runs_dir: Path,
+        *,
+        grounder: Grounder | None = None,
     ) -> None:
         self.client = client
         self.router = router
         self.verifier = verifier
         self.run_config = run_config
         self.runs_dir = runs_dir
+        # Used only when run_config.grounding.enabled, so one grounder can serve every arm.
+        self.grounder = grounder
 
     def new_run_dir(self, run_id: str | None = None) -> tuple[str, Path]:
         rid = run_id or new_run_id()

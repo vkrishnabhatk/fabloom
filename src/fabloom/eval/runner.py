@@ -38,6 +38,7 @@ from fabloom.eval.results import (
     record_from_events,
 )
 from fabloom.llm import ChatClient, ModelRouter
+from fabloom.llm.grounding import Grounder
 from fabloom.llm.prompts import prompt_hash
 from fabloom.provenance import content_key, git_sha
 
@@ -96,6 +97,7 @@ class Arm:
             max_repair_rounds=self.run_config.budget.max_repair_rounds,
             repair_candidates=self.run_config.repair_candidates,
             max_usd=self.run_config.budget.max_usd,
+            grounding=self.run_config.grounding.enabled,
         )
 
     def roles_used(self) -> set[ModelRole]:
@@ -212,11 +214,16 @@ class BenchRunner:
         benchmark: str = "v0.1",
         concurrency: int = 1,
         on_record: OnRecord | None = None,
+        grounder: Grounder | None = None,
     ) -> None:
         if concurrency < 1:
             raise ValueError("concurrency must be at least 1")
+        missing = [a.name for a in arms if a.run_config.grounding.enabled and grounder is None]
+        if missing:
+            raise ValueError(f"arms {missing} need doc grounding; set FABLOOM_TAVILY_API_KEY")
         self.client = client
         self.verifier = verifier
+        self.grounder = grounder
         self.arms = list(arms)
         self.scenarios = list(scenarios)
         self.meta = build_meta(self.arms, self.scenarios, verifier, benchmark)
@@ -257,7 +264,14 @@ class BenchRunner:
             # A killed process left half a log; appending to it would corrupt the run.
             shutil.rmtree(events.parent)
         async with self._sem:
-            machine = RunMachine(self.client, arm.router, self.verifier, arm.run_config, runs_dir)
+            machine = RunMachine(
+                self.client,
+                arm.router,
+                self.verifier,
+                arm.run_config,
+                runs_dir,
+                grounder=self.grounder,
+            )
             req = RunRequest(scenario.request, scenario.intent.platform, intent=scenario.intent)
             await machine.run(req, run_id=rid)
         if self._on_record and (rec := record()) is not None:

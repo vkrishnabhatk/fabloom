@@ -11,3 +11,18 @@ run:
     max_usd: 0.25            # a Super run is ~$0.01; this is the runaway guard, not a target
     max_wall_clock_s: 900
     max_verifications: 12
+    max_grounding_queries: 6   # Tavily searches per run; cached lookups are free
+
+  # Doc-grounded repair (architecture §8). When Batfish reports unrecognised lines, search the
+  # vendor's own documentation for the real syntax and put the excerpts in the repair prompt.
+  # Off here: only the super-repair-grounding arm in conf/bench.yaml turns it on, and it ships
+  # in the product only if that arm passes the grounding gate. Needs FABLOOM_TAVILY_API_KEY.
+  grounding:
+    enabled: false
+    domains:
+      frr: [docs.frrouting.org]
+      arista_eos: [arista.com]
+    max_results: 3
+    max_excerpt_chars: 800
+    min_interval_s: 1.0
+    timeout_s: 15

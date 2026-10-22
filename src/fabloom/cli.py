@@ -13,7 +13,14 @@ from fabloom import __version__
 from fabloom.agent import RunMachine, RunRequest, RunResult, tail_events
 from fabloom.agent.events import EVENTS_FILE, read_events
 from fabloom.checks import allocate, compile_checks
-from fabloom.config import REPO_ROOT, Settings, bench_config, models_config, run_config
+from fabloom.config import (
+    REPO_ROOT,
+    GroundingConfig,
+    Settings,
+    bench_config,
+    models_config,
+    run_config,
+)
 from fabloom.contracts import Platform, RunBudget, Verifier
 from fabloom.contracts.run import RunEvent
 from fabloom.eval import (
@@ -33,6 +40,7 @@ from fabloom.eval import (
 from fabloom.eval.gates import Gate
 from fabloom.eval.runner import RESULTS_FILE
 from fabloom.llm import ModelRouter, TokenFactoryClient
+from fabloom.llm.grounding import DocGrounder, Grounder, TavilySearch
 from fabloom.llm.prompts import render_plan
 from fabloom.log import configure_logging
 from fabloom.provenance import git_sha
@@ -74,6 +82,14 @@ def build_client(settings: Settings) -> TokenFactoryClient:
     )
 
 
+def build_grounder(settings: Settings, config: GroundingConfig) -> Grounder | None:
+    """Doc grounding for the repairer, or None without a Tavily key (it is optional)."""
+    if settings.tavily_api_key is None:
+        return None
+    search = TavilySearch(settings.tavily_api_key.get_secret_value(), timeout_s=config.timeout_s)
+    return DocGrounder(search, config, settings.grounding_cache_dir)
+
+
 def format_event(e: RunEvent) -> str:  # noqa: PLR0911 - one arm per event type
     match e.type:
         case "state_changed":
@@ -94,6 +110,12 @@ def format_event(e: RunEvent) -> str:  # noqa: PLR0911 - one arm per event type
             )
         case "checks_compiled":
             return f"[{e.seq:>3}]   compiled {e.count} checks"
+        case "grounding_lookup":
+            note = f", {e.error}" if e.error else ""
+            return (
+                f"[{e.seq:>3}]   grounding: {len(e.queries)} queries, {e.searched} searched, "
+                f"{e.excerpts} excerpts{note}"
+            )
         case "budget_exhausted":
             return f"[{e.seq:>3}]   budget exhausted: {e.limit} ({e.detail})"
         case "explanation_ready":
@@ -162,12 +184,21 @@ def generate(
             {**rc.budget.model_dump(), "max_repair_rounds": max_repair_rounds}
         )
         rc = rc.model_copy(update={"budget": budget})
+    grounder = build_grounder(settings, rc.grounding) if rc.grounding.enabled else None
+    if rc.grounding.enabled and grounder is None:
+        typer.secho(
+            "Grounding is on but FABLOOM_TAVILY_API_KEY is unset; repairing without it.",
+            fg=typer.colors.YELLOW,
+            err=True,
+        )
+        rc = rc.model_copy(update={"grounding": rc.grounding.model_copy(update={"enabled": False})})
     machine = RunMachine(
         client=build_client(settings),
         router=ModelRouter(models_config(settings.conf_dir)),
         verifier=build_verifier(settings),
         run_config=rc,
         runs_dir=runs_dir or settings.runs_dir,
+        grounder=grounder,
     )
     result = asyncio.run(_run_and_watch(machine, RunRequest(request, platform), watch))
     typer.echo(f"run dir: {result.run_dir}")
@@ -311,7 +342,8 @@ def bench_run(  # noqa: PLR0917 - one parameter per CLI option
     )
     if dry_run:
         for a in arms:
-            typer.echo(f"  {a.name:<16} {a.spec.description}")
+            tag = " [needs FABLOOM_TAVILY_API_KEY]" if a.run_config.grounding.enabled else ""
+            typer.echo(f"  {a.name:<24} {a.spec.description}{tag}")
         for s in scenarios:
             typer.echo(f"  {s.id}")
         return
@@ -329,6 +361,17 @@ def bench_run(  # noqa: PLR0917 - one parameter per CLI option
             f"${r.cost_usd:.4f}{tag}"
         )
 
+    grounding = [a for a in arms if a.run_config.grounding.enabled]
+    # Every arm shares conf/fabloom.yaml's grounding settings; arms only switch it on or off.
+    grounder = build_grounder(settings, grounding[0].run_config.grounding) if grounding else None
+    if grounding and grounder is None:
+        typer.secho(
+            f"arms {[a.name for a in grounding]} need FABLOOM_TAVILY_API_KEY; "
+            "set it or leave them out with --arm",
+            fg=typer.colors.RED,
+            err=True,
+        )
+        raise typer.Exit(2)
     runner = BenchRunner(
         client=build_client(settings),
         verifier=build_verifier(settings),
@@ -339,6 +382,7 @@ def bench_run(  # noqa: PLR0917 - one parameter per CLI option
         benchmark=scenarios_dir.name,
         concurrency=concurrency,
         on_record=progress,
+        grounder=grounder,
     )
     try:
         results = asyncio.run(runner.run())

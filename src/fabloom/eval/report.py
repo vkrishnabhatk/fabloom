@@ -6,11 +6,11 @@ The same ``Gate`` list CI checks is the one printed here.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 from fabloom.eval.gates import Gate
-from fabloom.eval.results import BenchResults, wilson_interval
+from fabloom.eval.results import ArmSummary, BenchResults, wilson_interval
 
 MAX_FAILED_LISTED = 5
 
@@ -43,6 +43,15 @@ def _table(header: Sequence[str], rows: Sequence[Sequence[str]]) -> list[str]:
     out = ["| " + " | ".join(header) + " |", "|" + "|".join("---" for _ in header) + "|"]
     out += ["| " + " | ".join(r) + " |" for r in rows]
     return out
+
+
+def _search_lines(summaries: Mapping[str, ArmSummary]) -> list[str]:
+    searches = {a: s.grounding_searches for a, s in summaries.items() if s.grounding_searches}
+    if not searches:
+        return []
+    # Tavily bills in search credits, not dollars, so these are not in $/scenario.
+    used = ", ".join(f"`{a}` {n}" for a, n in searches.items())
+    return [f"Doc searches (Tavily credits, not included in $/scenario): {used}.", ""]
 
 
 def render(results: BenchResults, gates: Sequence[Gate], source: str = "") -> str:
@@ -105,6 +114,7 @@ def render(results: BenchResults, gates: Sequence[Gate], source: str = "") -> st
     )
     total_usd = sum(s.usd_total for s in summaries.values())
     lines += ["", f"Total spend for this bench: {_usd(total_usd)}.", ""]
+    lines += _search_lines(summaries)
 
     lines += ["## Final pass rate by family", ""]
     rows = []

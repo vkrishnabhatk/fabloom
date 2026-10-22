@@ -1,0 +1,44 @@
+# The demo stack: Caddy (TLS) -> fabloom app -> local Batfish. `docker compose up -d`.
+# Secrets come from .env next to this file (FABLOOM_TOKEN_FACTORY_API_KEY, optional
+# FABLOOM_TAVILY_API_KEY); without a key the app serves the gallery read-only.
+
+services:
+  batfish:
+    image: batfish/allinone:2026.08.27.3685@sha256:54cb0ed94fd9a3c1ca0985f73e5be479e955cee9b9f6a6799b66be3364fd8e5c
+    restart: unless-stopped
+    # Not published: only the app talks to Batfish.
+    expose: ["9996", "9997"]
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.app
+    image: ghcr.io/vkrishnabhatk/fabloom-app:local
+    restart: unless-stopped
+    depends_on: [batfish]
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      FABLOOM_BATFISH_HOST: batfish
+      FABLOOM_LOG_JSON: "true"
+      # Caddy is the only client, so its X-Forwarded-For is the visitor's address.
+      FABLOOM_WEB_TRUST_PROXY: "true"
+    volumes:
+      - runs:/data
+    expose: ["8000"]
+
+  caddy:
+    image: caddy:2.10
+    restart: unless-stopped
+    depends_on: [app]
+    ports: ["80:80", "443:443"]
+    environment:
+      FABLOOM_DOMAIN: ${FABLOOM_DOMAIN:-localhost}
+    volumes:
+      - ./docker/app/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy:/data
+
+volumes:
+  runs:
+  caddy:

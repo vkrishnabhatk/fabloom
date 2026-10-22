@@ -1,0 +1,9 @@
+# TLS and the only door to the app. Set FABLOOM_DOMAIN (e.g. demo.example.org); with
+# "localhost" Caddy serves a locally trusted certificate for testing.
+{$FABLOOM_DOMAIN:localhost} {
+	encode gzip
+	reverse_proxy app:8000 {
+		# Server-sent events: forward each event as it is written, never buffer.
+		flush_interval -1
+	}
+}

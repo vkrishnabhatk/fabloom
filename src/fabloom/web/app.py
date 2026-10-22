@@ -71,12 +71,13 @@ class _Web:
     breaker: SpendBreaker
     examples: list[Scenario]
     templates: Jinja2Templates
+    git_sha: str  # read once: git_sha() may shell out to git
 
     def info(self) -> dict[str, Any]:
         m = self.machine
         return {
             "version": __version__,
-            "git_sha": git_sha(),
+            "git_sha": self.git_sha,
             "mode": "read-only" if self.service.read_only_reason else "live",
             "read_only_reason": self.service.read_only_reason,
             "verifier": m.verifier.name if m else None,
@@ -116,6 +117,7 @@ def create_app(
         breaker=breaker,
         examples=examples or [],
         templates=Jinja2Templates(directory=HERE / "templates"),
+        git_sha=git_sha(),
     )
 
     @asynccontextmanager

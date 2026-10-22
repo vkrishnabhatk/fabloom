@@ -68,6 +68,15 @@ image-verifier: ## Build the verifier image with GIT_SHA baked in (prevents untr
 	docker build -f docker/Dockerfile.verifier --build-arg GIT_SHA=$(GIT_SHA) \
 		--build-arg BATFISH_IMAGE=$(BATFISH_IMAGE) -t $(VERIFIER_IMAGE):git-$(GIT_SHA) .
 
+.PHONY: image-app
+image-app: ## Build the web demo image (prevents a demo that only runs on this laptop)
+	docker build -f docker/Dockerfile.app --build-arg GIT_SHA=$(GIT_SHA) \
+		-t ghcr.io/vkrishnabhatk/fabloom-app:git-$(GIT_SHA) .
+
+.PHONY: demo-up
+demo-up: ## Caddy + app + Batfish via docker compose (FABLOOM_DOMAIN, keys from .env)
+	docker compose up -d --build
+
 .PHONY: training-jobs
 training-jobs: ## Regenerate the AOT training jobs after changing checks (prevents a cold-JVM image)
 	PYTHONPATH=. uv run python scripts/make_training_jobs.py

@@ -7,7 +7,9 @@ diffed across runs, repair rounds and benchmark arms.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from fnmatch import fnmatchcase
+from ipaddress import IPv4Address
 from itertools import permutations
 
 from fabloom.contracts import (
@@ -167,7 +169,25 @@ def _link_checks(fabric: FabricPlan) -> list[Check]:
     ]
 
 
-def _loopback_checks(fabric: FabricPlan) -> list[Check]:
+def _intended_denials(
+    filters: Sequence[FilterRule], src_ip: IPv4Address, dst_device: str
+) -> list[dict[str, object]]:
+    """Traffic from ``src_ip`` to ``dst_device`` that the intent itself says to drop.
+
+    Reachability must not count those flows as failures: Batfish answers "is any flow
+    dropped?" with one example flow, and for a "block telnet to every switch" fabric that
+    example is telnet to the destination leaf (found against live Batfish, 2026-10-23).
+    """
+    denied = {
+        (rule.protocol, rule.dst_port)
+        for rule in filters
+        if fnmatchcase(dst_device, rule.devices)
+        and (rule.src_not_in is None or src_ip not in rule.src_not_in)
+    }
+    return [{"protocol": proto, "dst_port": port} for proto, port in sorted(denied)]
+
+
+def _loopback_checks(fabric: FabricPlan, filters: Sequence[FilterRule] = ()) -> list[Check]:
     out: list[Check] = []
     for node in fabric.devices:
         for owner in fabric.devices:
@@ -198,6 +218,7 @@ def _loopback_checks(fabric: FabricPlan) -> list[Check]:
                 src_ip=str(src_ip),
                 dst_device=dst,
                 dst_ip=str(dst_ip),
+                intended_denials=_intended_denials(filters, src_ip, dst),
             )
         )
     return out
@@ -237,7 +258,7 @@ def compile_checks(intent: Intent, fabric: FabricPlan) -> CheckSet:
         *_device_checks(fabric),
         *_session_checks(fabric),
         *_link_checks(fabric),
-        *(_loopback_checks(fabric) if intent.advertise_loopbacks else []),
+        *(_loopback_checks(fabric, intent.filters) if intent.advertise_loopbacks else []),
         *filters,
         _check(CheckKind.NO_FORWARDING_LOOPS, "", "no forwarding loops anywhere"),
     ]

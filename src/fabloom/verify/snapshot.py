@@ -7,7 +7,11 @@ Two platform packagings:
 
 - Arista EOS: the candidate is the whole running-config, written as-is.
 - FRR: Batfish reads FRR through its Cumulus "concatenated" format: hostname line, then
-  ``/etc/network/interfaces``, then ``frr.conf``. The interfaces section only declares which
+  ``/etc/network/interfaces``, then a ``# ports.conf --`` section, then ``frr.conf``. The
+  ports.conf marker is what ends the interfaces section: without it Batfish parsed every
+  ``frr.conf`` line as an interfaces statement (live Batfish 2026.08.27, 2026-10-23: all
+  four devices PARTIALLY_UNRECOGNIZED, no BGP sessions; with it, PASSED and 8/8 sessions
+  established). A blank line is not enough. The interfaces section only declares which
   ports exist (that is cabling, decided by the plan). It deliberately carries no addresses:
   addressing is the model's job, in ``frr.conf``, and must not be silently supplied here.
 
@@ -25,6 +29,7 @@ from typing import Any
 from fabloom.contracts import Device, FabricPlan, Platform
 
 FRR_VERSION_LINE = "frr version 8.4"
+PORTS_CONF_MARKER = "# ports.conf --"
 
 
 def config_filename(device: str) -> str:
@@ -44,7 +49,7 @@ def render_device_file(platform: Platform, device: Device, config: str) -> str:
         return body + "\n"
     if not body.lstrip().startswith("frr version"):
         body = f"{FRR_VERSION_LINE}\n{body}"
-    return f"{device.name}\n{_frr_interfaces(device)}\n{body}\n"
+    return f"{device.name}\n{_frr_interfaces(device)}\n{PORTS_CONF_MARKER}\n{body}\n"
 
 
 def layer1_topology(fabric: FabricPlan) -> dict[str, Any]:

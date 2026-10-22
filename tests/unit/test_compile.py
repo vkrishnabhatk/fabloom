@@ -93,3 +93,23 @@ def test_reachability_sampling_is_linear_for_big_fabrics() -> None:
     assert len(set(pairs)) == len(pairs)
     assert all(a != b for a, b in pairs)
     assert {a for a, _ in pairs} == set(big)  # every leaf is a source
+
+
+def test_reachability_leaves_out_only_what_the_intent_denies() -> None:
+    telnet_everywhere = FilterRule(devices="*", protocol="tcp", dst_port=23)
+    intent = Intent(
+        platform=Platform.ARISTA_EOS,
+        topology=TopologySpec(spines=2, leaves=2),
+        # Sources inside 10.0.0.0/8 (every loopback) are allowed SSH, so it is not excluded.
+        filters=[telnet_everywhere, _ssh_rule(), FilterRule(devices="spine*", dst_port=80)],
+    )
+    cs = compile_checks(intent, allocate(intent))
+    reach = {c.id: c.params for c in cs.checks if c.kind is CheckKind.REACHABILITY}
+    # HTTP is blocked only to the spines; traffic to a leaf must still get through.
+    assert reach["reachability:leaf1->leaf2"]["intended_denials"] == [
+        {"protocol": "tcp", "dst_port": 23}
+    ]
+    plain = compile_checks(intent.model_copy(update={"filters": []}), allocate(intent))
+    assert all(
+        c.params["intended_denials"] == [] for c in plain.checks if c.kind is CheckKind.REACHABILITY
+    )

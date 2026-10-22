@@ -25,7 +25,7 @@ What exists and is tested today (offline, `make check`):
 | Deterministic fabric plan + check compiler | 49 v0.1 scenarios in 7 families (23 on Arista EOS) compile; allocator property-tested (no overlaps, order-independent, never renumbers) |
 | Run state machine, budget, event log | Tested with scripted models and verifiers; golden path end to end |
 | Token Factory client | Strict JSON output, retries, refusal/truncation detection, cost accounting, secret scrubbing |
-| Batfish verifier | Question mapping tested against **synthetic** answers only; real recordings come from the week-0 spike |
+| Batfish verifier | Recorded against live Batfish 2026.08.27: known-good configs for 4 reference scenarios (FRR numbered and unnumbered, EOS, EOS filters) pass every check; the recordings are replayed in CI |
 | Benchmark harness | Arms x scenarios through the real loop, resumable; records derived from event logs; MLflow tracking; regression and grounding gates; generated report |
 | Doc-grounded repair | Tavily search of vendor docs for unrecognised lines, cached, rate-limited and capped per run; off unless its benchmark arm passes the grounding gate ([ADR-0008](docs/decisions/ADR-0008-doc-grounded-repair.md)). Tested with a scripted search only |
 | Web demo | `fabloom serve`: JSON API, live event stream (SSE), per-IP rate limit, daily spend cap, read-only gallery when there is no key or credit. Tested with fakes; not deployed |
@@ -91,11 +91,11 @@ arms and gates: `conf/bench.yaml`.
 - **FRR traffic filters cannot be verified.** `frr.conf` has no packet filter and Batfish
   does not model iptables, so "block SSH" on FRR is reported as *not verifiable* rather than
   passed. Filter scenarios use Arista EOS ([ADR-0006](docs/decisions/ADR-0006-deterministic-fabric-plan.md)).
-- **The Batfish evaluator has only seen synthetic answers.** Column names follow Batfish's
-  documented answer schemas; `scripts/record_batfish_fixtures.py` replaces them with real
-  recordings, which `tests/integration/test_recorded_fixtures.py` then replays.
-- **FRR packaging for Batfish** (Cumulus concatenated format) is unconfirmed against a live
-  server.
+- **Real Batfish recordings cover 4 reference scenarios**, not all 49. Their first
+  recording found two bugs that synthetic answers had hidden: FRR configs were not parsed
+  at all (a missing `# ports.conf --` section marker), and leaf-to-leaf reachability
+  counted traffic the intent itself blocks as a failure. Both are fixed and covered by
+  tests.
 - Leaf-spine eBGP underlays only: FRR and Arista EOS numbered, FRR unnumbered. The EOS
   generator rules have no unnumbered peering yet, so no EOS scenario uses it.
 

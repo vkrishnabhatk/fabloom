@@ -22,7 +22,7 @@ from fabloom.contracts import (
 )
 from fabloom.verify import PrelintGate, prelint
 from fabloom.verify.batfish_local import BatfishVerifier, run_checks, to_cell
-from fabloom.verify.batfish_questions import Evaluator, Question
+from fabloom.verify.batfish_questions import Evaluator, Question, _port_complement
 from fabloom.verify.recorded import MissingAnswerError, RecordedAnswerer, RecordingAnswerer
 from fabloom.verify.snapshot import layer1_topology, render_device_file, write_snapshot
 from tests.fakes import FakeVerifier
@@ -113,6 +113,17 @@ def test_frr_snapshot_layout(tmp_path: Path, frr_intent: Intent, frr_fabric: Fab
     assert "address" not in iface_section
     topo = json.loads((tmp_path / "batfish" / "layer1_topology.json").read_text())
     assert len(topo["edges"]) == 2 * len(frr_fabric.links)
+
+
+def test_frr_sections_are_separated_by_the_ports_conf_marker(frr_fabric: FabricPlan) -> None:
+    # Without the marker, live Batfish parses all of frr.conf as interfaces statements.
+    text = render_device_file(Platform.FRR, frr_fabric.device("leaf1"), "hostname leaf1\n")
+    assert text.index("iface swp1") < text.index("# ports.conf --") < text.index("frr version")
+
+
+def test_port_complement() -> None:
+    assert _port_complement([23]) == "1-22,24-65535"
+    assert _port_complement([1, 22, 22, 65535]) == "2-21,23-65534"
 
 
 def test_frr_version_line_added_once(frr_fabric: FabricPlan) -> None:

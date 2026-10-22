@@ -518,7 +518,13 @@
     "src_device": "leaf1",
     "src_ip": "10.0.1.1",
     "dst_device": "leaf2",
-    "dst_ip": "10.0.1.2"
+    "dst_ip": "10.0.1.2",
+    "intended_denials": [
+     {
+      "protocol": "tcp",
+      "dst_port": 23
+     }
+    ]
    }
   },
   {
@@ -530,7 +536,13 @@
     "src_device": "leaf2",
     "src_ip": "10.0.1.2",
     "dst_device": "leaf1",
-    "dst_ip": "10.0.1.1"
+    "dst_ip": "10.0.1.1",
+    "intended_denials": [
+     {
+      "protocol": "tcp",
+      "dst_port": 23
+     }
+    ]
    }
   },
   {

@@ -12,7 +12,8 @@ the same against a live Batfish, a sandbox, or recorded JSON fixtures.
 | bgp_established      | bgpSessionStatus                                     |
 | l3_edges             | layer3Edges                                          |
 | route_present        | routes                                               |
-| reachability         | reachability(actions=FAILURE), must be empty         |
+| reachability         | reachability(actions=FAILURE), must be empty; flows  |
+|                      | the intent itself denies are left out of the query   |
 | filter_denies        | reachability(@enter uplinks, actions=ACCEPTED), empty|
 | no_forwarding_loops  | detectLoops                                          |
 """
@@ -55,6 +56,21 @@ class Answerer(Protocol):
 
 def _device_of_file(filename: str) -> str:
     return PurePosixPath(str(filename)).stem
+
+
+MAX_PORT = 65535
+
+
+def _port_complement(ports: list[int]) -> str:
+    """Batfish dstPorts for every port except ``ports``: ``[23]`` -> ``"1-22,24-65535"``."""
+    ranges, lo = [], 1
+    for port in sorted(set(ports)):
+        if port > lo:
+            ranges.append(f"{lo}-{port - 1}")
+        lo = port + 1
+    if lo <= MAX_PORT:
+        ranges.append(f"{lo}-{MAX_PORT}")
+    return ",".join(ranges)
 
 
 def _iface(device: str, interface: str) -> str:
@@ -236,12 +252,28 @@ class Evaluator:
         p = check.params
         if not self._parsed(p["src_device"]):
             return False, {"detail": f"{p['src_device']} not parsed"}
-        failing = self.rows(
-            "reachability",
-            pathConstraints={"startLocation": p["src_device"]},
-            headers={"srcIps": p["src_ip"], "dstIps": p["dst_ip"]},
-            actions="FAILURE",
-        )
+        base = {"srcIps": p["src_ip"], "dstIps": p["dst_ip"]}
+        denied = sorted({int(d["dst_port"]) for d in p.get("intended_denials", [])})
+        if not denied:
+            header_sets = [base]
+        else:
+            # Everything except what the intent itself drops: ICMP, then TCP/UDP on every
+            # other port. Excluding a port for both protocols when only one is denied loses
+            # a little coverage but never reports an intended drop as a failure.
+            header_sets = [
+                {**base, "ipProtocols": ["icmp"]},
+                {**base, "ipProtocols": ["tcp", "udp"], "dstPorts": _port_complement(denied)},
+            ]
+        failing = [
+            row
+            for headers in header_sets
+            for row in self.rows(
+                "reachability",
+                pathConstraints={"startLocation": p["src_device"]},
+                headers=headers,
+                actions="FAILURE",
+            )
+        ]
         return not failing, ({"failing_flows": self._flows(failing)} if failing else {})
 
     def _filter_denies(self, check: Check) -> tuple[bool, dict[str, Any]]:

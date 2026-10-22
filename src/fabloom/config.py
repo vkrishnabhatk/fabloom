@@ -36,6 +36,15 @@ class Settings(BaseSettings):
         default=None, validation_alias=AliasChoices("FABLOOM_TAVILY_API_KEY", "TAVILY_API_KEY")
     )
     grounding_cache_dir: Path = Path(".cache/grounding")
+    # Web demo (`fabloom serve`). The spend cap is per UTC day across all visitors; at the cap
+    # the app turns read-only and serves the gallery instead of failing.
+    web_spend_cap_usd: float = Field(default=2.0, ge=0)
+    web_runs_per_ip: int = Field(default=3, ge=1)  # token bucket size
+    web_refill_s: float = Field(default=600.0, gt=0)  # one more run per IP this often
+    web_max_active_runs: int = Field(default=2, ge=1)
+    # Only behind our own reverse proxy (Caddy) is X-Forwarded-For the visitor's address.
+    web_trust_proxy: bool = False
+    gallery_dir: Path = REPO_ROOT / "gallery"
     log_level: str = "INFO"
     log_json: bool = True
     # SQLite store plus ./mlruns artifacts; both are backed up off the VM (architecture §11).

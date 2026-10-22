@@ -27,7 +27,7 @@ jobs:
           version: ${{ env.UV_VERSION }}
           enable-cache: true
           cache-dependency-glob: uv.lock
-      - run: uv sync --frozen --extra batfish --extra eval --python 3.12
+      - run: uv sync --frozen --extra batfish --extra eval --extra web --python 3.12
       - run: uv run ruff format --check src tests scripts spikes
       - run: uv run ruff check src tests scripts spikes
       - run: uv run mypy
@@ -50,7 +50,7 @@ jobs:
           version: ${{ env.UV_VERSION }}
           enable-cache: true
           cache-dependency-glob: uv.lock
-      - run: uv sync --frozen --extra batfish --extra eval --python ${{ matrix.python }}
+      - run: uv sync --frozen --extra batfish --extra eval --extra web --python ${{ matrix.python }}
       # Offline only: sandbox/llm markers need secrets and run in nightly.yml.
       - run: uv run pytest -m "unit or integration" --cov --cov-report=xml
 
@@ -75,7 +75,7 @@ jobs:
           docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.28.0 git /repo --redact
       - name: no GPL-family licences in runtime dependencies
         run: |
-          uv sync --frozen --no-dev --extra batfish --extra eval
+          uv sync --frozen --no-dev --extra batfish --extra eval --extra web
           uv run --no-sync --with pip-licenses pip-licenses --partial-match \
             --fail-on="GPL;AGPL" --ignore-packages pip-licenses prettytable wcwidth
 

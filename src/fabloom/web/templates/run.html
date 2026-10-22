@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Run {{ run_id }} · Fabloom{% endblock %}
+{% block page %}run{% endblock %}
+{% block body_attrs %}data-run-id="{{ run_id }}"{% endblock %}
+{% block main %}
+<section class="card">
+  <p class="muted"><a href="/">&larr; new run</a>{% if gallery %} · recorded gallery run{% endif %}</p>
+  <h1 id="request">Run {{ run_id }}</h1>
+  <p id="status" class="status">loading…</p>
+</section>
+<section class="card">
+  <h2>Live log</h2>
+  <ol id="events" class="events"></ol>
+</section>
+<section class="card" id="result" hidden>
+  <h2>Result</h2>
+  <p id="explanation"></p>
+  <p id="unverifiable" class="muted" hidden></p>
+  <h3>Checks</h3>
+  <ul id="checks" class="checks"></ul>
+  <h3>Configs</h3>
+  <div id="configs"></div>
+</section>
+{% endblock %}

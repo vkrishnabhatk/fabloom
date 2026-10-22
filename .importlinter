@@ -80,6 +80,7 @@ source_modules =
     fabloom.agent
     fabloom.scrub
     fabloom.eval
+    fabloom.web
 forbidden_modules =
     fabloom.cli
 
@@ -100,3 +101,26 @@ source_modules =
     fabloom.agent
 forbidden_modules =
     fabloom.eval
+
+[importlinter:contract:web-is-handed-a-machine]
+name = The web app runs what the composition root built: web never imports verify or eval
+type = forbidden
+source_modules =
+    fabloom.web
+forbidden_modules =
+    fabloom.verify
+    fabloom.eval
+
+[importlinter:contract:web-is-on-top]
+name = Nothing below the web app imports it
+type = forbidden
+source_modules =
+    fabloom.contracts
+    fabloom.checks
+    fabloom.verify
+    fabloom.llm
+    fabloom.agent
+    fabloom.scrub
+    fabloom.eval
+forbidden_modules =
+    fabloom.web

@@ -12,7 +12,7 @@ help: ## List targets
 
 .PHONY: install
 install: ## Sync the locked env incl. Batfish client (prevents "works on my machine" drift from uv.lock)
-	uv sync --frozen --extra batfish --extra eval
+	uv sync --frozen --extra batfish --extra eval --extra web
 	uv run pre-commit install
 
 .PHONY: format
@@ -49,6 +49,10 @@ doctor: ## Probe every configured model on Token Factory (prevents a retired mod
 .PHONY: bench-plan
 bench-plan: ## Show the benchmark matrix and its worst-case spend (prevents an unbudgeted run)
 	uv run fabloom bench run --dry-run
+
+.PHONY: serve
+serve: ## Run the web demo on :8000 (read-only gallery without a Token Factory key)
+	uv run fabloom serve --port 8000
 
 .PHONY: batfish-up
 batfish-up: ## Start a local Batfish for the batfish-local verifier backend

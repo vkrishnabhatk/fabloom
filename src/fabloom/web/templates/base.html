@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Fabloom{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='app.css') }}">
+  <script src="{{ url_for('static', path='app.js') }}" defer></script>
+</head>
+<body data-page="{% block page %}{% endblock %}" {% block body_attrs %}{% endblock %}>
+  <header class="top">
+    <a class="brand" href="/">Fabloom</a>
+    <span class="tag">plain-language leaf-spine configs, verified with Batfish</span>
+    <span class="mode mode-{{ info.mode }}">{{ info.mode }}</span>
+  </header>
+  {% if info.read_only_reason %}
+  <p class="banner">Read-only: {{ info.read_only_reason }}. The gallery below shows recorded runs.</p>
+  {% endif %}
+  <main>{% block main %}{% endblock %}</main>
+  <footer>
+    fabloom {{ info.version }} ({{ info.git_sha }}){% if info.verifier %} · verifier {{ info.verifier }}{% endif %}
+    · <a href="/api/docs">API</a>
+    · <a href="https://github.com/vkrishnabhatk/fabloom">source</a>
+    · input is scrubbed of secrets before it leaves the server
+  </footer>
+</body>
+</html>

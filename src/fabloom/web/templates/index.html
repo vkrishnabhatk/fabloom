@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block page %}index{% endblock %}
+{% block main %}
+<section class="card">
+  <h1>Describe the fabric</h1>
+  <p class="muted">Nemotron plans and writes the configs. Batfish checks them against checks
+    compiled from your request, and failed checks go back to the model to repair. The verdict
+    comes from Batfish, never from the model.</p>
+  <form id="run-form">
+    <label for="request">Request</label>
+    <textarea id="request" name="request" rows="4" minlength="10" maxlength="2000" required
+      placeholder="2 spines and 4 leaves on FRR, eBGP numbered, block SSH to the leaves from outside 10.0.0.0/8"
+      {% if info.read_only_reason %}disabled{% endif %}></textarea>
+    <div class="row">
+      <label for="platform">Platform</label>
+      <select id="platform" name="platform" {% if info.read_only_reason %}disabled{% endif %}>
+        <option value="">from the request</option>
+        <option value="frr">FRR</option>
+        <option value="arista_eos">Arista EOS</option>
+      </select>
+      <button type="submit" {% if info.read_only_reason %}disabled{% endif %}>Generate and verify</button>
+    </div>
+    <p id="form-error" class="error" hidden></p>
+  </form>
+  {% if examples and not info.read_only_reason %}
+  <div class="examples">
+    <span class="muted">Try:</span>
+    {% for e in examples %}<button type="button" class="example" data-request="{{ e }}">{{ e[:70] }}{% if e|length > 70 %}…{% endif %}</button>{% endfor %}
+  </div>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Gallery</h2>
+  {% if gallery %}
+  <ul class="gallery">
+    {% for g in gallery %}
+    <li>
+      <a href="/runs/{{ g.run_id }}">{{ g.request or g.run_id }}</a>
+      <span class="pill pill-{{ g.outcome or 'running' }}">{{ g.outcome or g.state }}</span>
+      {% if g.repair_rounds is not none %}<span class="muted">{{ g.repair_rounds }} repair round{{ '' if g.repair_rounds == 1 else 's' }}</span>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">No recorded runs yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -450,6 +450,45 @@ def bench_baseline(
     typer.echo(f"baseline {results.meta.bench_id} frozen at {path}")
 
 
+def build_web_machine(settings: Settings) -> RunMachine | None:
+    """The demo's run machine, or None (read-only gallery) when there is no model key."""
+    if settings.token_factory_api_key is None:
+        return None
+    rc = run_config(settings.conf_dir)
+    return RunMachine(
+        client=build_client(settings),
+        router=ModelRouter(models_config(settings.conf_dir)),
+        verifier=build_verifier(settings),
+        run_config=rc,
+        runs_dir=settings.runs_dir,
+        grounder=build_grounder(settings, rc.grounding) if rc.grounding.enabled else None,
+    )
+
+
+@app.command()
+def serve(
+    host: Annotated[str, typer.Option(help="Bind address.")] = "127.0.0.1",
+    port: Annotated[int, typer.Option(min=1, max=65535)] = 8000,
+) -> None:
+    """Run the web demo. Without a Token Factory key it serves the gallery read-only."""
+    try:
+        import uvicorn  # noqa: PLC0415 - optional extra
+
+        from fabloom.web import create_app  # noqa: PLC0415
+    except ImportError as exc:
+        typer.secho("The web demo needs the web extra: uv sync --extra web", fg=typer.colors.RED)
+        raise typer.Exit(2) from exc
+    settings = Settings()
+    configure_logging(settings.log_level, settings.log_json)
+    machine = build_web_machine(settings)
+    if machine is None:
+        typer.secho("No Token Factory key: serving the gallery read-only.", fg=typer.colors.YELLOW)
+    examples = load_scenarios(DEFAULT_BENCHMARK_DIR) if DEFAULT_BENCHMARK_DIR.is_dir() else []
+    app_ = create_app(settings, machine, examples=examples)
+    # proxy_headers off: client_ip() decides when X-Forwarded-For is trusted.
+    uvicorn.run(app_, host=host, port=port, proxy_headers=False, log_config=None)
+
+
 @app.command()
 def doctor() -> None:
     """Check every configured model exists on Token Factory and answers in JSON mode."""

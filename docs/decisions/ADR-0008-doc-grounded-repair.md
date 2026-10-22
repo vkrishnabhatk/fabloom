@@ -25,7 +25,10 @@ it only if the benchmark shows it helps.
   addresses, ASNs and interface numbers are dropped and the query is scrubbed. That
   deduplicates `neighbor 10.0.0.1 bfd` and `neighbor 10.0.0.3 bfd`, and keeps a user's
   addressing plan out of a third-party API. Search is restricted to the vendor's domains in
-  `conf/fabloom.yaml` (`docs.frrouting.org`, `arista.com`). A platform without configured
+  `conf/fabloom.yaml` (`docs.frrouting.org`, `arista.com/en/um-eos`). The Arista entry is
+  a path because the bare domain returned only marketing pages for a real query
+  (2026-10-22, four live searches); the user-manual path returned the BFD and BGP command
+  reference. A platform without configured
   domains is not grounded, because forum answers would reach the prompt looking like vendor
   syntax.
 - **Excerpts are data.** Web text goes into the prompt under a header that calls it reference

@@ -7,7 +7,7 @@
 
 models:
   nano:
-    id: nvidia/nvidia-nemotron-3-nano-30b-a3b
+    id: nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B
     usd_per_m_input: 0.06
     usd_per_m_output: 0.24
     price_verified: false   # plan "Costs" table; confirm in the probe

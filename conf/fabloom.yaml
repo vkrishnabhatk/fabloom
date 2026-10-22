@@ -21,7 +21,9 @@ run:
     enabled: false
     domains:
       frr: [docs.frrouting.org]
-      arista_eos: [arista.com]
+      # The EOS user manual path, not the domain: arista.com alone returns marketing pages
+      # (measured 2026-10-22 with "neighbor bfd fast-detect").
+      arista_eos: [arista.com/en/um-eos]
     max_results: 3
     max_excerpt_chars: 800
     min_interval_s: 1.0

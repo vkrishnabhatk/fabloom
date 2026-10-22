@@ -148,7 +148,7 @@ def _chat(content: str) -> dict[str, Any]:
 
 
 def test_doctor(monkeypatch: pytest.MonkeyPatch) -> None:
-    listed = {"nvidia/nvidia-nemotron-3-nano-30b-a3b", "nvidia/nemotron-3-super-120b-a12b"}
+    listed = {"nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B", "nvidia/nemotron-3-super-120b-a12b"}
 
     def handler(req: httpx2.Request) -> httpx2.Response:
         if req.url.path.endswith("/models"):

@@ -4,17 +4,17 @@ Describe a data center network in plain language; get configs that are generated
 Nemotron on Nebius Token Factory, **verified with Batfish**, and repaired until every check
 passes, or an honest report of what could not be fixed.
 
-> Status: pre-alpha (week 1 of the build). Hackathon entry for the Nebius × NVIDIA Global
+> Status: pre-alpha (week 3 of the build). Hackathon entry for the Nebius × NVIDIA Global
 > AI Hackathon, and a long-term open-source project. Output is always a proposal for a human
 > to review, never pushed to devices.
 
 ## Results
 
 **No benchmark numbers yet.** The harness is built and tested offline; it has not run
-against real models or a real Batfish. The v0.1 benchmark (40–60 scenarios) compares five
-arms from `conf/bench.yaml`: raw Nano, Super and Ultra, Super with the repair loop, and the
-routed product. The verify-only result is the repair arm's first-pass rate; repair + doc
-grounding is added with the Tavily step. Its report is generated into
+against real models or a real Batfish. The v0.1 benchmark (49 scenarios) compares six
+arms from `conf/bench.yaml`: raw Nano, Super and Ultra; Super with the repair loop; the same
+plus Tavily doc grounding; and the routed product. The verify-only result is the repair
+arm's first-pass rate. Its report is generated into
 `docs/benchmark/v0.1.md`, with every number annotated with how it was measured and negative
 results included.
 
@@ -27,6 +27,8 @@ What exists and is tested today (offline, `make check`):
 | Token Factory client | Strict JSON output, retries, refusal/truncation detection, cost accounting, secret scrubbing |
 | Batfish verifier | Question mapping tested against **synthetic** answers only; real recordings come from the week-0 spike |
 | Benchmark harness | Arms x scenarios through the real loop, resumable; records derived from event logs; MLflow tracking; regression and grounding gates; generated report |
+| Doc-grounded repair | Tavily search of vendor docs for unrecognised lines, cached, rate-limited and capped per run; off unless its benchmark arm passes the grounding gate ([ADR-0008](docs/decisions/ADR-0008-doc-grounded-repair.md)). Tested with a scripted search only |
+| Web demo | `fabloom serve`: JSON API, live event stream (SSE), per-IP rate limit, daily spend cap, read-only gallery when there is no key or credit. Tested with fakes; not deployed |
 | Nebius Sandboxes backend | Not built. Spike script ready (`spikes/batfish_in_sandbox.py`) |
 
 ## The one rule
@@ -67,13 +69,22 @@ uv run fabloom doctor            # every configured Nemotron model exists and an
 uv run fabloom bench run --dry-run                 # the arm x scenario matrix and its worst-case spend
 uv run fabloom bench run --arm super-repair        # runs, reports, gates, logs to MLflow
 uv run fabloom bench report runs/bench/<id> --report docs/benchmark/v0.1.md   # no model
+
+uv run fabloom serve             # web demo on :8000; read-only gallery without a key
+docker compose up -d --build     # Caddy + app + Batfish, as on the demo VM
 ```
+
+Doc grounding needs `FABLOOM_TAVILY_API_KEY` and runs only in the `super-repair-grounding`
+arm, or with `grounding.enabled: true` in `conf/fabloom.yaml`.
 
 Models, prices and routing: `conf/models.yaml`. Run budget: `conf/fabloom.yaml`. Benchmark
 arms and gates: `conf/bench.yaml`.
 
 ## Known limitations
 
+- **Doc grounding is unmeasured.** It is built and tested offline, but no search has run
+  against Tavily and its benchmark arm has no result. It stays off in the product until the
+  grounding gate passes, and the result is published either way.
 - **Prices and model IDs are unconfirmed.** Every entry in `conf/models.yaml` is
   `price_verified: false` until `spikes/nemotron_probe.py` runs; unknown prices are set
   pessimistically so the budget guard over-estimates spend.
@@ -95,8 +106,6 @@ data. See [SECURITY.md](SECURITY.md).
 
 ## Project documents
 
-- `fabloom-plan.html`: product plan and hackathon strategy
-- `fabloom-architecture.html`: engineering design
 - [docs/decisions/](docs/decisions/): architecture decision records
 - [CONTRIBUTING.md](CONTRIBUTING.md)
 

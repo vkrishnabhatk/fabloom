@@ -12,7 +12,7 @@ help: ## List targets
 
 .PHONY: install
 install: ## Sync the locked env incl. Batfish client (prevents "works on my machine" drift from uv.lock)
-	uv sync --frozen --extra batfish --extra eval --extra web
+	uv sync --frozen --extra batfish --extra eval --extra web --group docs
 	uv run pre-commit install
 
 .PHONY: format
@@ -37,6 +37,10 @@ test-live: ## Tests that spend credits or need Sandboxes; needs secrets (nightly
 
 .PHONY: check
 check: lint test ## Everything CI's lint and test jobs run
+
+.PHONY: docs
+docs: ## Build the docs site strictly (prevents broken links reaching the published docs)
+	uv run --group docs mkdocs build --strict
 
 .PHONY: scenarios
 scenarios: ## Validate every benchmark scenario compiles (prevents a broken benchmark file)

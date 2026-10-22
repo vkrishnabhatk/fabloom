@@ -54,6 +54,19 @@ jobs:
       # Offline only: sandbox/llm markers need secrets and run in nightly.yml.
       - run: uv run pytest -m "unit or integration" --cov --cov-report=xml
 
+  docs:
+    name: docs (mkdocs --strict, so a broken internal link fails)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: uv sync --frozen --only-group docs --python 3.12
+      - run: uv run --no-sync mkdocs build --strict
+
   security:
     name: security (pip-audit, gitleaks, licences)
     runs-on: ubuntu-latest

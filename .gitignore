@@ -36,3 +36,5 @@ secrets/*.yaml
 
 # Doc-grounding search cache (llm/grounding.py); safe to delete
 .cache/
+# mkdocs build output
+site/

@@ -1,0 +1,29 @@
+site_name: Fabloom
+site_description: Plain-language leaf-spine configs from NVIDIA Nemotron, verified with Batfish.
+repo_url: https://github.com/vkrishnabhatk/fabloom
+edit_uri: edit/main/docs/
+copyright: Code Apache-2.0 · benchmark scenarios CC BY 4.0
+
+theme:
+  name: material
+  features: [navigation.sections, content.code.copy]
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle: {icon: material/brightness-7, name: Dark mode}
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle: {icon: material/brightness-4, name: Light mode}
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc: {permalink: true}
+  - pymdownx.superfences
+
+# --strict in CI turns every broken internal link into a build failure.
+validation:
+  links:
+    not_found: warn
+    anchors: warn
+    absolute_links: info

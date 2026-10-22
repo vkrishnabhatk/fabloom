@@ -121,6 +121,17 @@ def test_frr_sections_are_separated_by_the_ports_conf_marker(frr_fabric: FabricP
     assert text.index("iface swp1") < text.index("# ports.conf --") < text.index("frr version")
 
 
+def test_frr_top_level_exit_is_dropped_for_batfish_only(frr_fabric: FabricPlan) -> None:
+    config = "hostname leaf1\ninterface lo\n ip address 10.0.1.1/32\nexit\nrouter bgp 65101\n"
+    config += " address-family ipv4 unicast\n exit-address-family\n  exit\nexit\n"
+    text = render_device_file(Platform.FRR, frr_fabric.device("leaf1"), config)
+    frr = text.split("frr version")[1].splitlines()
+    assert "exit" not in frr
+    assert " exit-address-family" in frr
+    assert "  exit" in frr  # indented: not the top-level no-op, so not ours to drop
+    assert render_device_file(Platform.ARISTA_EOS, frr_fabric.device("leaf1"), "exit\n") == "exit\n"
+
+
 def test_port_complement() -> None:
     assert _port_complement([23]) == "1-22,24-65535"
     assert _port_complement([1, 22, 22, 65535]) == "2-21,23-65534"

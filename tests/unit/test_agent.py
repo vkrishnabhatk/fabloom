@@ -34,8 +34,8 @@ from fabloom.contracts import (
     RunBudget,
     RunState,
 )
-from fabloom.contracts.run import RunFinished, StateChanged
-from fabloom.llm import LlmOutputError, ModelRouter
+from fabloom.contracts.run import LlmCall, RunFinished, StateChanged
+from fabloom.llm import Completion, LlmOutputError, ModelRouter
 from tests.fakes import FakeChatClient, FakeVerifier
 from tests.fakes.render import as_device_blocks, render_good_configs
 
@@ -240,6 +240,24 @@ async def test_unexpected_error_fails_the_run(
     last = list(read_events(result.run_dir / EVENTS_FILE))[-1]
     assert isinstance(last, RunFinished)
     assert last.outcome == "failed"
+
+
+async def test_a_truncated_call_is_still_paid_for(
+    frr_intent: Intent, router: ModelRouter, runs_dir: Path, run_config: RunConfig
+) -> None:
+    spec = router.spec(ModelRole.GENERATOR)
+    truncated = LlmOutputError("output truncated at max_output_tokens")
+    truncated.spent = Completion(
+        value=None, model=spec.id, prompt_tokens=900, completion_tokens=12000,
+        cost_usd=spec.cost_usd(900, 12000), duration_ms=1, redactions=0,
+    )  # fmt: skip
+    machine, _ = _machine([truncated], FakeVerifier([0]), router, runs_dir, run_config)
+    result = await machine.run(RunRequest("x" * 10, intent=frr_intent))
+    assert result.outcome == "failed"
+    assert result.usage.completion_tokens == 12000
+    assert result.usage.cost_usd == pytest.approx(spec.cost_usd(900, 12000))
+    calls = [e for e in read_events(result.run_dir / EVENTS_FILE) if isinstance(e, LlmCall)]
+    assert [c.completion_tokens for c in calls] == [12000]
 
 
 def test_transition_table_is_closed() -> None:

@@ -20,7 +20,7 @@ from fabloom.contracts import (
     VerificationReport,
 )
 from fabloom.contracts.run import GroundingLookup, LlmCall
-from fabloom.llm import ChatClient, Completion, LlmOutputError, ModelRouter
+from fabloom.llm import ChatClient, Completion, LlmError, LlmOutputError, ModelRouter
 from fabloom.llm.grounding import Excerpt, Grounder
 from fabloom.llm.parsing import parse_device_blocks
 from fabloom.llm.prompts import (
@@ -64,6 +64,10 @@ class LlmSteps:
             redactions=c.redactions,
         )
 
+    def _account_failure(self, role: ModelRole, exc: LlmError) -> None:
+        if exc.spent is not None:
+            self._account(role, exc.spent)
+
     async def _json(self, role: ModelRole, messages: list[dict[str, str]], output: type[M]) -> M:
         """Structured call with one corrective retry if the output fails validation."""
         spec = self._router.spec(role)
@@ -71,19 +75,28 @@ class LlmSteps:
         try:
             c = await self._client.complete_json(spec, messages, output)
         except LlmOutputError as exc:
+            self._account_failure(role, exc)
             retry = [
                 *messages,
                 {"role": "user", "content": f"Your previous answer was invalid: {exc}. "
                  "Answer again with only a valid JSON object."},
             ]  # fmt: skip
             self._budget.check_llm(spec, retry)
-            c = await self._client.complete_json(spec, retry, output)
+            try:
+                c = await self._client.complete_json(spec, retry, output)
+            except LlmError as retry_exc:
+                self._account_failure(role, retry_exc)
+                raise
         self._account(role, c)
         return c.value
 
     async def _text(self, role: ModelRole, spec: ModelSpec, messages: list[dict[str, str]]) -> str:
         self._budget.check_llm(spec, messages)
-        c = await self._client.complete_text(spec, messages)
+        try:
+            c = await self._client.complete_text(spec, messages)
+        except LlmError as exc:
+            self._account_failure(role, exc)
+            raise
         self._account(role, c)
         return c.value
 

@@ -22,7 +22,7 @@ from fabloom.contracts import (
     VerificationLevel,
     VerificationReport,
 )
-from fabloom.llm import LlmOutputError, LlmRefusalError, ModelRouter, TokenFactoryClient
+from fabloom.llm import LlmError, LlmOutputError, LlmRefusalError, ModelRouter, TokenFactoryClient
 from fabloom.llm.parsing import parse_device_blocks, strip_reasoning
 from fabloom.llm.prompts import (
     explainer_messages,
@@ -262,8 +262,21 @@ async def test_refusal_truncation_and_invalid_output(
     response: dict[str, Any], error: type[Exception]
 ) -> None:
     client = _client(lambda req: httpx2.Response(200, json=response))
-    with pytest.raises(error):
+    with pytest.raises(error) as info:
         await client.complete_json(SPEC, [{"role": "user", "content": "hi"}], Answer)
+    # A failed answer was still billed: the error carries the tokens it cost.
+    assert isinstance(info.value, LlmError)
+    assert info.value.spent is not None
+    assert (info.value.spent.prompt_tokens, info.value.spent.completion_tokens) == (100, 50)
+    assert info.value.spent.cost_usd == SPEC.cost_usd(100, 50)
+
+
+async def test_truncated_text_carries_its_cost() -> None:
+    client = _client(lambda req: httpx2.Response(200, json=_chat("<device", finish="length")))
+    with pytest.raises(LlmOutputError) as info:
+        await client.complete_text(SPEC, [{"role": "user", "content": "hi"}])
+    assert info.value.spent is not None
+    assert info.value.spent.completion_tokens == 50
 
 
 async def test_models_and_probe() -> None:

@@ -41,7 +41,9 @@ RETRYABLE = (
 
 
 class LlmError(RuntimeError):
-    pass
+    # What the failed call was billed for, when it got far enough to be billed. A truncated
+    # or invalid answer still costs its tokens; dropping them would under-report spend.
+    spent: Completion[None] | None = None
 
 
 class LlmRefusalError(LlmError):
@@ -155,6 +157,16 @@ class TokenFactoryClient:
             redactions=redactions,
         )
 
+    def _checked(
+        self, spec: ModelSpec, resp: ChatCompletion, redactions: int, duration_ms: int
+    ) -> str:
+        """The answer text, or an ``LlmError`` that carries what the call cost."""
+        try:
+            return self._content(resp)
+        except LlmError as exc:
+            exc.spent = self._completion(spec, resp, None, redactions, duration_ms)
+            raise
+
     async def complete_json(
         self, spec: ModelSpec, messages: list[dict[str, str]], output: type[M]
     ) -> Completion[M]:
@@ -167,18 +179,21 @@ class TokenFactoryClient:
             },
         }
         resp, redactions, ms = await self._create(spec, messages, response_format=response_format)
-        content = self._content(resp)
+        content = self._checked(spec, resp, redactions, ms)
         try:
             value = output.model_validate_json(content)
         except ValidationError as exc:
-            raise LlmOutputError(f"{output.__name__} did not validate: {exc}") from exc
+            err = LlmOutputError(f"{output.__name__} did not validate: {exc}")
+            err.spent = self._completion(spec, resp, None, redactions, ms)
+            raise err from exc
         return self._completion(spec, resp, value, redactions, ms)
 
     async def complete_text(
         self, spec: ModelSpec, messages: list[dict[str, str]]
     ) -> Completion[str]:
         resp, redactions, ms = await self._create(spec, messages)
-        return self._completion(spec, resp, self._content(resp), redactions, ms)
+        content = self._checked(spec, resp, redactions, ms)
+        return self._completion(spec, resp, content, redactions, ms)
 
     # --- doctor ---------------------------------------------------------------------------
 

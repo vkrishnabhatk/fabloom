@@ -28,6 +28,8 @@ SCENARIOS = [
     "leaf-spine-unnumbered-0001",
     "leaf-spine-eos-0001",
     "leaf-spine-filters-0002",
+    # Spine-only filter: leaf-to-leaf transit through the spines must stay open.
+    "leaf-spine-filters-0006",
 ]
 OUT = REPO_ROOT / "tests" / "fixtures" / "batfish"
 

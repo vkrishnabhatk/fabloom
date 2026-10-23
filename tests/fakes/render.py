@@ -51,13 +51,20 @@ def _eos(intent: Intent, fabric: FabricPlan, d: Device) -> str:
     if rules:
         lines.append("ip access-list FABLOOM-PROTECT")
         seq = 10
+        # Only traffic to this device's own addresses: "deny any any" on a spine would also
+        # drop transit traffic between leaves the filter does not cover (filters-0006, live
+        # Batfish 2026-10-23).
+        own = [d.loopback.ip, *(i.address.ip for i in d.interfaces if i.address)]
         for r in rules:
-            # "deny from outside X" = permit from X first, then deny from anywhere.
-            if r.src_not_in is not None:
-                lines.append(f"   {seq} permit {r.protocol} {r.src_not_in} any eq {r.dst_port}")
+            for ip in own:
+                # "deny from outside X" = permit from X first, then deny from anywhere.
+                if r.src_not_in is not None:
+                    lines.append(
+                        f"   {seq} permit {r.protocol} {r.src_not_in} host {ip} eq {r.dst_port}"
+                    )
+                    seq += 10
+                lines.append(f"   {seq} deny {r.protocol} any host {ip} eq {r.dst_port}")
                 seq += 10
-            lines.append(f"   {seq} deny {r.protocol} any any eq {r.dst_port}")
-            seq += 10
         lines += [f"   {seq} permit ip any any", "!"]
     lines += ["interface Loopback0", f"   ip address {d.loopback}", "!"]
     for i in d.interfaces:

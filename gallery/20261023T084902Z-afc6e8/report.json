@@ -1,0 +1,447 @@
+{
+  "level": "L2",
+  "checks": [
+    {
+      "id": "parse_clean:spine1",
+      "kind": "parse_clean",
+      "passed": true,
+      "severity": "critical",
+      "evidence": {
+        "status": "PASSED"
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "no_undefined_refs:spine1",
+      "kind": "no_undefined_refs",
+      "passed": true,
+      "severity": "high",
+      "evidence": {},
+      "remediation_hint": null
+    },
+    {
+      "id": "parse_clean:spine2",
+      "kind": "parse_clean",
+      "passed": true,
+      "severity": "critical",
+      "evidence": {
+        "status": "PASSED"
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "no_undefined_refs:spine2",
+      "kind": "no_undefined_refs",
+      "passed": true,
+      "severity": "high",
+      "evidence": {},
+      "remediation_hint": null
+    },
+    {
+      "id": "parse_clean:leaf1",
+      "kind": "parse_clean",
+      "passed": true,
+      "severity": "critical",
+      "evidence": {
+        "status": "PASSED"
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "no_undefined_refs:leaf1",
+      "kind": "no_undefined_refs",
+      "passed": true,
+      "severity": "high",
+      "evidence": {},
+      "remediation_hint": null
+    },
+    {
+      "id": "parse_clean:leaf2",
+      "kind": "parse_clean",
+      "passed": true,
+      "severity": "critical",
+      "evidence": {
+        "status": "PASSED"
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "no_undefined_refs:leaf2",
+      "kind": "no_undefined_refs",
+      "passed": true,
+      "severity": "high",
+      "evidence": {},
+      "remediation_hint": null
+    },
+    {
+      "id": "bgp_compatible:leaf1--spine1",
+      "kind": "bgp_compatible",
+      "passed": true,
+      "severity": "high",
+      "evidence": {
+        "leaf1": [
+          "UNIQUE_MATCH"
+        ],
+        "spine1": [
+          "UNIQUE_MATCH"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "bgp_established:leaf1--spine1",
+      "kind": "bgp_established",
+      "passed": true,
+      "severity": "high",
+      "evidence": {
+        "leaf1": [
+          "ESTABLISHED"
+        ],
+        "spine1": [
+          "ESTABLISHED"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "bgp_compatible:leaf1--spine2",
+      "kind": "bgp_compatible",
+      "passed": true,
+      "severity": "high",
+      "evidence": {
+        "leaf1": [
+          "UNIQUE_MATCH"
+        ],
+        "spine2": [
+          "UNIQUE_MATCH"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "bgp_established:leaf1--spine2",
+      "kind": "bgp_established",
+      "passed": true,
+      "severity": "high",
+      "evidence": {
+        "leaf1": [
+          "ESTABLISHED"
+        ],
+        "spine2": [
+          "ESTABLISHED"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "bgp_compatible:leaf2--spine1",
+      "kind": "bgp_compatible",
+      "passed": true,
+      "severity": "high",
+      "evidence": {
+        "leaf2": [
+          "UNIQUE_MATCH"
+        ],
+        "spine1": [
+          "UNIQUE_MATCH"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "bgp_established:leaf2--spine1",
+      "kind": "bgp_established",
+      "passed": true,
+      "severity": "high",
+      "evidence": {
+        "leaf2": [
+          "ESTABLISHED"
+        ],
+        "spine1": [
+          "ESTABLISHED"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "bgp_compatible:leaf2--spine2",
+      "kind": "bgp_compatible",
+      "passed": true,
+      "severity": "high",
+      "evidence": {
+        "leaf2": [
+          "UNIQUE_MATCH"
+        ],
+        "spine2": [
+          "UNIQUE_MATCH"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "bgp_established:leaf2--spine2",
+      "kind": "bgp_established",
+      "passed": true,
+      "severity": "high",
+      "evidence": {
+        "leaf2": [
+          "ESTABLISHED"
+        ],
+        "spine2": [
+          "ESTABLISHED"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "l3_edges:leaf1[swp1]--spine1[swp1]",
+      "kind": "l3_edges",
+      "passed": true,
+      "severity": "medium",
+      "evidence": {
+        "ips": [
+          "10.1.0.1"
+        ],
+        "remote_ips": [
+          "10.1.0.0"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "l3_edges:leaf1[swp2]--spine2[swp1]",
+      "kind": "l3_edges",
+      "passed": true,
+      "severity": "medium",
+      "evidence": {
+        "ips": [
+          "10.1.0.3"
+        ],
+        "remote_ips": [
+          "10.1.0.2"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "l3_edges:leaf2[swp1]--spine1[swp2]",
+      "kind": "l3_edges",
+      "passed": true,
+      "severity": "medium",
+      "evidence": {
+        "ips": [
+          "10.1.0.17"
+        ],
+        "remote_ips": [
+          "10.1.0.16"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "l3_edges:leaf2[swp2]--spine2[swp2]",
+      "kind": "l3_edges",
+      "passed": true,
+      "severity": "medium",
+      "evidence": {
+        "ips": [
+          "10.1.0.19"
+        ],
+        "remote_ips": [
+          "10.1.0.18"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "route_present:spine1:10.0.1.1/32",
+      "kind": "route_present",
+      "passed": true,
+      "severity": "medium",
+      "evidence": {
+        "protocols": [
+          "bgp"
+        ],
+        "next_hops": [
+          "ip 10.1.0.1"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "route_present:spine1:10.0.1.2/32",
+      "kind": "route_present",
+      "passed": true,
+      "severity": "medium",
+      "evidence": {
+        "protocols": [
+          "bgp"
+        ],
+        "next_hops": [
+          "ip 10.1.0.17"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "route_present:spine2:10.0.1.1/32",
+      "kind": "route_present",
+      "passed": true,
+      "severity": "medium",
+      "evidence": {
+        "protocols": [
+          "bgp"
+        ],
+        "next_hops": [
+          "ip 10.1.0.3"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "route_present:spine2:10.0.1.2/32",
+      "kind": "route_present",
+      "passed": true,
+      "severity": "medium",
+      "evidence": {
+        "protocols": [
+          "bgp"
+        ],
+        "next_hops": [
+          "ip 10.1.0.19"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "route_present:leaf1:10.0.0.1/32",
+      "kind": "route_present",
+      "passed": true,
+      "severity": "medium",
+      "evidence": {
+        "protocols": [
+          "bgp"
+        ],
+        "next_hops": [
+          "ip 10.1.0.0"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "route_present:leaf1:10.0.0.2/32",
+      "kind": "route_present",
+      "passed": true,
+      "severity": "medium",
+      "evidence": {
+        "protocols": [
+          "bgp"
+        ],
+        "next_hops": [
+          "ip 10.1.0.2"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "route_present:leaf1:10.0.1.2/32",
+      "kind": "route_present",
+      "passed": true,
+      "severity": "medium",
+      "evidence": {
+        "protocols": [
+          "bgp"
+        ],
+        "next_hops": [
+          "ip 10.1.0.0",
+          "ip 10.1.0.2"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "route_present:leaf2:10.0.0.1/32",
+      "kind": "route_present",
+      "passed": true,
+      "severity": "medium",
+      "evidence": {
+        "protocols": [
+          "bgp"
+        ],
+        "next_hops": [
+          "ip 10.1.0.16"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "route_present:leaf2:10.0.0.2/32",
+      "kind": "route_present",
+      "passed": true,
+      "severity": "medium",
+      "evidence": {
+        "protocols": [
+          "bgp"
+        ],
+        "next_hops": [
+          "ip 10.1.0.18"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "route_present:leaf2:10.0.1.1/32",
+      "kind": "route_present",
+      "passed": true,
+      "severity": "medium",
+      "evidence": {
+        "protocols": [
+          "bgp"
+        ],
+        "next_hops": [
+          "ip 10.1.0.16",
+          "ip 10.1.0.18"
+        ]
+      },
+      "remediation_hint": null
+    },
+    {
+      "id": "reachability:leaf1->leaf2",
+      "kind": "reachability",
+      "passed": true,
+      "severity": "high",
+      "evidence": {},
+      "remediation_hint": null
+    },
+    {
+      "id": "reachability:leaf2->leaf1",
+      "kind": "reachability",
+      "passed": true,
+      "severity": "high",
+      "evidence": {},
+      "remediation_hint": null
+    },
+    {
+      "id": "no_forwarding_loops",
+      "kind": "no_forwarding_loops",
+      "passed": true,
+      "severity": "high",
+      "evidence": {},
+      "remediation_hint": null
+    }
+  ],
+  "parse_status": {
+    "leaf1": "PASSED",
+    "leaf2": "PASSED",
+    "spine1": "PASSED",
+    "spine2": "PASSED"
+  },
+  "unrecognized_lines": [],
+  "undefined_references": [],
+  "score": 1.0,
+  "duration_ms": 2078,
+  "verifier_name": "batfish-local",
+  "verifier_version": "0.1.0.dev0",
+  "batfish_version": "2026.08.27.3685",
+  "backend_executed": true
+}

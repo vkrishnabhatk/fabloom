@@ -6,15 +6,18 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import httpx2
+import openai
 import pytest
 from pydantic import SecretStr
 from typer.testing import CliRunner
 
 from fabloom import cli
 from fabloom.agent.events import EVENTS_FILE
-from fabloom.config import ModelsConfig, RunConfig, Settings, bench_config, run_config
+from fabloom.config import ModelsConfig, ModelSpec, RunConfig, Settings, bench_config, run_config
 from fabloom.contracts import Intent, Platform, Scenario
 from fabloom.eval import (
+    BenchAbortedError,
     BenchMismatchError,
     BenchResults,
     BenchRunner,
@@ -23,6 +26,7 @@ from fabloom.eval import (
     resolve_arms,
 )
 from fabloom.eval.runner import BENCH_FILE, RESULTS_FILE, RUNS_SUBDIR
+from fabloom.llm import Completion
 from fabloom.llm.grounding import DocGrounder
 from fabloom.scenarios import load_scenarios
 from tests.conftest import CONF_DIR
@@ -211,6 +215,38 @@ async def test_mlflow_logs_one_run_per_arm_once(
     artifacts = {a.path for a in client.list_artifacts(run.info.run_id)}
     assert artifacts == {"records.json", "report.md"}
     assert (tmp_path / "mlruns").is_dir()  # artifacts land where configured, not in cwd
+
+
+class FlakyClient(PlanAwareChatClient):
+    """Loses the connection after ``ok_calls`` answers, as Token Factory did on 2026-10-23."""
+
+    ok_calls: int = 2
+
+    async def complete_text(
+        self, spec: ModelSpec, messages: list[dict[str, str]]
+    ) -> Completion[str]:
+        if len(self.calls) >= self.ok_calls:
+            raise openai.APIConnectionError(request=httpx2.Request("POST", "https://tf/v1"))
+        return await super().complete_text(spec, messages)
+
+
+async def test_an_outage_stops_the_bench_and_resume_reruns_only_the_lost_runs(
+    tmp_path: Path, scenarios: list[Scenario], models: ModelsConfig
+) -> None:
+    out = tmp_path / "bench"
+    flaky = FlakyClient(intents=[s.intent for s in scenarios], breaks=lambda *_: False)
+    runner, _ = _runner(scenarios, models, out, arms=["super-raw"], client=flaky)
+    with pytest.raises(BenchAbortedError, match="APIConnectionError"):
+        await runner.run()
+    kept = sorted(p.name for p in (out / RUNS_SUBDIR).iterdir())
+    # Two runs finished before the outage; the run that hit it left nothing behind.
+    assert len(kept) == 2
+
+    runner, client = _runner(scenarios, models, out, arms=["super-raw"])
+    results = await runner.run()
+    assert len(results.records) == len(scenarios)
+    assert all(r.error is None for r in results.records)
+    assert len(client.calls) == len(scenarios) - 2  # only the lost runs were paid for again
 
 
 # --- CLI -------------------------------------------------------------------------------------

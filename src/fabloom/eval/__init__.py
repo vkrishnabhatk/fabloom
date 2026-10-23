@@ -10,6 +10,7 @@ from fabloom.eval.report import render, write_report
 from fabloom.eval.results import ArmSummary, BenchMeta, BenchResults, RunRecord, summarize
 from fabloom.eval.runner import (
     Arm,
+    BenchAbortedError,
     BenchMismatchError,
     BenchRunner,
     collect,
@@ -22,6 +23,7 @@ from fabloom.eval.tracking import MlflowTracker, NullTracker, Tracker
 __all__ = [
     "Arm",
     "ArmSummary",
+    "BenchAbortedError",
     "BenchMeta",
     "BenchMismatchError",
     "BenchResults",

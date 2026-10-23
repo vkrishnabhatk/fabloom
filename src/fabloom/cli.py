@@ -24,6 +24,7 @@ from fabloom.config import (
 from fabloom.contracts import Platform, RunBudget, Verifier
 from fabloom.contracts.run import RunEvent
 from fabloom.eval import (
+    BenchAbortedError,
     BenchMismatchError,
     BenchResults,
     BenchRunner,
@@ -389,6 +390,9 @@ def bench_run(  # noqa: PLR0917 - one parameter per CLI option
     except BenchMismatchError as exc:
         typer.secho(str(exc), fg=typer.colors.RED, err=True)
         raise typer.Exit(2) from exc
+    except BenchAbortedError as exc:
+        typer.secho(str(exc), fg=typer.colors.RED, err=True)
+        raise typer.Exit(3) from exc
     typer.echo(f"bench dir: {runner.out_dir}")
     _finish_bench(
         runner.out_dir,

@@ -51,6 +51,22 @@ class BenchMismatchError(RuntimeError):
     """A bench directory was produced by a different configuration than the one resuming it."""
 
 
+class BenchAbortedError(RuntimeError):
+    """The model API or the verifier became unreachable; resume into the same directory."""
+
+
+# Failures of the infrastructure, not of the arm. A run that ends in one of these measures
+# the network, so it is discarded rather than recorded: one Token Factory outage on
+# 2026-10-23 turned 239 of 294 runs into "failed" in 14 minutes before this existed.
+INFRA_ERRORS = frozenset({
+    "APIConnectionError",
+    "APITimeoutError",
+    "InternalServerError",
+    "RateLimitError",
+    "VerifierUnavailableError",
+})  # fmt: skip
+
+
 def select_scenarios(
     scenarios: Sequence[Scenario],
     *,
@@ -230,6 +246,7 @@ class BenchRunner:
         self.out_dir = out_dir or bench_root / self.meta.bench_id
         self._sem = asyncio.Semaphore(concurrency)
         self._on_record = on_record
+        self._aborted: str | None = None
 
     def _prepare(self) -> None:
         bench_file = self.out_dir / BENCH_FILE
@@ -264,6 +281,8 @@ class BenchRunner:
             # A killed process left half a log; appending to it would corrupt the run.
             shutil.rmtree(events.parent)
         async with self._sem:
+            if self._aborted is not None:
+                return
             machine = RunMachine(
                 self.client,
                 arm.router,
@@ -273,13 +292,23 @@ class BenchRunner:
                 grounder=self.grounder,
             )
             req = RunRequest(scenario.request, scenario.intent.platform, intent=scenario.intent)
-            await machine.run(req, run_id=rid)
+            result = await machine.run(req, run_id=rid)
+        error_type = (result.error or "").split(":", 1)[0]
+        if error_type in INFRA_ERRORS:
+            shutil.rmtree(events.parent)
+            self._aborted = self._aborted or f"{rid}: {result.error}"
+            return
         if self._on_record and (rec := record()) is not None:
             self._on_record(rec, False)
 
     async def run(self) -> BenchResults:
         self._prepare()
         await asyncio.gather(*[self._one(a, s) for a in self.arms for s in self.scenarios])
+        if self._aborted is not None:
+            raise BenchAbortedError(
+                f"stopped on an infrastructure error ({self._aborted}); finished runs are "
+                f"kept, so run again with --out {self.out_dir} to resume"
+            )
         results = collect(self.out_dir)
         results.write(self.out_dir / RESULTS_FILE)
         return results

@@ -2,9 +2,8 @@
 
 ## Status
 
-Accepted — 2026-10-22. Built and tested offline only (scripted search, `httpx2.MockTransport`
-for Tavily). No search has run against Tavily and the `super-repair-grounding` arm has no
-result yet, so nothing below is measured.
+Accepted — 2026-10-22. Measured 2026-10-23 on benchmark v0.1: **the gate failed and
+grounding stays off** (see Result).
 
 ## Context
 
@@ -60,3 +59,19 @@ it only if the benchmark shows it helps.
   a benchmark where few first candidates have invented commands, a real effect can be too
   small to clear `min_gain`. That is a negative result to report, not a reason to lower the
   bar.
+
+## Result (2026-10-23, benchmark v0.1)
+
+`super-repair-grounding` reached 42/49 against 46/49 for `super-repair`, so the grounding
+gate (`min_gain` 0.05) failed. Cost was within the ratio: $0.0081 against $0.0067 per
+scenario. The 4-scenario gap is within run-to-run noise (the arms' first candidates, which
+grounding never touches, already differed: 34/49 against 37/49), so this shows no gain
+rather than harm.
+
+Why it could not help here: every unrecognised line in the arm was `exit-address-family`,
+so after the first search every lookup was a cache hit (1 Tavily search in total). The
+line is where Batfish *notices* the error, not where it is: in all 187 cases the model had
+written `neighbor … remote-as` inside the address-family block. Grounding keyed on parser
+complaints retrieves documentation for the wrong command. A future version would need
+queries from the parser context, or a deterministic pre-lint for misplaced BGP statements,
+which would make grounding unnecessary for this error.

@@ -10,13 +10,23 @@ passes, or an honest report of what could not be fixed.
 
 ## Results
 
-**No benchmark numbers yet.** The harness is built and tested offline; it has not run
-against real models or a real Batfish. The v0.1 benchmark (49 scenarios) compares six
-arms from `conf/bench.yaml`: raw Nano, Super and Ultra; Super with the repair loop; the same
-plus Tavily doc grounding; and the routed product. The verify-only result is the repair
-arm's first-pass rate. Its report is generated into
-`docs/benchmark/v0.1.md`, with every number annotated with how it was measured and negative
-results included.
+v0.1 benchmark, 23 October 2026: 49 scenarios × 6 arms against live Nemotron models on
+Token Factory, graded by Batfish against checks compiled from each scenario's intent.
+The generated report is [docs/benchmark/v0.1.md](docs/benchmark/v0.1.md) and the reading of it is in
+[docs/benchmark/index.md](docs/benchmark/index.md).
+
+| Arm | Final pass | $/scenario |
+|---|---|---|
+| Nemotron Nano, one attempt | 10/49 (20%) | $0.0020 |
+| Nemotron Super, one attempt | 33/49 (67%) | $0.0039 |
+| Nemotron Ultra, one attempt | 47/49 (96%) | $0.0127 |
+| Super + Batfish repair loop | 46/49 (94%) | $0.0067 |
+| Super + repair + Tavily doc grounding | 42/49 (86%) | $0.0081 |
+| **Fabloom routed** (Super, escalating to Ultra) | **47/49 (96%)** | **$0.0082** |
+
+The repair loop lifts Super from 76% to 94% on the same runs. The routed product matches
+Ultra at about two-thirds of its cost. Doc grounding showed no gain and stays off. One run
+per arm and scenario, so the intervals are wide: see the report.
 
 What exists and is tested today (offline, `make check`):
 
@@ -82,9 +92,9 @@ arms and gates: `conf/bench.yaml`.
 
 ## Known limitations
 
-- **Doc grounding is unmeasured.** Live Tavily searches return the vendors' command
-  references, but its benchmark arm has no result yet. It stays off in the product until the
-  grounding gate passes, and the result is published either way.
+- **Doc grounding is off.** Measured on v0.1, it showed no gain (42/49 against 46/49
+  without it, within noise). It searches for the line Batfish flags, which is often not the
+  line that is wrong ([ADR-0008](docs/decisions/ADR-0008-doc-grounded-repair.md)).
 - **Costs use list prices.** Model IDs and per-token prices in `conf/models.yaml` were
   confirmed against Token Factory on 22 Oct 2026 ([ADR-0005](docs/decisions/ADR-0005-model-routing-in-config.md)).
   Reported spend is tokens × those prices, not an invoice.

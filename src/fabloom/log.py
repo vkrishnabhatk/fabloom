@@ -22,11 +22,17 @@ def configure_logging(level: str = "INFO", json: bool = True) -> None:
     renderer: structlog.types.Processor = (
         structlog.processors.JSONRenderer() if json else structlog.dev.ConsoleRenderer()
     )
+    # JSON needs exceptions rendered into the event, or log.exception() emits only
+    # "exc_info": true (the first containerised web run crashed with no traceback, 2026-10-23).
+    # Before the scrubber, so a traceback that quotes a config is scrubbed too. The console
+    # renderer formats exceptions itself and warns if this runs first.
+    exc: list[structlog.types.Processor] = [structlog.processors.format_exc_info] if json else []
     structlog.configure(
         processors=[
             structlog.contextvars.merge_contextvars,
             structlog.processors.add_log_level,
             structlog.processors.TimeStamper(fmt="iso", utc=True),
+            *exc,
             structlog_processor,
             renderer,
         ],

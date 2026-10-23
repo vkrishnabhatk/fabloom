@@ -19,7 +19,13 @@ services:
     env_file:
       - path: .env
         required: false
+    # `environment` wins over env_file: a .env copied from .env.example sets relative paths
+    # for local use, which in the container point at the read-only /app tree.
     environment:
+      FABLOOM_RUNS_DIR: /data/runs
+      FABLOOM_GROUNDING_CACHE_DIR: /data/cache/grounding
+      FABLOOM_CONF_DIR: /app/conf
+      FABLOOM_GALLERY_DIR: /app/gallery
       FABLOOM_BATFISH_HOST: batfish
       FABLOOM_LOG_JSON: "true"
       # Caddy is the only client, so its X-Forwarded-For is the visitor's address.

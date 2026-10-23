@@ -84,6 +84,17 @@ def test_provenance(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     set_seeds(7)
 
 
+def test_json_logs_carry_the_traceback(capsys: pytest.CaptureFixture[str]) -> None:
+    configure_logging("INFO", json=True)
+    try:
+        raise PermissionError("Permission denied: 'runs'")
+    except PermissionError:
+        structlog.get_logger("t").exception("web_run_crashed")
+    line = json.loads(capsys.readouterr().err.strip().splitlines()[-1])
+    assert "PermissionError: Permission denied: 'runs'" in line["exception"]
+    assert "Traceback" in line["exception"]
+
+
 def test_logging_scrubs(capsys: pytest.CaptureFixture[str]) -> None:
     configure_logging("INFO", json=True)
     structlog.get_logger("t").info("config", line="snmp-server community public")

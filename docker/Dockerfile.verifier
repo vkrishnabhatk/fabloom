@@ -24,7 +24,7 @@ LABEL org.opencontainers.image.source="https://github.com/vkrishnabhatk/fabloom"
 # Close what the upstream image leaves open (Trivy, fixable HIGH/CRITICAL only):
 # - Ubuntu packages with released fixes (kernel headers, openssl).
 # - Jupyter: the base image's notebook server, which start-batfish.sh never starts. It is
-#   removed rather than patched; pillow, tornado, urllib3 and certifi are upgraded because
+#   removed rather than patched (nbconvert and nbclient too); pillow, tornado, urllib3 and certifi are upgraded because
 #   pybatfish or the AOT training run may still import them.
 # - /usr/bin/pebble: the Ubuntu base's service manager. The entrypoint is fabloom-verify,
 #   so nothing runs it, and its Go stdlib findings cannot be fixed from here.
@@ -33,7 +33,7 @@ RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y --no-install-recommends \
  && rm -rf /var/lib/apt/lists/* \
  && rm -f /usr/bin/pebble \
- && (pip3 uninstall -y --break-system-packages jupyterlab notebook jupyter_server 2>/dev/null || true) \
+ && (pip3 uninstall -y --break-system-packages jupyterlab notebook jupyter_server nbconvert nbclient 2>/dev/null || true) \
  && pip3 install --break-system-packages --no-cache-dir --upgrade pillow tornado urllib3 certifi
 # The verify plane needs only pydantic beyond what the base image has (pybatfish ships in it,
 # version-matched to the server). --no-deps keeps the model-side dependencies out.

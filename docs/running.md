@@ -48,8 +48,9 @@ Two guards protect the credits:
 - **Per-visitor rate limit.** A token bucket per IP (`FABLOOM_WEB_RUNS_PER_IP`, refilling
   one run every `FABLOOM_WEB_REFILL_S`). `X-Forwarded-For` is trusted only with
   `FABLOOM_WEB_TRUST_PROXY=true`, behind your own proxy.
-- **Daily spend cap** (`FABLOOM_WEB_SPEND_CAP_USD`, UTC day). Each run reserves its
-  worst-case budget before it starts, so concurrent runs can't overshoot. On restart, the
+- **Daily spend cap** (`FABLOOM_WEB_SPEND_CAP_USD`, default $0.40, UTC day). Each run
+  reserves its worst-case budget (`FABLOOM_WEB_RUN_MAX_USD`, default $0.05) before it
+  starts, so concurrent runs can't overshoot. On restart, the
   day's spend is read back from the run logs. At the cap, the app switches to read-only and
   serves the gallery (`gallery/`) instead of erroring.
 

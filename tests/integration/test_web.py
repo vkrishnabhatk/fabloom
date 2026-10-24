@@ -207,3 +207,21 @@ def test_run_id_pattern_matches_new_run_ids() -> None:
 
     assert RUN_ID.match(new_run_id())
     assert not RUN_ID.match("../x")
+
+
+def test_web_runs_fit_the_daily_cap(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    from fabloom import cli  # noqa: PLC0415
+
+    monkeypatch.setattr(cli, "build_client", lambda s: FakeChatClient(script=[]))
+    monkeypatch.setattr(cli, "build_verifier", lambda s: FakeVerifier([0]))
+    monkeypatch.delenv("NEBIUS_API_KEY", raising=False)
+    monkeypatch.setenv("FABLOOM_TOKEN_FACTORY_API_KEY", "k")
+    settings = _settings(tmp_path)
+    assert settings.web_spend_cap_usd == pytest.approx(0.40)
+    machine = cli.build_web_machine(settings)
+    assert machine is not None
+    # A run reserves its budget against the daily cap before it starts: at the CLI's $0.25,
+    # nothing could start after $0.15 of a $0.40 day.
+    assert machine.run_config.budget.max_usd == pytest.approx(0.05)
+    monkeypatch.setenv("FABLOOM_TOKEN_FACTORY_API_KEY", "")
+    assert cli.build_web_machine(_settings(tmp_path)) is None

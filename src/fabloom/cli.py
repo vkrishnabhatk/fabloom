@@ -459,6 +459,8 @@ def build_web_machine(settings: Settings) -> RunMachine | None:
     if settings.token_factory_api_key is None:
         return None
     rc = run_config(settings.conf_dir)
+    max_usd = min(rc.budget.max_usd, settings.web_run_max_usd)
+    rc = rc.model_copy(update={"budget": rc.budget.model_copy(update={"max_usd": max_usd})})
     return RunMachine(
         client=build_client(settings),
         router=ModelRouter(models_config(settings.conf_dir)),

@@ -109,7 +109,7 @@ class VerificationCompleted(RunEventBase):
 
 
 class GroundingLookup(RunEventBase):
-    """Vendor-doc excerpts fetched for unrecognised lines before a repair (architecture §8)."""
+    """Vendor-doc excerpts fetched for unrecognised lines before a repair (ADR-0008)."""
 
     type: Literal["grounding_lookup"] = "grounding_lookup"
     round: int

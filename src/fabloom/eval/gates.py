@@ -1,5 +1,5 @@
 """Benchmark gates: one module, one rule, consumed by both the report and CI so they can
-never disagree (architecture §3).
+never disagree (ADR-0007).
 
 - **Regression**: did a prompt, routing or hosted-model change make an arm worse than the
   frozen baseline? Compared only on the scenarios both runs share, so a 10-scenario nightly

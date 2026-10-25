@@ -28,7 +28,7 @@ the model would influence what it is graded on (ADR-0001).
 - **FRR traffic filters are reported as unverifiable.** `frr.conf` has no packet filter, and
   SSH filtering on an FRR box lives in iptables/nftables, which Batfish's Cumulus/FRR model
   does not read. Filter scenarios therefore use Arista EOS. The report lists unverifiable
-  intent explicitly instead of dropping it. This refines the plan's example scenario (FRR +
+  intent explicitly instead of dropping it. This refines the original example scenario (FRR +
   SSH filter) and is to be confirmed against a live Batfish in the week-0 spike.
 
 ## Alternatives considered

@@ -2,7 +2,7 @@
 
 Doc-grounded repair: vendor documentation for the lines a parser did not recognise.
 
-An unrecognised line usually means the model invented a command (architecture §8). Before a
+An unrecognised line usually means the model invented a command (ADR-0008). Before a
 repair, the agent hands those lines to a ``Grounder``, which searches the platform vendor's
 own docs (Tavily, restricted to the domains in ``conf/fabloom.yaml``) and returns short
 excerpts for the repair prompt.

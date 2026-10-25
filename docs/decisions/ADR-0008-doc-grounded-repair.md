@@ -10,7 +10,7 @@ grounding stays off** (see Result).
 When Batfish reports unrecognised lines, the model has usually invented a command or used
 another vendor's syntax. The repair prompt already lists those lines, but the repairer then
 has to recall the right syntax from memory, which is how the line was invented in the first
-place. Architecture §8 proposes retrieving the vendor's own documentation instead, and ships
+place. The design proposes retrieving the vendor's own documentation instead, and ships
 it only if the benchmark shows it helps.
 
 ## Decision

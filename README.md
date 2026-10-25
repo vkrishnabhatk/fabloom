@@ -64,6 +64,17 @@ explains) and one more per repair round, up to three: Super repairs, and Ultra t
 repair that Super could not finish. Each call's tokens and cost are in
 the run log; reported spend is tokens × the list prices in `conf/models.yaml`.
 
+Where Token Factory made the difference:
+
+- **Three Nemotron sizes behind one OpenAI-compatible endpoint**, so each step gets the model
+  it needs and routing is a line of YAML, not code. The benchmark measured that choice: Super
+  plus repair, escalating to Ultra, matches Ultra alone at about two-thirds of its cost.
+- **Strict JSON-schema output** for the planner, so its intent is parsed, never scraped.
+- **Model IDs and prices from the API** (`/v1/models?verbose=true`). `fabloom doctor` checks
+  every configured model nightly, so a retired ID is caught before a visitor finds it.
+- **Cheap enough to measure honestly**: the full v0.1 benchmark, 294 runs through the real
+  loop, cost $2.04.
+
 ## Quick start
 
 ```bash
@@ -150,9 +161,6 @@ data. See [SECURITY.md](SECURITY.md).
 - [docs/running.md](docs/running.md): install, configuration, web demo, deployment
 - [docs/decisions/](docs/decisions/): architecture decision records
 - [CONTRIBUTING.md](CONTRIBUTING.md) · [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) · [SECURITY.md](SECURITY.md)
-
-Fabloom started as an entry to the Nebius × NVIDIA Global AI Hackathon (October 2026) and
-continues as an open-source project.
 
 ## Licence
 

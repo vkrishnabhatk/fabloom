@@ -57,6 +57,30 @@ Two guards protect the credits:
 `docker compose up -d --build` runs the deployment stack: Caddy (TLS, set `FABLOOM_DOMAIN`),
 then the app, then a pinned Batfish.
 
+## Deploying
+
+The demo at [fabloom.dev](https://fabloom.dev) runs on one CPU VM on Nebius AI Cloud
+(2 vCPU, 8 GiB, Ubuntu 24.04, 30 GiB disk), about $1.60 a day. Any Linux host with Docker
+works the same way:
+
+1. Open ports 22, 80 and 443 only. Batfish and the app are not published; Caddy is the only
+   door.
+2. Point an `A` record at the host. Leave any CDN proxy off: the rate limit keys on the
+   visitor's address, and a proxy that cuts idle connections breaks the live event stream.
+3. Copy the repository and create `.env` next to `docker-compose.yml`, readable only by the
+   deploying user:
+
+   ```bash
+   FABLOOM_DOMAIN="example.org, www.example.org"
+   FABLOOM_TOKEN_FACTORY_API_KEY=...   # a key for this deployment only, so it can be revoked alone
+   ```
+
+4. `docker compose build --build-arg GIT_SHA=$(git rev-parse --short HEAD) app && docker compose up -d`.
+   Caddy obtains the certificates on first start; `/info` shows the deployed commit.
+
+Without the key the same stack serves the gallery read-only, which is how to keep a demo up
+at no model cost.
+
 ## Configuration
 
 | File | Holds |

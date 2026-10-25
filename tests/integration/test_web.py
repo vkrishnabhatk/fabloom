@@ -97,6 +97,9 @@ def test_pages_ops_and_headers(live: TestClient) -> None:
     assert home.status_code == 200
     assert "Generate and verify" in home.text
     assert 'class="example"' in home.text
+    # Path-only asset links: behind the TLS proxy an absolute http:// link is blocked.
+    assert 'href="/static/app.css"' in home.text
+    assert 'src="/static/app.js"' in home.text
     assert "default-src 'self'" in home.headers["content-security-policy"]
     assert live.get("/", headers={"X-Request-ID": "abc"}).headers["x-request-id"] == "abc"
     assert live.get("/healthz").json() == {"status": "ok"}

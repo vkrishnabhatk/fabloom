@@ -82,6 +82,9 @@ function describe(e) {
     }
     case "grounding_lookup":
       return { title: "Looked up vendor docs", detail: e.queries.length + " queries, " + e.excerpts + " excerpts" };
+    case "docs_found":
+      return { title: "Tavily found " + plural(e.docs.length, "vendor doc page"),
+        detail: e.searched ? plural(e.searched, "search") + ", the rest cached" : "all from cache" };
     case "budget_exhausted":
       return { cls: "t-fail", title: "Budget used up: " + e.limit, detail: e.detail };
     case "run_error":
@@ -224,6 +227,21 @@ function renderChecks(checks) {
   });
 }
 
+function renderDocs(docs) {
+  const safe = docs.filter((d) => /^https:\/\//.test(d.url));
+  document.getElementById("docs-card").hidden = safe.length === 0;
+  document.getElementById("docs").replaceChildren(...safe.map((d) => {
+    const a = el("a");
+    a.href = d.url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.append(el("b", d.title), el("span", new URL(d.url).host + " · " + d.query));
+    const li = el("li");
+    li.append(a);
+    return li;
+  }));
+}
+
 function renderConfigs(configs) {
   const tabs = document.getElementById("tabs");
   const pre = document.getElementById("config");
@@ -282,6 +300,7 @@ function renderRun(run) {
     u.textContent = "Not verifiable here: " + run.unverifiable.join("; ");
     u.hidden = false;
   }
+  renderDocs(run.docs || []);
   document.getElementById("checks").replaceChildren(...renderChecks(checks));
   if (run.fabric) drawFabric(run.fabric.spines, run.fabric.leaves);
   colourFabric(new Map(checks.map((c) => [c.id, c.passed])));
@@ -301,7 +320,7 @@ async function initRun() {
   const source = new EventSource("/api/v1/runs/" + encodeURIComponent(id) + "/events");
   const finish = async () => { source.close(); renderRun(await fetchRun(id)); };
   const types = ["run_started", "state_changed", "intent_planned", "checks_compiled", "llm_call",
-    "candidate_generated", "verification_completed", "grounding_lookup", "budget_exhausted",
+    "candidate_generated", "verification_completed", "grounding_lookup", "docs_found", "budget_exhausted",
     "explanation_ready", "run_error", "run_finished"];
   types.forEach((t) => source.addEventListener(t, (msg) => {
     const e = JSON.parse(msg.data);

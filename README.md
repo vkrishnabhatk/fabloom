@@ -58,6 +58,7 @@ what this release targets. L0 means nothing could be checked.
 |---|---|
 | All model calls: Nemotron 3 Nano, Super and Ultra | [Nebius Token Factory](https://tokenfactory.nebius.com), OpenAI-compatible API. Model IDs, prices and routing in `conf/models.yaml` |
 | The live demo: Caddy, the app and Batfish | One CPU VM on Nebius AI Cloud (2 vCPU, 8 GiB) with `docker compose` |
+| Vendor doc search | [Tavily](https://tavily.com), restricted to the vendors' documentation sites (optional: `FABLOOM_TAVILY_API_KEY`) |
 
 A run makes three model calls when the first draft passes (Nano plans, Super writes, Nano
 explains) and one more per repair round, up to three: Super repairs, and Ultra takes over a
@@ -110,6 +111,7 @@ coverage). Nothing in CI needs a key or a network.
 | Batfish verifier | Against live Batfish 2026.08.27, the known-good reference config of every one of the 49 scenarios passes every check. Recordings of 5 scenarios are replayed in CI |
 | Benchmark harness | Arms × scenarios through the real loop, resumable, aborts cleanly on provider outages; records derived from event logs only; MLflow tracking; regression and grounding gates; generated report |
 | Doc-grounded repair | Tavily search of vendor docs for unrecognised lines, cached, rate-limited and capped per run. Off: its benchmark arm failed the grounding gate ([ADR-0008](docs/decisions/ADR-0008-doc-grounded-repair.md)) |
+| Vendor doc links | After verification, Tavily finds the vendor's own page for each feature the fabric uses (BGP mode, loopbacks, filters), restricted to docs.frrouting.org and Arista's EOS manual; the best page per topic is linked beside the result. Queries use only feature names, never addresses or ASNs. Links never reach a prompt or a check. On in the demo, off in the benchmark |
 | Web demo | Live at [fabloom.dev](https://fabloom.dev): JSON API ([/api/docs](https://fabloom.dev/api/docs)), live event stream, per-visitor rate limit, $0.40 daily spend cap, read-only gallery when there is no key or credit |
 | Nebius Sandboxes backend | Not built. Spike script ready (`spikes/batfish_in_sandbox.py`) |
 

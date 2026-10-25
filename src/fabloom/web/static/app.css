@@ -197,6 +197,14 @@ select { padding: 9px 12px; }
 .notice { font-size: 14px; color: var(--muted); background: var(--surface-2); border-radius: 10px;
   padding: 10px 14px; margin: 12px 0 0; }
 
+/* Vendor documentation links */
+.docs { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.docs a { display: block; padding: 10px 12px; border-radius: 10px; background: var(--surface-2);
+  text-decoration: none; color: var(--text); border: 1px solid transparent; }
+.docs a:hover { border-color: var(--accent); }
+.docs b { display: block; font-size: 14.5px; color: var(--accent); overflow-wrap: anywhere; }
+.docs span { font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+
 /* Topology diagram (SVG built in app.js) */
 .diagram svg { width: 100%; height: auto; display: block; }
 .diagram .link { stroke: var(--border); stroke-width: 2.5; }

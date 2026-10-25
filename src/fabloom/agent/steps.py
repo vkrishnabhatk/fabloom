@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from fabloom import metrics
 from fabloom.agent.budget import BudgetTracker
 from fabloom.agent.events import EventLog
-from fabloom.config import ModelSpec
+from fabloom.config import DocsConfig, ModelSpec
 from fabloom.contracts import (
     CheckSet,
     FabricPlan,
@@ -19,9 +19,9 @@ from fabloom.contracts import (
     Platform,
     VerificationReport,
 )
-from fabloom.contracts.run import GroundingLookup, LlmCall
+from fabloom.contracts.run import DocsFound, GroundingLookup, LlmCall
 from fabloom.llm import ChatClient, Completion, LlmError, LlmOutputError, ModelRouter
-from fabloom.llm.grounding import Excerpt, Grounder
+from fabloom.llm.grounding import Excerpt, Grounder, best_links
 from fabloom.llm.parsing import parse_device_blocks
 from fabloom.llm.prompts import (
     explainer_messages,
@@ -41,12 +41,15 @@ class LlmSteps:
         log: EventLog,
         budget: BudgetTracker,
         grounder: Grounder | None = None,
+        *,
+        docs: tuple[Grounder, DocsConfig] | None = None,
     ) -> None:
         self._client = client
         self._router = router
         self._log = log
         self._budget = budget
         self._grounder = grounder
+        self._docs = docs
 
     def _account(self, role: ModelRole, c: Completion[Any]) -> None:
         self._budget.record_llm(c.prompt_tokens, c.completion_tokens, c.cost_usd)
@@ -148,6 +151,25 @@ class LlmSteps:
             error=g.error,
         )
         return g.excerpts
+
+    async def find_docs(self, intent: Intent) -> None:
+        """Vendor doc links for the reader of the result; searches count against the run's
+        grounding budget like the repairer's."""
+        if self._docs is None:
+            return
+        grounder, config = self._docs
+        allowance = min(config.max_queries, self._budget.grounding_allowance())
+        g = await grounder.docs(intent, allowance, config.cache_ttl_days * 86400)
+        self._budget.record_grounding(g.searched)
+        # https only: these become hrefs on the result page.
+        links = best_links(g.excerpts, config.max_links)
+        self._log.emit(
+            DocsFound,
+            queries=g.queries,
+            searched=g.searched,
+            docs=[{"title": x.title or x.url, "url": x.url, "query": x.query} for x in links],
+            error=g.error,
+        )
 
     async def explain(
         self,

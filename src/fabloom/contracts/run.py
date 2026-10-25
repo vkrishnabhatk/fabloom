@@ -120,6 +120,19 @@ class GroundingLookup(RunEventBase):
     error: str | None = None
 
 
+class DocsFound(RunEventBase):
+    """Vendor documentation for what the run built, found after verification.
+
+    Shown to the reader only: it never reaches a prompt, a check or a report (ADR-0001).
+    """
+
+    type: Literal["docs_found"] = "docs_found"
+    queries: list[str]
+    searched: int  # queries that went to the search API; the rest came from the cache
+    docs: list[dict[str, str]]  # {"title", "url", "query"}
+    error: str | None = None
+
+
 class BudgetExhausted(RunEventBase):
     type: Literal["budget_exhausted"] = "budget_exhausted"
     limit: str
@@ -155,6 +168,7 @@ RunEvent = Annotated[
     | CandidateGenerated
     | VerificationCompleted
     | GroundingLookup
+    | DocsFound
     | BudgetExhausted
     | ExplanationReady
     | RunFinished

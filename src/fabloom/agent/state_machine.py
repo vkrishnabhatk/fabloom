@@ -122,8 +122,12 @@ class _Run:
         self.run_id = run_id
         self.log = EventLog(run_dir, run_id)
         self.budget = BudgetTracker(machine.run_config.budget)
-        grounder = machine.grounder if machine.run_config.grounding.enabled else None
-        self.steps = LlmSteps(machine.client, machine.router, self.log, self.budget, grounder)
+        rc = machine.run_config
+        grounder = machine.grounder if rc.grounding.enabled else None
+        docs = (machine.grounder, rc.docs) if rc.docs.enabled and machine.grounder else None
+        self.steps = LlmSteps(
+            machine.client, machine.router, self.log, self.budget, grounder, docs=docs
+        )
         self.cache: dict[str, VerificationReport] = {}
         self.result = RunResult(
             run_id=run_id,
@@ -246,6 +250,11 @@ class _Run:
             outcome, report, r.checkset, r.repair_rounds, stop_reason
         )
         text, source = fallback, "deterministic"
+        if r.intent is not None and use_model:
+            try:
+                await self.steps.find_docs(r.intent)
+            except Exception as exc:  # links are a nicety, like the explanation
+                log.warning("docs_lookup_failed", run_id=self.run_id, error=str(exc))
         if report is not None and use_model:
             try:
                 text = await self.steps.explain(outcome, report, r.checkset, r.repair_rounds)

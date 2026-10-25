@@ -18,7 +18,7 @@ import structlog
 from fabloom.agent import RunMachine, RunRequest, read_events
 from fabloom.agent.events import EVENTS_FILE
 from fabloom.contracts import Platform
-from fabloom.contracts.run import IntentPlanned, RunFinished, RunStarted
+from fabloom.contracts.run import DocsFound, IntentPlanned, RunFinished, RunStarted
 from fabloom.web.guards import SpendBreaker
 
 log = structlog.get_logger(__name__)
@@ -140,6 +140,7 @@ def summarize(loc: RunLocation, *, with_configs: bool = True) -> dict[str, Any]:
     """A run as JSON: what the API returns and what every HTML view renders."""
     started: RunStarted | None = None
     planned: IntentPlanned | None = None
+    docs: DocsFound | None = None
     finished: RunFinished | None = None
     state = None
     for e in read_events(loc.events):
@@ -148,6 +149,8 @@ def summarize(loc: RunLocation, *, with_configs: bool = True) -> dict[str, Any]:
             started = e
         elif isinstance(e, IntentPlanned):
             planned = e
+        elif isinstance(e, DocsFound):
+            docs = e
         elif isinstance(e, RunFinished):
             finished = e
     out: dict[str, Any] = {
@@ -162,6 +165,7 @@ def summarize(loc: RunLocation, *, with_configs: bool = True) -> dict[str, Any]:
         "repair_rounds": finished.repair_rounds if finished else None,
         "cost_usd": finished.usage.cost_usd if finished else None,
         "fabric": _fabric(planned),
+        "docs": docs.docs if docs else [],
     }
     result_file = loc.run_dir / "result.json"
     if finished and result_file.exists():

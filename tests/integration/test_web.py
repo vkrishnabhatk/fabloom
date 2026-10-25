@@ -87,6 +87,7 @@ def test_a_run_end_to_end(live: TestClient) -> None:
     assert run["level"] == "L2"
     assert {"spine1", "leaf1"} <= set(run["configs"])
     assert run["fabric"] == {"platform": "frr", "spines": 2, "leaves": 2}
+    assert run["docs"] == []  # no search configured
     assert all(c["passed"] for c in run["checks"])
 
     resp = live.get(f"/api/v1/runs/{run_id}/configs.zip")

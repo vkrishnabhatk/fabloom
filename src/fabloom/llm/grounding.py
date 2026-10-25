@@ -1,4 +1,6 @@
-"""Doc-grounded repair: vendor documentation for the lines a parser did not recognise.
+"""Vendor documentation search: for the repairer, and for the reader of a result.
+
+Doc-grounded repair: vendor documentation for the lines a parser did not recognise.
 
 An unrecognised line usually means the model invented a command (architecture §8). Before a
 repair, the agent hands those lines to a ``Grounder``, which searches the platform vendor's
@@ -8,6 +10,10 @@ excerpts for the repair prompt.
 Grounding only adds context to a prompt. It never touches a check or a report, so it sits
 on the model's side of the verification boundary (ADR-0001). It is best-effort: a search
 error yields no excerpts and an ``error`` note, never a failed run.
+
+Doc links: after verification, one search per feature the intent uses (``doc_queries``),
+linked beside the result for the engineer reviewing it. Same domains, same cache, but a
+cached answer expires, because the page a reader is sent to should still exist.
 
 Results are cached on disk by (platform, query, domains): the benchmark repeats the same
 invented commands across scenarios, and a re-run should not spend search credits twice.
@@ -29,7 +35,7 @@ from typing import Any, Protocol
 import httpx2
 
 from fabloom.config import GroundingConfig
-from fabloom.contracts import Platform, UnrecognizedLine
+from fabloom.contracts import BgpMode, Intent, Platform, UnrecognizedLine
 from fabloom.scrub import scrub
 
 TAVILY_URL = "https://api.tavily.com/search"
@@ -40,6 +46,8 @@ _PLATFORM_NAME = {Platform.FRR: "FRRouting", Platform.ARISTA_EOS: "Arista EOS"}
 # keeping them out of the query keeps a user's addressing plan out of a third-party API.
 _VALUE = re.compile(r"^[\d.:/]+$|^[0-9a-f:]+::?[0-9a-f:/]*$", re.IGNORECASE)
 _TRAILING_DIGITS = re.compile(r"(?<=[A-Za-z])[\d/.:]+$")
+# Versioned doc trees (docs.frrouting.org/en/stable-8.2/bgp.html) hold the same page per release.
+_DOC_VERSION = re.compile(r"/en/[^/]+/")
 
 
 @dataclass(frozen=True)
@@ -62,6 +70,8 @@ class Grounder(Protocol):
     async def lookup(
         self, platform: Platform, lines: Sequence[UnrecognizedLine], max_searches: int
     ) -> Grounding: ...
+
+    async def docs(self, intent: Intent, max_searches: int, max_age_s: float) -> Grounding: ...
 
 
 class DocSearch(Protocol):
@@ -98,6 +108,45 @@ def build_queries(platform: Platform, lines: Sequence[UnrecognizedLine]) -> list
             query = scrub(f"{_PLATFORM_NAME[platform]} {shape} command syntax").text
             seen.setdefault(query, None)
     return list(seen)
+
+
+def doc_queries(intent: Intent) -> list[str]:
+    """One query per feature the fabric uses, in a fixed order.
+
+    Built from the intent's features alone, never from its addresses, ASNs or names, so
+    nothing of the user's plan reaches the search API and repeat runs share the cache.
+    """
+    name = _PLATFORM_NAME[intent.platform]
+    queries = [
+        f"{name} BGP unnumbered interface neighbor configuration"
+        if intent.bgp_mode == BgpMode.UNNUMBERED
+        else f"{name} BGP neighbor remote-as configuration"
+    ]
+    if intent.advertise_loopbacks:
+        queries.append(f"{name} BGP network statement advertise prefix")
+    # FRR filters are reported as not verifiable (ADR-0006); no doc link implies otherwise.
+    if intent.filters and intent.platform == Platform.ARISTA_EOS:
+        queries.append(f"{name} IP access list deny {intent.filters[0].protocol} apply interface")
+    return queries
+
+
+def best_links(excerpts: Sequence[Excerpt], limit: int) -> list[Excerpt]:
+    """The top hit per query, each page once whatever its release, https only.
+
+    Measured on 2026-10-25: a query's later hits were the same FRR page in older releases,
+    or unrelated EOS chapters, so only the first distinct page per topic is worth a link.
+    """
+    pages: set[str] = set()
+    done: set[str] = set()
+    out: list[Excerpt] = []
+    for x in excerpts:
+        page = _DOC_VERSION.sub("/en/", x.url)
+        if x.query in done or page in pages or not x.url.startswith("https://"):
+            continue
+        pages.add(page)
+        done.add(x.query)
+        out.append(x)
+    return out[:limit]
 
 
 class TavilySearch:
@@ -183,18 +232,31 @@ class DocGrounder:
     async def lookup(
         self, platform: Platform, lines: Sequence[UnrecognizedLine], max_searches: int
     ) -> Grounding:
+        return await self._run(platform, build_queries(platform, lines), max_searches, None)
+
+    async def docs(self, intent: Intent, max_searches: int, max_age_s: float) -> Grounding:
+        return await self._run(intent.platform, doc_queries(intent), max_searches, max_age_s)
+
+    async def _run(
+        self,
+        platform: Platform,
+        queries: list[str],
+        max_searches: int,
+        max_age_s: float | None,
+    ) -> Grounding:
         domains = self._config.domains.get(platform, [])
         if not domains:
             # Unrestricted web search would put forum guesses in the prompt as if they were
             # the vendor's syntax; no configured domains means no grounding for the platform.
             return Grounding(error=f"no documentation domains configured for {platform}")
-        queries = build_queries(platform, lines)
         excerpts: list[Excerpt] = []
         searched = 0
         errors: list[str] = []
         for query in queries:
             path = self._cache_path(platform, query, domains)
-            if path.exists():
+            cached = path.exists()
+            fresh = cached and (max_age_s is None or time.time() - path.stat().st_mtime < max_age_s)
+            if fresh or (cached and searched >= max_searches):
                 hits = json.loads(path.read_text(encoding="utf-8"))["hits"]
             elif searched < max_searches:
                 await self._spacer.wait()
@@ -203,11 +265,15 @@ class DocGrounder:
                     hits = await self._search.search(query, domains, self._config.max_results)
                 except GroundingError as exc:
                     errors.append(str(exc))
-                    continue
-                path.parent.mkdir(parents=True, exist_ok=True)
-                tmp = path.with_suffix(".tmp")
-                tmp.write_text(json.dumps({"query": query, "hits": hits}), encoding="utf-8")
-                tmp.replace(path)
+                    if not cached:
+                        continue
+                    # A stale answer beats none: the search failed, the old pages likely exist.
+                    hits = json.loads(path.read_text(encoding="utf-8"))["hits"]
+                else:
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    tmp = path.with_suffix(".tmp")
+                    tmp.write_text(json.dumps({"query": query, "hits": hits}), encoding="utf-8")
+                    tmp.replace(path)
             else:
                 continue
             excerpts.extend(self._excerpts(query, hits))

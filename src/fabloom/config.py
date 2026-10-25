@@ -139,6 +139,22 @@ class GroundingConfig(BaseModel):
     timeout_s: float = Field(default=15.0, gt=0)
 
 
+class DocsConfig(BaseModel):
+    """Vendor documentation for what a run built, linked beside the result.
+
+    Searched after verification with the grounding domains. The links never reach a prompt,
+    a check or a report, so they cannot change a verdict (ADR-0001).
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    enabled: bool = False
+    max_queries: int = Field(default=3, ge=1, le=6)  # Tavily searches per run, cache misses only
+    max_links: int = Field(default=6, ge=1, le=20)
+    # Docs change; a cached answer older than this is searched again.
+    cache_ttl_days: float = Field(default=7.0, gt=0)
+
+
 class RunConfig(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
@@ -147,6 +163,7 @@ class RunConfig(BaseModel):
     # The benchmark turns this off: nothing grades the explanation, so it would only add cost.
     explain_with_model: bool = True
     grounding: GroundingConfig = GroundingConfig()
+    docs: DocsConfig = DocsConfig()
 
 
 class ArmSpec(BaseModel):
@@ -170,8 +187,15 @@ class ArmSpec(BaseModel):
         if self.max_repair_rounds is not None:
             budget = budget.model_copy(update={"max_repair_rounds": self.max_repair_rounds})
         grounding = base.grounding.model_copy(update={"enabled": self.grounding})
+        # Doc links are for a reader; nothing grades them, so the benchmark never searches.
+        docs = base.docs.model_copy(update={"enabled": False})
         return base.model_copy(
-            update={"budget": budget, "explain_with_model": False, "grounding": grounding}
+            update={
+                "budget": budget,
+                "explain_with_model": False,
+                "grounding": grounding,
+                "docs": docs,
+            }
         )
 
 

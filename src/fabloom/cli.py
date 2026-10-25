@@ -117,6 +117,9 @@ def format_event(e: RunEvent) -> str:  # noqa: PLR0911 - one arm per event type
                 f"[{e.seq:>3}]   grounding: {len(e.queries)} queries, {e.searched} searched, "
                 f"{e.excerpts} excerpts{note}"
             )
+        case "docs_found":
+            note = f", {e.error}" if e.error else ""
+            return f"[{e.seq:>3}]   docs: {len(e.docs)} links, {e.searched} searched{note}"
         case "budget_exhausted":
             return f"[{e.seq:>3}]   budget exhausted: {e.limit} ({e.detail})"
         case "explanation_ready":
@@ -185,7 +188,8 @@ def generate(
             {**rc.budget.model_dump(), "max_repair_rounds": max_repair_rounds}
         )
         rc = rc.model_copy(update={"budget": budget})
-    grounder = build_grounder(settings, rc.grounding) if rc.grounding.enabled else None
+    wants_search = rc.grounding.enabled or rc.docs.enabled
+    grounder = build_grounder(settings, rc.grounding) if wants_search else None
     if rc.grounding.enabled and grounder is None:
         typer.secho(
             "Grounding is on but FABLOOM_TAVILY_API_KEY is unset; repairing without it.",
@@ -467,7 +471,11 @@ def build_web_machine(settings: Settings) -> RunMachine | None:
         verifier=build_verifier(settings),
         run_config=rc,
         runs_dir=settings.runs_dir,
-        grounder=build_grounder(settings, rc.grounding) if rc.grounding.enabled else None,
+        grounder=(
+            build_grounder(settings, rc.grounding)
+            if rc.grounding.enabled or rc.docs.enabled
+            else None
+        ),
     )
 
 

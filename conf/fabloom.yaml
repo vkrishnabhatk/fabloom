@@ -28,3 +28,12 @@ run:
     max_excerpt_chars: 800
     min_interval_s: 1.0
     timeout_s: 15
+
+  # Vendor docs for what the run built, linked beside the result: one Tavily search per
+  # feature the intent uses (BGP mode, loopbacks, filters), restricted to the domains above
+  # and cached. Never part of a prompt or a check. Skipped without FABLOOM_TAVILY_API_KEY.
+  docs:
+    enabled: true
+    max_queries: 3
+    max_links: 6
+    cache_ttl_days: 7

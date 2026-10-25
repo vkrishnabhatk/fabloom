@@ -1,7 +1,7 @@
 # Fabloom: notes for Claude Code
 
-Read `fabloom-architecture.html` (engineering design) and `fabloom-plan.html` (product plan)
-before structural changes. Decisions live in `docs/decisions/`.
+Read `README.md` (what the project is and how it is measured) and the decision records in
+`docs/decisions/` before structural changes; a structural change gets its own ADR.
 
 ## Commands
 

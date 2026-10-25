@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
+import base64
+import hashlib
+import io
+import re
 import shutil
+import zipfile
 from collections.abc import Iterator
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -81,7 +86,18 @@ def test_a_run_end_to_end(live: TestClient) -> None:
     assert run["explanation"] == "All checks pass."
     assert run["level"] == "L2"
     assert {"spine1", "leaf1"} <= set(run["configs"])
+    assert run["fabric"] == {"platform": "frr", "spines": 2, "leaves": 2}
     assert all(c["passed"] for c in run["checks"])
+
+    resp = live.get(f"/api/v1/runs/{run_id}/configs.zip")
+    assert resp.status_code == 200
+    assert resp.headers["content-disposition"] == f'attachment; filename="fabloom-{run_id}.zip"'
+    with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
+        names = set(z.namelist())
+        assert {f"{run_id}/spine1.cfg", f"{run_id}/leaf1.cfg", f"{run_id}/README.txt"} <= names
+        readme = z.read(f"{run_id}/README.txt").decode()
+    assert REQUEST in readme
+    assert "a proposal for review" in readme
 
     page = live.get(f"/runs/{run_id}")
     assert page.status_code == 200
@@ -96,7 +112,8 @@ def test_pages_ops_and_headers(live: TestClient) -> None:
     home = live.get("/")
     assert home.status_code == 200
     assert "Generate and verify" in home.text
-    assert 'class="example"' in home.text
+    assert 'class="chip example"' in home.text
+    assert "3 runs, plus one more every 10 minutes" in home.text
     # Path-only asset links: behind the TLS proxy an absolute http:// link is blocked.
     assert 'href="/static/app.css"' in home.text
     assert 'src="/static/app.js"' in home.text
@@ -107,6 +124,23 @@ def test_pages_ops_and_headers(live: TestClient) -> None:
     assert "fabloom_runs_total" in live.get("/metrics").text
     assert len(live.get("/api/v1/scenarios").json()) == 3
     assert live.get("/static/app.js").status_code == 200
+    assert live.get("/static/favicon.svg").status_code == 200
+
+
+def test_api_docs_get_their_own_csp(live: TestClient) -> None:
+    # Swagger UI only ships from a CDN; that is allowed on this one page, and its inline
+    # bootstrap script by hash, never by 'unsafe-inline'.
+    docs = live.get("/api/docs")
+    assert docs.status_code == 200
+    csp = docs.headers["content-security-policy"]
+    assert "script-src 'self' https://cdn.jsdelivr.net 'sha256-" in csp
+    assert "'unsafe-inline'" not in csp.split("script-src")[1].split(";")[0]
+    [inline] = re.findall(rb"<script>(.*?)</script>", docs.content, re.DOTALL)
+    digest = base64.b64encode(hashlib.sha256(inline).digest()).decode()
+    assert f"'sha256-{digest}'" in csp
+    assert "swagger-ui-dist@5.17.14" in docs.text
+    # Every other page keeps the strict policy.
+    assert "cdn.jsdelivr.net" not in live.get("/").headers["content-security-policy"]
 
 
 def test_bad_input_and_unknown_runs(live: TestClient) -> None:
@@ -116,6 +150,7 @@ def test_bad_input_and_unknown_runs(live: TestClient) -> None:
     # Anything that is not a run ID never reaches the filesystem.
     assert live.get("/api/v1/runs/..%2F..%2Fetc").status_code == 404
     assert live.get("/runs/nope").status_code == 404
+    assert live.get("/api/v1/runs/20261022T000000Z-abcdef/configs.zip").status_code == 404
 
 
 def test_rate_limit_per_visitor(

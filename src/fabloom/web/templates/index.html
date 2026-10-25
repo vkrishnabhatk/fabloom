@@ -1,49 +1,94 @@
 {% extends "base.html" %}
 {% block page %}index{% endblock %}
+{% macro platform_label(p) %}{{ {'frr': 'FRR', 'arista_eos': 'Arista EOS'}.get(p, p) }}{% endmacro %}
 {% block main %}
-<section class="card">
-  <h1>Describe the fabric</h1>
-  <p class="muted">Nemotron plans and writes the configs. Batfish checks them against checks
-    compiled from your request, and failed checks go back to the model to repair. The verdict
-    comes from Batfish, never from the model.</p>
-  <form id="run-form">
-    <label for="request">Request</label>
-    <textarea id="request" name="request" rows="4" minlength="10" maxlength="2000" required
-      placeholder="2 spines and 4 leaves on FRR, eBGP numbered, block SSH to the leaves from outside 10.0.0.0/8"
-      {% if info.read_only_reason %}disabled{% endif %}></textarea>
-    <div class="row">
-      <label for="platform">Platform</label>
-      <select id="platform" name="platform" {% if info.read_only_reason %}disabled{% endif %}>
-        <option value="">from the request</option>
-        <option value="frr">FRR</option>
-        <option value="arista_eos">Arista EOS</option>
-      </select>
-      <button type="submit" {% if info.read_only_reason %}disabled{% endif %}>Generate and verify</button>
-    </div>
-    <p id="form-error" class="error" hidden></p>
-  </form>
-  {% if examples and not info.read_only_reason %}
-  <div class="examples">
-    <span class="muted">Try:</span>
-    {% for e in examples %}<button type="button" class="example" data-request="{{ e }}">{{ e[:70] }}{% if e|length > 70 %}…{% endif %}</button>{% endfor %}
+<section class="hero">
+  <span class="eyebrow">NVIDIA Nemotron on Nebius Token Factory · verified by Batfish</span>
+  <h1>Describe a data-center fabric. Get configs that are <em>verified</em>, not just plausible.</h1>
+  <p class="lede">Fabloom turns a plain-language request into FRR or Arista EOS configs for a
+    leaf-spine fabric. Batfish then checks them against checks compiled from your request, and
+    failed checks go back to the model to repair. The verdict comes from Batfish, never from the model.</p>
+  <div class="stats">
+    <div class="stat"><b>47 / 49</b><span>benchmark fabrics verified</span></div>
+    <div class="stat"><b>$0.008</b><span>average model cost per fabric</span></div>
+    <div class="stat"><b>37 → 46</b><span>fabrics passing after repair</span></div>
   </div>
-  {% endif %}
+  <p class="stats-note">Benchmark v0.1, 49 scenarios, every result checked by Batfish: routed models
+    for the first two, Nemotron Super first pass vs. after repair for the third.
+    <a href="https://github.com/vkrishnabhatk/fabloom/blob/main/docs/benchmark/index.md">How it was measured</a></p>
 </section>
 
-<section class="card">
-  <h2>Gallery</h2>
+<section class="section" id="how">
+  <ol class="pipeline">
+    <li class="step"><strong>Plan</strong><p>Reads your request into a structured intent.</p><span class="who">Nemotron Nano</span></li>
+    <li class="step step-det"><strong>Compile checks</strong><p>Derives the checks from the intent. No model can change them.</p><span class="who">deterministic</span></li>
+    <li class="step"><strong>Generate</strong><p>Writes the config for every device.</p><span class="who">Nemotron Super</span></li>
+    <li class="step step-verify"><strong>Verify</strong><p>Parses the configs and simulates the fabric.</p><span class="who">Batfish</span></li>
+    <li class="step"><strong>Repair</strong><p>Fixes what failed, escalating if needed.</p><span class="who">Super → Ultra</span></li>
+    <li class="step"><strong>Explain</strong><p>Summarises what was built and checked.</p><span class="who">Nemotron Nano</span></li>
+  </ol>
+  <p class="loop-note">Verify and repair loop until every check passes or the run's budget is used up.</p>
+</section>
+
+<section class="section">
+  <div class="card try">
+    <form id="run-form">
+      <label class="field" for="request">Describe your fabric</label>
+      <textarea id="request" name="request" rows="3" minlength="10" maxlength="2000" required
+        placeholder="2 spines and 4 leaves on FRR, eBGP numbered, block SSH to the leaves from outside 10.0.0.0/8"
+        {% if info.read_only_reason %}disabled{% endif %}></textarea>
+      <div class="controls">
+        <label for="platform">Platform
+          <select id="platform" name="platform" {% if info.read_only_reason %}disabled{% endif %}>
+            <option value="">from the request</option>
+            <option value="frr">FRR</option>
+            <option value="arista_eos">Arista EOS</option>
+          </select>
+        </label>
+        <button class="btn" type="submit" {% if info.read_only_reason %}disabled{% endif %}>Generate and verify</button>
+      </div>
+      <p id="form-error" class="error" hidden></p>
+    </form>
+    {% if examples and not info.read_only_reason %}
+    <div class="examples">
+      <span>Try:</span>
+      {% for e in examples %}<button type="button" class="chip example" data-request="{{ e }}">{{ e[:64] }}{% if e|length > 64 %}…{% endif %}</button>{% endfor %}
+    </div>
+    {% endif %}
+    {% if not info.read_only_reason %}
+    <p class="fine">A run takes about 1–3 minutes. Each run may spend at most ${{ '%.2f' % limits.run_max_usd }}
+      on models, and each visitor gets {{ limits.runs_per_ip }} runs, plus one more every {{ limits.refill_min }} minutes.</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="section" id="gallery">
+  <div class="section-head">
+    <h2>Recorded runs</h2>
+    <span class="muted small">Real runs against live Nemotron models and Batfish</span>
+  </div>
   {% if gallery %}
   <ul class="gallery">
     {% for g in gallery %}
     <li>
-      <a href="/runs/{{ g.run_id }}">{{ g.request or g.run_id }}</a>
-      <span class="pill pill-{{ g.outcome or 'running' }}">{{ g.outcome or g.state }}</span>
-      {% if g.repair_rounds is not none %}<span class="muted">{{ g.repair_rounds }} repair round{{ '' if g.repair_rounds == 1 else 's' }}</span>{% endif %}
+      <a class="run-card" href="/runs/{{ g.run_id }}">
+        <div class="badges">
+          {% if g.fabric %}
+          <span class="badge badge-platform">{{ platform_label(g.fabric.platform) }}</span>
+          <span class="badge">{{ g.fabric.spines }} spines · {{ g.fabric.leaves }} leaves</span>
+          {% endif %}
+        </div>
+        <p class="req">{{ g.request or g.run_id }}</p>
+        <div class="foot">
+          <span class="badge badge-{{ g.outcome or 'running' }}">{{ {'passed': '✓ verified', 'exhausted': 'not verified', 'failed': 'failed'}.get(g.outcome, g.state) }}</span>
+          <span>{% if g.repair_rounds is not none %}{{ g.repair_rounds }} repair round{{ '' if g.repair_rounds == 1 else 's' }}{% endif %}{% if g.cost_usd is not none %} · ${{ '%.4f' % g.cost_usd }}{% endif %}</span>
+        </div>
+      </a>
     </li>
     {% endfor %}
   </ul>
   {% else %}
-  <p class="muted">No recorded runs yet.</p>
+  <p class="empty">No recorded runs yet.</p>
   {% endif %}
 </section>
 {% endblock %}

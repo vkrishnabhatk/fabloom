@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Fabloom{% endblock %}</title>
+  <title>{% block title %}Fabloom · verified leaf-spine configs{% endblock %}</title>
+  <meta name="description" content="Describe a leaf-spine fabric in plain language. Nemotron writes the FRR or Arista EOS configs; Batfish verifies them.">
+  <link rel="icon" href="{{ url_for('static', path='favicon.svg').path }}" type="image/svg+xml">
   {# .path, not the full URL: behind Caddy the app sees plain http, and an http:// asset on an
      https page is blocked as mixed content. #}
   <link rel="stylesheet" href="{{ url_for('static', path='app.css').path }}">
@@ -11,19 +13,28 @@
 </head>
 <body data-page="{% block page %}{% endblock %}" {% block body_attrs %}{% endblock %}>
   <header class="top">
-    <a class="brand" href="/">Fabloom</a>
-    <span class="tag">plain-language leaf-spine configs, verified with Batfish</span>
-    <span class="mode mode-{{ info.mode }}">{{ info.mode }}</span>
+    <div class="wrap">
+      <a class="brand" href="/"><img src="{{ url_for('static', path='favicon.svg').path }}" alt="">Fabloom</a>
+      <span class="mode mode-{{ info.mode }}">{{ 'Live' if info.mode == 'live' else 'Read-only' }}</span>
+      <nav class="nav">
+        <a href="/#how">How it works</a>
+        <a href="/#gallery">Gallery</a>
+        <a href="/api/docs">API</a>
+        <a href="https://github.com/vkrishnabhatk/fabloom">GitHub</a>
+      </nav>
+    </div>
   </header>
   {% if info.read_only_reason %}
-  <p class="banner">Read-only: {{ info.read_only_reason }}. The gallery below shows recorded runs.</p>
+  <div class="banner"><div class="wrap">Read-only: {{ info.read_only_reason }}. The gallery below shows recorded runs.</div></div>
   {% endif %}
-  <main>{% block main %}{% endblock %}</main>
+  <main class="wrap">{% block main %}{% endblock %}</main>
   <footer>
-    fabloom {{ info.version }} ({{ info.git_sha }}){% if info.verifier %} · verifier {{ info.verifier }}{% endif %}
-    · <a href="/api/docs">API</a>
-    · <a href="https://github.com/vkrishnabhatk/fabloom">source</a>
-    · input is scrubbed of secrets before it leaves the server
+    <div class="wrap">
+      <span>fabloom {{ info.version }} ({{ info.git_sha }}){% if info.verifier %} · verifier {{ info.verifier }}{% endif %}</span>
+      <span>Inference on Nebius Token Factory · NVIDIA Nemotron · verification by Batfish</span>
+      <span>Input is scrubbed of secrets before it leaves the server</span>
+      <a href="https://github.com/vkrishnabhatk/fabloom">Source (Apache-2.0)</a>
+    </div>
   </footer>
 </body>
 </html>

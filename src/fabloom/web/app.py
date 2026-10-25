@@ -7,8 +7,13 @@ never builds a verifier or a model client itself, so ``web`` cannot reach ``veri
 
 from __future__ import annotations
 
+import base64
+import hashlib
+import io
+import re
 import time
 import uuid
+import zipfile
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
@@ -18,6 +23,7 @@ from typing import Any
 
 import structlog
 from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -45,6 +51,10 @@ SECURITY_HEADERS = {
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "same-origin",
 }
+# Swagger UI ships only from a CDN. The API docs page alone may load this pinned build, plus
+# its one inline bootstrap script, allowed by hash rather than 'unsafe-inline'.
+SWAGGER_UI = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.17.14"
+INLINE_SCRIPT = re.compile(rb"<script>(.*?)</script>", re.DOTALL)
 
 
 class RunCreate(BaseModel):
@@ -129,7 +139,7 @@ def create_app(
         title="Fabloom",
         version=__version__,
         lifespan=lifespan,
-        docs_url="/api/docs",
+        docs_url=None,
         redoc_url=None,
         openapi_url="/api/openapi.json",
     )
@@ -187,7 +197,56 @@ def _add_ops_routes(app: FastAPI, w: _Web) -> None:
         return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
+def _zip_readme(run: dict[str, Any]) -> str:
+    checks = run.get("checks") or []
+    passed = sum(c["passed"] for c in checks)
+    lines = [
+        f"Fabloom run {run['run_id']}",
+        "",
+        f"Request: {run.get('request')}",
+        f"Outcome: {run.get('outcome')}, {passed}/{len(checks)} checks pass"
+        f" (verification level {run.get('level')}, verifier {run.get('verifier')})",
+    ]
+    if run.get("unverifiable"):
+        lines.append("Not verifiable: " + "; ".join(run["unverifiable"]))
+    lines += [
+        "",
+        "These configs are a proposal for review. Batfish checked them statically (L2): they",
+        "were parsed and the fabric simulated, not booted on a device. Review them before use.",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def _docs_csp(page: bytes) -> str:
+    hashes = " ".join(
+        f"'sha256-{base64.b64encode(hashlib.sha256(s).digest()).decode()}'"
+        for s in INLINE_SCRIPT.findall(page)
+    )
+    cdn = "https://cdn.jsdelivr.net"
+    return (
+        f"default-src 'self'; script-src 'self' {cdn} {hashes}; "
+        f"style-src 'self' 'unsafe-inline' {cdn}; img-src 'self' data:; connect-src 'self'; "
+        "frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+    )
+
+
 def _add_api_routes(app: FastAPI, w: _Web) -> None:
+    @app.get("/api/docs", include_in_schema=False)
+    async def api_docs() -> HTMLResponse:
+        page = get_swagger_ui_html(
+            openapi_url=app.openapi_url or "/api/openapi.json",
+            title="Fabloom API",
+            swagger_js_url=f"{SWAGGER_UI}/swagger-ui-bundle.js",
+            swagger_css_url=f"{SWAGGER_UI}/swagger-ui.css",
+            swagger_favicon_url="/static/favicon.svg",
+            # The default validator badge is an image from validator.swagger.io.
+            swagger_ui_parameters={"validatorUrl": None},
+        )
+        # Set before the middleware, which only fills in headers a route left unset.
+        page.headers["Content-Security-Policy"] = _docs_csp(bytes(page.body))
+        return page
+
     @app.get("/api/v1/scenarios")
     async def scenarios() -> list[dict[str, Any]]:
         return [
@@ -229,6 +288,24 @@ def _add_api_routes(app: FastAPI, w: _Web) -> None:
     async def get_run(run_id: str) -> dict[str, Any]:
         return summarize(w.locate(run_id))
 
+    @app.get("/api/v1/runs/{run_id}/configs.zip")
+    async def run_configs_zip(run_id: str) -> Response:
+        loc = w.locate(run_id)
+        run = summarize(loc)
+        if not run.get("configs"):
+            raise HTTPException(404, "this run has no configs")
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+            for device, text in run["configs"].items():
+                z.writestr(f"{run_id}/{device}.cfg", text)
+            z.writestr(f"{run_id}/README.txt", _zip_readme(run))
+        return Response(
+            buf.getvalue(),
+            media_type="application/zip",
+            # run_id has passed RUN_ID in locate(), so it is safe in a header.
+            headers={"Content-Disposition": f'attachment; filename="fabloom-{run_id}.zip"'},
+        )
+
     @app.get("/api/v1/runs/{run_id}/events")
     async def run_events(run_id: str) -> StreamingResponse:
         loc = w.locate(run_id)
@@ -255,6 +332,11 @@ def _add_html_routes(app: FastAPI, w: _Web) -> None:
                 "info": w.info(),
                 "gallery": w.service.gallery(),
                 "examples": [s.request for s in w.examples[:6]],
+                "limits": {
+                    "run_max_usd": w.settings.web_run_max_usd,
+                    "runs_per_ip": w.settings.web_runs_per_ip,
+                    "refill_min": round(w.settings.web_refill_s / 60),
+                },
             },
         )
 

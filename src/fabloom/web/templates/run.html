@@ -3,22 +3,61 @@
 {% block page %}run{% endblock %}
 {% block body_attrs %}data-run-id="{{ run_id }}"{% endblock %}
 {% block main %}
-<section class="card">
-  <p class="muted"><a href="/">&larr; new run</a>{% if gallery %} · recorded gallery run{% endif %}</p>
+<section class="run-head">
+  <p class="crumbs"><a href="/">&larr; New run</a>{% if gallery %}<span class="badge">recorded run</span>{% endif %}
+    <span class="muted mono small">{{ run_id }}</span></p>
   <h1 id="request">Run {{ run_id }}</h1>
-  <p id="status" class="status">loading…</p>
+  <div id="fabric" class="badges"></div>
+  <div class="card verdict-card">
+    <div id="verdict" class="verdict verdict-running">
+      <div class="verdict-icon" id="verdict-icon"><span class="spinner"></span></div>
+      <div>
+        <p class="verdict-title" id="verdict-title">Loading…</p>
+        <p class="verdict-sub" id="verdict-sub"></p>
+      </div>
+    </div>
+    <div class="metrics">
+      <div class="metric"><b id="m-checks">–</b><span>checks passing</span></div>
+      <div class="metric"><b id="m-rounds">–</b><span>repair rounds</span></div>
+      <div class="metric"><b id="m-cost">–</b><span>model cost</span></div>
+      <div class="metric"><b id="m-time">–</b><span>wall time</span></div>
+    </div>
+  </div>
 </section>
-<section class="card">
-  <h2>Live log</h2>
-  <ol id="events" class="events"></ol>
+
+<section class="section card" id="topology" hidden>
+  <div class="section-head">
+    <h3>Fabric</h3>
+    <span class="legend small"><i class="lg lg-ok"></i>checks pass <i class="lg lg-bad"></i>failing <i class="lg lg-wait"></i>not checked yet</span>
+  </div>
+  <div id="diagram" class="diagram"></div>
+  <p class="fine">Each line is a spine–leaf link: green when its BGP and link checks pass in Batfish's latest round. A red box is a device whose config does not parse cleanly or references something it never defines.</p>
 </section>
-<section class="card" id="result" hidden>
-  <h2>Result</h2>
-  <p id="explanation"></p>
-  <p id="unverifiable" class="muted" hidden></p>
-  <h3>Checks</h3>
-  <ul id="checks" class="checks"></ul>
-  <h3>Configs</h3>
-  <div id="configs"></div>
+
+<section class="section cols">
+  <div class="card">
+    <h3>What happened</h3>
+    <ol id="events" class="timeline"></ol>
+  </div>
+  <div id="result" hidden>
+    <div class="card">
+      <h3>Explanation</h3>
+      <p id="explanation" class="explanation"></p>
+      <p id="unverifiable" class="notice" hidden></p>
+    </div>
+    <div class="card section">
+      <h3>Checks from your request</h3>
+      <ul id="checks" class="checks"></ul>
+    </div>
+    <div class="card">
+      <div class="section-head">
+        <h3>Configs</h3>
+        <a class="btn btn-ghost" href="/api/v1/runs/{{ run_id }}/configs.zip" download>Download configs (.zip)</a>
+      </div>
+      <div id="tabs" class="tabs" role="tablist"></div>
+      <div class="code"><button type="button" id="copy" class="btn-ghost btn">Copy</button><pre id="config"></pre></div>
+      <p class="fine"><a href="/api/v1/runs/{{ run_id }}">Raw run as JSON</a> · <a href="/api/v1/runs/{{ run_id }}/events">event stream</a></p>
+    </div>
+  </div>
 </section>
 {% endblock %}

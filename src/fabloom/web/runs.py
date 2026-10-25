@@ -18,7 +18,7 @@ import structlog
 from fabloom.agent import RunMachine, RunRequest, read_events
 from fabloom.agent.events import EVENTS_FILE
 from fabloom.contracts import Platform
-from fabloom.contracts.run import RunFinished, RunStarted
+from fabloom.contracts.run import IntentPlanned, RunFinished, RunStarted
 from fabloom.web.guards import SpendBreaker
 
 log = structlog.get_logger(__name__)
@@ -124,15 +124,30 @@ class RunService:
         return items
 
 
+def _fabric(planned: IntentPlanned | None) -> dict[str, Any] | None:
+    """What the planner made of the request, for labels: platform and fabric size."""
+    if planned is None:
+        return None
+    topology = planned.intent.get("topology") or {}
+    return {
+        "platform": planned.intent.get("platform"),
+        "spines": topology.get("spines"),
+        "leaves": topology.get("leaves"),
+    }
+
+
 def summarize(loc: RunLocation, *, with_configs: bool = True) -> dict[str, Any]:
     """A run as JSON: what the API returns and what every HTML view renders."""
     started: RunStarted | None = None
+    planned: IntentPlanned | None = None
     finished: RunFinished | None = None
     state = None
     for e in read_events(loc.events):
         state = e.state
         if isinstance(e, RunStarted):
             started = e
+        elif isinstance(e, IntentPlanned):
+            planned = e
         elif isinstance(e, RunFinished):
             finished = e
     out: dict[str, Any] = {
@@ -146,6 +161,7 @@ def summarize(loc: RunLocation, *, with_configs: bool = True) -> dict[str, Any]:
         "score": finished.score if finished else None,
         "repair_rounds": finished.repair_rounds if finished else None,
         "cost_usd": finished.usage.cost_usd if finished else None,
+        "fabric": _fabric(planned),
     }
     result_file = loc.run_dir / "result.json"
     if finished and result_file.exists():

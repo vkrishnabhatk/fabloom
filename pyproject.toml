@@ -1,6 +1,6 @@
 [project]
 name = "fabloom"
-version = "0.1.0.dev0"
+version = "0.1.0"
 description = "Describe a data center network in plain language; get configs that are generated, verified with Batfish and repaired until they pass."
 readme = "README.md"
 license = "Apache-2.0"

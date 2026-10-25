@@ -7,7 +7,7 @@ or a real Batfish yet, so nothing below is measured.
 
 ## Context
 
-The ablation matrix is the submission's main evidence (architecture §8): it has to show what
+The ablation matrix is the submission's main evidence: it has to show what
 the verify-and-repair loop adds over raw Nemotron, with every number traceable and negative
 results published. It also has to catch a hosted model changing behaviour during the
 1–15 December judging window, on a 10-scenario nightly that costs little. Credits are finite,

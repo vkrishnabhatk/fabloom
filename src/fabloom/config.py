@@ -53,7 +53,7 @@ class Settings(BaseSettings):
     gallery_dir: Path = REPO_ROOT / "gallery"
     log_level: str = "INFO"
     log_json: bool = True
-    # SQLite store plus ./mlruns artifacts; both are backed up off the VM (architecture §11).
+    # SQLite store plus ./mlruns artifacts; both are backed up off the VM.
     mlflow_tracking_uri: str = "sqlite:///mlflow.db"
     mlflow_artifact_root: Path = Path("mlruns")
 
@@ -125,7 +125,7 @@ class ModelsConfig(BaseModel):
 
 
 class GroundingConfig(BaseModel):
-    """Doc-grounded repair (architecture §8): what to search, and how hard."""
+    """Doc-grounded repair (ADR-0008): what to search, and how hard."""
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 

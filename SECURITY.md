@@ -19,7 +19,7 @@ Please do not open a public issue. Expect an acknowledgement within 7 days.
 
 ## Deployment secrets
 
-Planned (architecture §12, not yet in place): the Token Factory key, Tavily key and GHCR
+Planned, not yet in place: the Token Factory key, Tavily key and GHCR
 token stored sops/age-encrypted in git, decrypted only at deploy time. Until then they live
 only in a local, git-ignored `.env` and in GitHub environment secrets. Rotation: on any suspected exposure
 immediately, otherwise every 90 days and after the judging window closes.

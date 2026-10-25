@@ -13,7 +13,7 @@ convention in a README rots; an import that quietly lets the repair loop tweak a
 lets a verifier call a model to "interpret" a result, would hollow the product out while
 every test still passed.
 
-The architecture document states the rule twice: "the agent and llm packages cannot import
+The design states the rule twice: "the agent and llm packages cannot import
 the verify package" and "verify/ never imports llm/ or agent/". Read together, the boundary
 runs both ways.
 

@@ -25,7 +25,7 @@ anyway, so dropping it does not change what Batfish evaluates. Indented lines an
 ``exit-address-family`` are kept.
 
 ``layer1_topology.json`` is always written. Without it, FRR BGP-unnumbered sessions silently
-fail to come up in Batfish (architecture §6, risk register).
+fail to come up in Batfish.
 """
 
 from __future__ import annotations

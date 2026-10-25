@@ -13,7 +13,7 @@ run:
     max_verifications: 12
     max_grounding_queries: 6   # Tavily searches per run; cached lookups are free
 
-  # Doc-grounded repair (architecture §8). When Batfish reports unrecognised lines, search the
+  # Doc-grounded repair (ADR-0008). When Batfish reports unrecognised lines, search the
   # vendor's own documentation for the real syntax and put the excerpts in the repair prompt.
   # Off here: only the super-repair-grounding arm in conf/bench.yaml turns it on, and it ships
   # in the product only if that arm passes the grounding gate. Needs FABLOOM_TAVILY_API_KEY.

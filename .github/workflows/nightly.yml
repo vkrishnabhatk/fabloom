@@ -1,7 +1,7 @@
 name: nightly
 
 # A model ID retired, or a hosted model silently changing behaviour, during the 1-15 December
-# judging window would otherwise go unnoticed until a judge hit it (architecture §7, risks).
+# judging window would otherwise go unnoticed until a judge hit it.
 on:
   schedule:
     - cron: "17 3 * * *"

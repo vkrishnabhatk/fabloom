@@ -60,7 +60,7 @@ def test_scenarios_validate() -> None:
 
 def test_benchmark_scenarios_well_formed() -> None:
     scenarios = load_scenarios()
-    assert 40 <= len(scenarios) <= 60  # the v0.1 target (architecture §8)
+    assert 40 <= len(scenarios) <= 60  # the v0.1 target (ADR-0007)
     families = {s.family for s in scenarios}
     assert {"leaf-spine-ebgp", "leaf-spine-unnumbered", "leaf-spine-filters"} <= families
     assert {s.intent.platform for s in scenarios} == set(Platform)

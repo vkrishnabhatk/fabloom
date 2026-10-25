@@ -6,7 +6,7 @@ Accepted — 2026-09-30. Measurements pending the week-0 spike (`spikes/batfish_
 
 ## Context
 
-The plan proposed starting Batfish once in a Nebius Sandbox and forking the *running*
+The original design proposed starting Batfish once in a Nebius Sandbox and forking the *running*
 server per repair candidate. ConTree checkpoints capture the filesystem, not process state,
 so a warm JVM cannot be checkpointed. Batfish's JVM start-up cost has to be paid per
 execution, or moved into a file.

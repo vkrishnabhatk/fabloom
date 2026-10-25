@@ -3,7 +3,7 @@ does Super do on a first real generation?
 
     uv run python spikes/nemotron_probe.py [--generate leaf-spine-ebgp-0002]
 
-1. Lists every nvidia/* model Token Factory advertises (to catch IDs the plan doesn't know).
+1. Lists every nvidia/* model Token Factory advertises (to catch IDs not yet in conf/models.yaml).
 2. For each model in conf/models.yaml: is it listed, does a strict json_schema call work,
    latency and token counts.
 3. --generate: one real generator call for a pilot scenario, then deterministic pre-lint on

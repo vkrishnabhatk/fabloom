@@ -1,5 +1,5 @@
 """What keeps a public demo from spending the credits: a per-visitor rate limit and a global
-daily spend cap. Both are in-process; the demo is one process on one VM (architecture §9)."""
+daily spend cap. Both are in-process; the demo is one process on one VM."""
 
 from __future__ import annotations
 

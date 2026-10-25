@@ -1,4 +1,4 @@
-# Benchmark arms and gates (`fabloom bench`, architecture §8).
+# Benchmark arms and gates (`fabloom bench`, ADR-0007).
 #
 # Every arm grades against the scenario's ground-truth intent, never the planner's reading of
 # the request, so arms differ only in who writes and repairs the configs. Model names refer to

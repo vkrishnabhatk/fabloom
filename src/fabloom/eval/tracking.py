@@ -1,6 +1,6 @@
 """MLflow tracking for the benchmark: one MLflow run per (bench, arm).
 
-The benchmark is the experiment (architecture §3). Params are what was run (model IDs,
+The benchmark is the experiment (ADR-0007). Params are what was run (model IDs,
 temperatures, prompt hash, repair cap, verifier); metrics are the arm summary; the per-run
 records and the report are artifacts. Tracking only: nothing is registered, because Fabloom
 does not own the models it calls.

@@ -1,13 +1,12 @@
 # Fabloom
 
-Describe a data center network in plain language. Fabloom has NVIDIA Nemotron on Nebius
-Token Factory write the configs, **verifies them with Batfish**, and repairs them until every
-check passes. If something can't be fixed, it says so plainly.
+Describe a data center fabric in plain language. Fabloom has NVIDIA Nemotron on Nebius Token
+Factory write the configs for Juniper Junos, Cisco NX-OS, IOS-XE or IOS-XR, Arista EOS, SONiC
+or FRR, **verifies them with Batfish**, and repairs them until every check passes. If
+something can't be fixed, it says so plainly.
 
-!!! note "Status"
-    Pre-alpha. No benchmark numbers yet: everything below is built and tested offline, with
-    scripted models and verifiers. Output is always a proposal for a human to review, never
-    pushed to devices.
+Try it at [fabloom.dev](https://fabloom.dev). Output is always a proposal for a person to
+review; Fabloom never connects to a device.
 
 ## The one rule
 
@@ -23,19 +22,26 @@ request ──► planner (Nemotron Nano) ──► intent JSON
             deterministic compiler   ──► checks
             generator (Nemotron Super) ──► per-device configs
             pre-lint gate ──► Batfish ──► report ──┐
-            [doc grounding: vendor docs for unrecognised lines]
             repairer (Super, escalating to Ultra) ◄┘ until pass or budget/rounds exhausted
             explainer (Nano) ──► plain-language summary
 ```
 
 Every step is an event in `runs/<run_id>/events.jsonl` ([ADR-0004](decisions/ADR-0004-run-event-log.md)).
-The CLI's `--watch`, the web demo's live log and the benchmark all read that same file.
+The CLI's `--watch`, the web demo's live timeline and the benchmark all read that same file.
 
 Each report states its verification level. **L2** (statically verified with Batfish) is
 what this release targets. **L0** means nothing could be checked.
 
+## Results in one line
+
+Routed Nemotron passed 47 of 49 FRR and EOS fabrics, matching Ultra alone at about
+two-thirds of its cost, and 25 of 25 on Junos, NX-OS, IOS-XE, IOS-XR and SONiC, where Ultra
+alone passed 20. How that was measured, and how far to trust it, is in
+[Benchmark](benchmark/index.md).
+
 ## Where to go next
 
-- [Running Fabloom](running.md): CLI, web demo, benchmark, configuration
-- [Benchmark](benchmark/index.md): what is measured and how
-- [Decisions](decisions/ADR-0001-verification-independence.md): the architecture decision records
+- [Running Fabloom](running.md): install, CLI, benchmark, web demo, deployment
+- [Benchmark](benchmark/index.md): what is measured, the results and their limits
+- [Decisions](decisions/ADR-0001-verification-independence.md): the architecture decision records,
+  including [more platforms](decisions/ADR-0009-more-platforms.md)

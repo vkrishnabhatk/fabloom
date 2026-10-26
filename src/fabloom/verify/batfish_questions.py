@@ -291,6 +291,10 @@ class Evaluator:
                 "dstIps": p["dst_ip"],
                 "ipProtocols": [p["protocol"]],
                 "dstPorts": str(p["dst_port"]),
+                # Only packets that can open a connection. A non-initial fragment carries no
+                # ports, so no port-based deny can match it, on any vendor; Batfish picked
+                # one as NX-OS's "accepted" SSH flow (live Batfish 2026-10-26).
+                "fragmentOffsets": "0",
             },
             actions="ACCEPTED",
         )

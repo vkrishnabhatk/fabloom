@@ -1,0 +1,1451 @@
+{
+ "_provenance": "recorded from Batfish 2026.08.27.3685 on 2026-10-26",
+ "answers": {
+  "{\"name\": \"bgpSessionCompatibility\", \"params\": {}}": [
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Configured_Status": "UNIQUE_MATCH",
+    "Local_AS": 65101,
+    "Local_IP": "10.1.0.1",
+    "Local_Interface": null,
+    "Node": "leaf1",
+    "Remote_AS": "65000",
+    "Remote_IP": "10.1.0.0",
+    "Remote_Interface": null,
+    "Remote_Node": "spine1",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Configured_Status": "UNIQUE_MATCH",
+    "Local_AS": 65101,
+    "Local_IP": "10.1.0.3",
+    "Local_Interface": null,
+    "Node": "leaf1",
+    "Remote_AS": "65000",
+    "Remote_IP": "10.1.0.2",
+    "Remote_Interface": null,
+    "Remote_Node": "spine2",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Configured_Status": "UNIQUE_MATCH",
+    "Local_AS": 65102,
+    "Local_IP": "10.1.0.17",
+    "Local_Interface": null,
+    "Node": "leaf2",
+    "Remote_AS": "65000",
+    "Remote_IP": "10.1.0.16",
+    "Remote_Interface": null,
+    "Remote_Node": "spine1",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Configured_Status": "UNIQUE_MATCH",
+    "Local_AS": 65102,
+    "Local_IP": "10.1.0.19",
+    "Local_Interface": null,
+    "Node": "leaf2",
+    "Remote_AS": "65000",
+    "Remote_IP": "10.1.0.18",
+    "Remote_Interface": null,
+    "Remote_Node": "spine2",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Configured_Status": "UNIQUE_MATCH",
+    "Local_AS": 65103,
+    "Local_IP": "10.1.0.33",
+    "Local_Interface": null,
+    "Node": "leaf3",
+    "Remote_AS": "65000",
+    "Remote_IP": "10.1.0.32",
+    "Remote_Interface": null,
+    "Remote_Node": "spine1",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Configured_Status": "UNIQUE_MATCH",
+    "Local_AS": 65103,
+    "Local_IP": "10.1.0.35",
+    "Local_Interface": null,
+    "Node": "leaf3",
+    "Remote_AS": "65000",
+    "Remote_IP": "10.1.0.34",
+    "Remote_Interface": null,
+    "Remote_Node": "spine2",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Configured_Status": "UNIQUE_MATCH",
+    "Local_AS": 65104,
+    "Local_IP": "10.1.0.49",
+    "Local_Interface": null,
+    "Node": "leaf4",
+    "Remote_AS": "65000",
+    "Remote_IP": "10.1.0.48",
+    "Remote_Interface": null,
+    "Remote_Node": "spine1",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Configured_Status": "UNIQUE_MATCH",
+    "Local_AS": 65104,
+    "Local_IP": "10.1.0.51",
+    "Local_Interface": null,
+    "Node": "leaf4",
+    "Remote_AS": "65000",
+    "Remote_IP": "10.1.0.50",
+    "Remote_Interface": null,
+    "Remote_Node": "spine2",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Configured_Status": "UNIQUE_MATCH",
+    "Local_AS": 65000,
+    "Local_IP": "10.1.0.48",
+    "Local_Interface": null,
+    "Node": "spine1",
+    "Remote_AS": "65104",
+    "Remote_IP": "10.1.0.49",
+    "Remote_Interface": null,
+    "Remote_Node": "leaf4",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Configured_Status": "UNIQUE_MATCH",
+    "Local_AS": 65000,
+    "Local_IP": "10.1.0.32",
+    "Local_Interface": null,
+    "Node": "spine1",
+    "Remote_AS": "65103",
+    "Remote_IP": "10.1.0.33",
+    "Remote_Interface": null,
+    "Remote_Node": "leaf3",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Configured_Status": "UNIQUE_MATCH",
+    "Local_AS": 65000,
+    "Local_IP": "10.1.0.16",
+    "Local_Interface": null,
+    "Node": "spine1",
+    "Remote_AS": "65102",
+    "Remote_IP": "10.1.0.17",
+    "Remote_Interface": null,
+    "Remote_Node": "leaf2",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Configured_Status": "UNIQUE_MATCH",
+    "Local_AS": 65000,
+    "Local_IP": "10.1.0.0",
+    "Local_Interface": null,
+    "Node": "spine1",
+    "Remote_AS": "65101",
+    "Remote_IP": "10.1.0.1",
+    "Remote_Interface": null,
+    "Remote_Node": "leaf1",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Configured_Status": "UNIQUE_MATCH",
+    "Local_AS": 65000,
+    "Local_IP": "10.1.0.34",
+    "Local_Interface": null,
+    "Node": "spine2",
+    "Remote_AS": "65103",
+    "Remote_IP": "10.1.0.35",
+    "Remote_Interface": null,
+    "Remote_Node": "leaf3",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Configured_Status": "UNIQUE_MATCH",
+    "Local_AS": 65000,
+    "Local_IP": "10.1.0.2",
+    "Local_Interface": null,
+    "Node": "spine2",
+    "Remote_AS": "65101",
+    "Remote_IP": "10.1.0.3",
+    "Remote_Interface": null,
+    "Remote_Node": "leaf1",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Configured_Status": "UNIQUE_MATCH",
+    "Local_AS": 65000,
+    "Local_IP": "10.1.0.50",
+    "Local_Interface": null,
+    "Node": "spine2",
+    "Remote_AS": "65104",
+    "Remote_IP": "10.1.0.51",
+    "Remote_Interface": null,
+    "Remote_Node": "leaf4",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Configured_Status": "UNIQUE_MATCH",
+    "Local_AS": 65000,
+    "Local_IP": "10.1.0.18",
+    "Local_Interface": null,
+    "Node": "spine2",
+    "Remote_AS": "65102",
+    "Remote_IP": "10.1.0.19",
+    "Remote_Interface": null,
+    "Remote_Node": "leaf2",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   }
+  ],
+  "{\"name\": \"bgpSessionStatus\", \"params\": {}}": [
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Established_Status": "ESTABLISHED",
+    "Local_AS": 65101,
+    "Local_IP": "10.1.0.1",
+    "Local_Interface": null,
+    "Node": "leaf1",
+    "Remote_AS": "65000",
+    "Remote_IP": "10.1.0.0",
+    "Remote_Interface": null,
+    "Remote_Node": "spine1",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Established_Status": "ESTABLISHED",
+    "Local_AS": 65101,
+    "Local_IP": "10.1.0.3",
+    "Local_Interface": null,
+    "Node": "leaf1",
+    "Remote_AS": "65000",
+    "Remote_IP": "10.1.0.2",
+    "Remote_Interface": null,
+    "Remote_Node": "spine2",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Established_Status": "ESTABLISHED",
+    "Local_AS": 65102,
+    "Local_IP": "10.1.0.17",
+    "Local_Interface": null,
+    "Node": "leaf2",
+    "Remote_AS": "65000",
+    "Remote_IP": "10.1.0.16",
+    "Remote_Interface": null,
+    "Remote_Node": "spine1",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Established_Status": "ESTABLISHED",
+    "Local_AS": 65102,
+    "Local_IP": "10.1.0.19",
+    "Local_Interface": null,
+    "Node": "leaf2",
+    "Remote_AS": "65000",
+    "Remote_IP": "10.1.0.18",
+    "Remote_Interface": null,
+    "Remote_Node": "spine2",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Established_Status": "ESTABLISHED",
+    "Local_AS": 65103,
+    "Local_IP": "10.1.0.33",
+    "Local_Interface": null,
+    "Node": "leaf3",
+    "Remote_AS": "65000",
+    "Remote_IP": "10.1.0.32",
+    "Remote_Interface": null,
+    "Remote_Node": "spine1",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Established_Status": "ESTABLISHED",
+    "Local_AS": 65103,
+    "Local_IP": "10.1.0.35",
+    "Local_Interface": null,
+    "Node": "leaf3",
+    "Remote_AS": "65000",
+    "Remote_IP": "10.1.0.34",
+    "Remote_Interface": null,
+    "Remote_Node": "spine2",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Established_Status": "ESTABLISHED",
+    "Local_AS": 65104,
+    "Local_IP": "10.1.0.49",
+    "Local_Interface": null,
+    "Node": "leaf4",
+    "Remote_AS": "65000",
+    "Remote_IP": "10.1.0.48",
+    "Remote_Interface": null,
+    "Remote_Node": "spine1",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Established_Status": "ESTABLISHED",
+    "Local_AS": 65104,
+    "Local_IP": "10.1.0.51",
+    "Local_Interface": null,
+    "Node": "leaf4",
+    "Remote_AS": "65000",
+    "Remote_IP": "10.1.0.50",
+    "Remote_Interface": null,
+    "Remote_Node": "spine2",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Established_Status": "ESTABLISHED",
+    "Local_AS": 65000,
+    "Local_IP": "10.1.0.48",
+    "Local_Interface": null,
+    "Node": "spine1",
+    "Remote_AS": "65104",
+    "Remote_IP": "10.1.0.49",
+    "Remote_Interface": null,
+    "Remote_Node": "leaf4",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Established_Status": "ESTABLISHED",
+    "Local_AS": 65000,
+    "Local_IP": "10.1.0.32",
+    "Local_Interface": null,
+    "Node": "spine1",
+    "Remote_AS": "65103",
+    "Remote_IP": "10.1.0.33",
+    "Remote_Interface": null,
+    "Remote_Node": "leaf3",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Established_Status": "ESTABLISHED",
+    "Local_AS": 65000,
+    "Local_IP": "10.1.0.16",
+    "Local_Interface": null,
+    "Node": "spine1",
+    "Remote_AS": "65102",
+    "Remote_IP": "10.1.0.17",
+    "Remote_Interface": null,
+    "Remote_Node": "leaf2",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Established_Status": "ESTABLISHED",
+    "Local_AS": 65000,
+    "Local_IP": "10.1.0.0",
+    "Local_Interface": null,
+    "Node": "spine1",
+    "Remote_AS": "65101",
+    "Remote_IP": "10.1.0.1",
+    "Remote_Interface": null,
+    "Remote_Node": "leaf1",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Established_Status": "ESTABLISHED",
+    "Local_AS": 65000,
+    "Local_IP": "10.1.0.34",
+    "Local_Interface": null,
+    "Node": "spine2",
+    "Remote_AS": "65103",
+    "Remote_IP": "10.1.0.35",
+    "Remote_Interface": null,
+    "Remote_Node": "leaf3",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Established_Status": "ESTABLISHED",
+    "Local_AS": 65000,
+    "Local_IP": "10.1.0.2",
+    "Local_Interface": null,
+    "Node": "spine2",
+    "Remote_AS": "65101",
+    "Remote_IP": "10.1.0.3",
+    "Remote_Interface": null,
+    "Remote_Node": "leaf1",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Established_Status": "ESTABLISHED",
+    "Local_AS": 65000,
+    "Local_IP": "10.1.0.50",
+    "Local_Interface": null,
+    "Node": "spine2",
+    "Remote_AS": "65104",
+    "Remote_IP": "10.1.0.51",
+    "Remote_Interface": null,
+    "Remote_Node": "leaf4",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   },
+   {
+    "Address_Families": [
+     "IPV4_UNICAST"
+    ],
+    "Established_Status": "ESTABLISHED",
+    "Local_AS": 65000,
+    "Local_IP": "10.1.0.18",
+    "Local_Interface": null,
+    "Node": "spine2",
+    "Remote_AS": "65102",
+    "Remote_IP": "10.1.0.19",
+    "Remote_Interface": null,
+    "Remote_Node": "leaf2",
+    "Session_Type": "EBGP_SINGLEHOP",
+    "Session_VRF": "*",
+    "VRF": "default"
+   }
+  ],
+  "{\"name\": \"detectLoops\", \"params\": {}}": [],
+  "{\"name\": \"fileParseStatus\", \"params\": {}}": [
+   {
+    "File_Format": "SONIC",
+    "File_Name": "sonic_configs/leaf1/config_db.json",
+    "Nodes": [
+     "leaf1"
+    ],
+    "Status": "PASSED"
+   },
+   {
+    "File_Format": "SONIC",
+    "File_Name": "sonic_configs/leaf1/frr.conf",
+    "Nodes": [
+     "leaf1"
+    ],
+    "Status": "PASSED"
+   },
+   {
+    "File_Format": "SONIC",
+    "File_Name": "sonic_configs/leaf2/config_db.json",
+    "Nodes": [
+     "leaf2"
+    ],
+    "Status": "PASSED"
+   },
+   {
+    "File_Format": "SONIC",
+    "File_Name": "sonic_configs/leaf2/frr.conf",
+    "Nodes": [
+     "leaf2"
+    ],
+    "Status": "PASSED"
+   },
+   {
+    "File_Format": "SONIC",
+    "File_Name": "sonic_configs/leaf3/config_db.json",
+    "Nodes": [
+     "leaf3"
+    ],
+    "Status": "PASSED"
+   },
+   {
+    "File_Format": "SONIC",
+    "File_Name": "sonic_configs/leaf3/frr.conf",
+    "Nodes": [
+     "leaf3"
+    ],
+    "Status": "PASSED"
+   },
+   {
+    "File_Format": "SONIC",
+    "File_Name": "sonic_configs/leaf4/config_db.json",
+    "Nodes": [
+     "leaf4"
+    ],
+    "Status": "PASSED"
+   },
+   {
+    "File_Format": "SONIC",
+    "File_Name": "sonic_configs/leaf4/frr.conf",
+    "Nodes": [
+     "leaf4"
+    ],
+    "Status": "PASSED"
+   },
+   {
+    "File_Format": "SONIC",
+    "File_Name": "sonic_configs/spine1/config_db.json",
+    "Nodes": [
+     "spine1"
+    ],
+    "Status": "PASSED"
+   },
+   {
+    "File_Format": "SONIC",
+    "File_Name": "sonic_configs/spine1/frr.conf",
+    "Nodes": [
+     "spine1"
+    ],
+    "Status": "PASSED"
+   },
+   {
+    "File_Format": "SONIC",
+    "File_Name": "sonic_configs/spine2/config_db.json",
+    "Nodes": [
+     "spine2"
+    ],
+    "Status": "PASSED"
+   },
+   {
+    "File_Format": "SONIC",
+    "File_Name": "sonic_configs/spine2/frr.conf",
+    "Nodes": [
+     "spine2"
+    ],
+    "Status": "PASSED"
+   }
+  ],
+  "{\"name\": \"layer3Edges\", \"params\": {}}": [
+   {
+    "IPs": [
+     "10.1.0.1"
+    ],
+    "Interface": "leaf1[Ethernet0]",
+    "Remote_IPs": [
+     "10.1.0.0"
+    ],
+    "Remote_Interface": "spine1[Ethernet0]"
+   },
+   {
+    "IPs": [
+     "10.1.0.3"
+    ],
+    "Interface": "leaf1[Ethernet4]",
+    "Remote_IPs": [
+     "10.1.0.2"
+    ],
+    "Remote_Interface": "spine2[Ethernet0]"
+   },
+   {
+    "IPs": [
+     "10.1.0.17"
+    ],
+    "Interface": "leaf2[Ethernet0]",
+    "Remote_IPs": [
+     "10.1.0.16"
+    ],
+    "Remote_Interface": "spine1[Ethernet4]"
+   },
+   {
+    "IPs": [
+     "10.1.0.19"
+    ],
+    "Interface": "leaf2[Ethernet4]",
+    "Remote_IPs": [
+     "10.1.0.18"
+    ],
+    "Remote_Interface": "spine2[Ethernet4]"
+   },
+   {
+    "IPs": [
+     "10.1.0.33"
+    ],
+    "Interface": "leaf3[Ethernet0]",
+    "Remote_IPs": [
+     "10.1.0.32"
+    ],
+    "Remote_Interface": "spine1[Ethernet8]"
+   },
+   {
+    "IPs": [
+     "10.1.0.35"
+    ],
+    "Interface": "leaf3[Ethernet4]",
+    "Remote_IPs": [
+     "10.1.0.34"
+    ],
+    "Remote_Interface": "spine2[Ethernet8]"
+   },
+   {
+    "IPs": [
+     "10.1.0.49"
+    ],
+    "Interface": "leaf4[Ethernet0]",
+    "Remote_IPs": [
+     "10.1.0.48"
+    ],
+    "Remote_Interface": "spine1[Ethernet12]"
+   },
+   {
+    "IPs": [
+     "10.1.0.51"
+    ],
+    "Interface": "leaf4[Ethernet4]",
+    "Remote_IPs": [
+     "10.1.0.50"
+    ],
+    "Remote_Interface": "spine2[Ethernet12]"
+   },
+   {
+    "IPs": [
+     "10.1.0.0"
+    ],
+    "Interface": "spine1[Ethernet0]",
+    "Remote_IPs": [
+     "10.1.0.1"
+    ],
+    "Remote_Interface": "leaf1[Ethernet0]"
+   },
+   {
+    "IPs": [
+     "10.1.0.16"
+    ],
+    "Interface": "spine1[Ethernet4]",
+    "Remote_IPs": [
+     "10.1.0.17"
+    ],
+    "Remote_Interface": "leaf2[Ethernet0]"
+   },
+   {
+    "IPs": [
+     "10.1.0.32"
+    ],
+    "Interface": "spine1[Ethernet8]",
+    "Remote_IPs": [
+     "10.1.0.33"
+    ],
+    "Remote_Interface": "leaf3[Ethernet0]"
+   },
+   {
+    "IPs": [
+     "10.1.0.48"
+    ],
+    "Interface": "spine1[Ethernet12]",
+    "Remote_IPs": [
+     "10.1.0.49"
+    ],
+    "Remote_Interface": "leaf4[Ethernet0]"
+   },
+   {
+    "IPs": [
+     "10.1.0.2"
+    ],
+    "Interface": "spine2[Ethernet0]",
+    "Remote_IPs": [
+     "10.1.0.3"
+    ],
+    "Remote_Interface": "leaf1[Ethernet4]"
+   },
+   {
+    "IPs": [
+     "10.1.0.18"
+    ],
+    "Interface": "spine2[Ethernet4]",
+    "Remote_IPs": [
+     "10.1.0.19"
+    ],
+    "Remote_Interface": "leaf2[Ethernet4]"
+   },
+   {
+    "IPs": [
+     "10.1.0.34"
+    ],
+    "Interface": "spine2[Ethernet8]",
+    "Remote_IPs": [
+     "10.1.0.35"
+    ],
+    "Remote_Interface": "leaf3[Ethernet4]"
+   },
+   {
+    "IPs": [
+     "10.1.0.50"
+    ],
+    "Interface": "spine2[Ethernet12]",
+    "Remote_IPs": [
+     "10.1.0.51"
+    ],
+    "Remote_Interface": "leaf4[Ethernet4]"
+   }
+  ],
+  "{\"name\": \"parseWarning\", \"params\": {}}": [],
+  "{\"name\": \"reachability\", \"params\": {\"actions\": \"FAILURE\", \"headers\": {\"dstIps\": \"10.0.1.1\", \"srcIps\": \"10.0.1.2\"}, \"pathConstraints\": {\"startLocation\": \"leaf2\"}}}": [],
+  "{\"name\": \"reachability\", \"params\": {\"actions\": \"FAILURE\", \"headers\": {\"dstIps\": \"10.0.1.1\", \"srcIps\": \"10.0.1.3\"}, \"pathConstraints\": {\"startLocation\": \"leaf3\"}}}": [],
+  "{\"name\": \"reachability\", \"params\": {\"actions\": \"FAILURE\", \"headers\": {\"dstIps\": \"10.0.1.1\", \"srcIps\": \"10.0.1.4\"}, \"pathConstraints\": {\"startLocation\": \"leaf4\"}}}": [],
+  "{\"name\": \"reachability\", \"params\": {\"actions\": \"FAILURE\", \"headers\": {\"dstIps\": \"10.0.1.2\", \"srcIps\": \"10.0.1.1\"}, \"pathConstraints\": {\"startLocation\": \"leaf1\"}}}": [],
+  "{\"name\": \"reachability\", \"params\": {\"actions\": \"FAILURE\", \"headers\": {\"dstIps\": \"10.0.1.2\", \"srcIps\": \"10.0.1.3\"}, \"pathConstraints\": {\"startLocation\": \"leaf3\"}}}": [],
+  "{\"name\": \"reachability\", \"params\": {\"actions\": \"FAILURE\", \"headers\": {\"dstIps\": \"10.0.1.2\", \"srcIps\": \"10.0.1.4\"}, \"pathConstraints\": {\"startLocation\": \"leaf4\"}}}": [],
+  "{\"name\": \"reachability\", \"params\": {\"actions\": \"FAILURE\", \"headers\": {\"dstIps\": \"10.0.1.3\", \"srcIps\": \"10.0.1.1\"}, \"pathConstraints\": {\"startLocation\": \"leaf1\"}}}": [],
+  "{\"name\": \"reachability\", \"params\": {\"actions\": \"FAILURE\", \"headers\": {\"dstIps\": \"10.0.1.3\", \"srcIps\": \"10.0.1.2\"}, \"pathConstraints\": {\"startLocation\": \"leaf2\"}}}": [],
+  "{\"name\": \"reachability\", \"params\": {\"actions\": \"FAILURE\", \"headers\": {\"dstIps\": \"10.0.1.3\", \"srcIps\": \"10.0.1.4\"}, \"pathConstraints\": {\"startLocation\": \"leaf4\"}}}": [],
+  "{\"name\": \"reachability\", \"params\": {\"actions\": \"FAILURE\", \"headers\": {\"dstIps\": \"10.0.1.4\", \"srcIps\": \"10.0.1.1\"}, \"pathConstraints\": {\"startLocation\": \"leaf1\"}}}": [],
+  "{\"name\": \"reachability\", \"params\": {\"actions\": \"FAILURE\", \"headers\": {\"dstIps\": \"10.0.1.4\", \"srcIps\": \"10.0.1.2\"}, \"pathConstraints\": {\"startLocation\": \"leaf2\"}}}": [],
+  "{\"name\": \"reachability\", \"params\": {\"actions\": \"FAILURE\", \"headers\": {\"dstIps\": \"10.0.1.4\", \"srcIps\": \"10.0.1.3\"}, \"pathConstraints\": {\"startLocation\": \"leaf3\"}}}": [],
+  "{\"name\": \"routes\", \"params\": {}}": [
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.0.1/32",
+    "Next_Hop": "ip 10.1.0.0",
+    "Node": "leaf1",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.0.2/32",
+    "Next_Hop": "ip 10.1.0.2",
+    "Node": "leaf1",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.0.1.1/32",
+    "Next_Hop": "interface Loopback0",
+    "Node": "leaf1",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.2/32",
+    "Next_Hop": "ip 10.1.0.0",
+    "Node": "leaf1",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.2/32",
+    "Next_Hop": "ip 10.1.0.2",
+    "Node": "leaf1",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.3/32",
+    "Next_Hop": "ip 10.1.0.0",
+    "Node": "leaf1",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.3/32",
+    "Next_Hop": "ip 10.1.0.2",
+    "Node": "leaf1",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.4/32",
+    "Next_Hop": "ip 10.1.0.0",
+    "Node": "leaf1",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.4/32",
+    "Next_Hop": "ip 10.1.0.2",
+    "Node": "leaf1",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.1.0.0/31",
+    "Next_Hop": "interface Ethernet0",
+    "Node": "leaf1",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.1.0.2/31",
+    "Next_Hop": "interface Ethernet4",
+    "Node": "leaf1",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.0.1/32",
+    "Next_Hop": "ip 10.1.0.16",
+    "Node": "leaf2",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.0.2/32",
+    "Next_Hop": "ip 10.1.0.18",
+    "Node": "leaf2",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.1/32",
+    "Next_Hop": "ip 10.1.0.16",
+    "Node": "leaf2",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.1/32",
+    "Next_Hop": "ip 10.1.0.18",
+    "Node": "leaf2",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.0.1.2/32",
+    "Next_Hop": "interface Loopback0",
+    "Node": "leaf2",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.3/32",
+    "Next_Hop": "ip 10.1.0.16",
+    "Node": "leaf2",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.3/32",
+    "Next_Hop": "ip 10.1.0.18",
+    "Node": "leaf2",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.4/32",
+    "Next_Hop": "ip 10.1.0.16",
+    "Node": "leaf2",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.4/32",
+    "Next_Hop": "ip 10.1.0.18",
+    "Node": "leaf2",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.1.0.16/31",
+    "Next_Hop": "interface Ethernet0",
+    "Node": "leaf2",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.1.0.18/31",
+    "Next_Hop": "interface Ethernet4",
+    "Node": "leaf2",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.0.1/32",
+    "Next_Hop": "ip 10.1.0.32",
+    "Node": "leaf3",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.0.2/32",
+    "Next_Hop": "ip 10.1.0.34",
+    "Node": "leaf3",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.1/32",
+    "Next_Hop": "ip 10.1.0.32",
+    "Node": "leaf3",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.1/32",
+    "Next_Hop": "ip 10.1.0.34",
+    "Node": "leaf3",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.2/32",
+    "Next_Hop": "ip 10.1.0.32",
+    "Node": "leaf3",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.2/32",
+    "Next_Hop": "ip 10.1.0.34",
+    "Node": "leaf3",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.0.1.3/32",
+    "Next_Hop": "interface Loopback0",
+    "Node": "leaf3",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.4/32",
+    "Next_Hop": "ip 10.1.0.32",
+    "Node": "leaf3",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.4/32",
+    "Next_Hop": "ip 10.1.0.34",
+    "Node": "leaf3",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.1.0.32/31",
+    "Next_Hop": "interface Ethernet0",
+    "Node": "leaf3",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.1.0.34/31",
+    "Next_Hop": "interface Ethernet4",
+    "Node": "leaf3",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.0.1/32",
+    "Next_Hop": "ip 10.1.0.48",
+    "Node": "leaf4",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.0.2/32",
+    "Next_Hop": "ip 10.1.0.50",
+    "Node": "leaf4",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.1/32",
+    "Next_Hop": "ip 10.1.0.48",
+    "Node": "leaf4",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.1/32",
+    "Next_Hop": "ip 10.1.0.50",
+    "Node": "leaf4",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.2/32",
+    "Next_Hop": "ip 10.1.0.48",
+    "Node": "leaf4",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.2/32",
+    "Next_Hop": "ip 10.1.0.50",
+    "Node": "leaf4",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.3/32",
+    "Next_Hop": "ip 10.1.0.48",
+    "Node": "leaf4",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.3/32",
+    "Next_Hop": "ip 10.1.0.50",
+    "Node": "leaf4",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.0.1.4/32",
+    "Next_Hop": "interface Loopback0",
+    "Node": "leaf4",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.1.0.48/31",
+    "Next_Hop": "interface Ethernet0",
+    "Node": "leaf4",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.1.0.50/31",
+    "Next_Hop": "interface Ethernet4",
+    "Node": "leaf4",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.0.0.1/32",
+    "Next_Hop": "interface Loopback0",
+    "Node": "spine1",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.1/32",
+    "Next_Hop": "ip 10.1.0.1",
+    "Node": "spine1",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.2/32",
+    "Next_Hop": "ip 10.1.0.17",
+    "Node": "spine1",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.3/32",
+    "Next_Hop": "ip 10.1.0.33",
+    "Node": "spine1",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.4/32",
+    "Next_Hop": "ip 10.1.0.49",
+    "Node": "spine1",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.1.0.0/31",
+    "Next_Hop": "interface Ethernet0",
+    "Node": "spine1",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.1.0.16/31",
+    "Next_Hop": "interface Ethernet4",
+    "Node": "spine1",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.1.0.32/31",
+    "Next_Hop": "interface Ethernet8",
+    "Node": "spine1",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.1.0.48/31",
+    "Next_Hop": "interface Ethernet12",
+    "Node": "spine1",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.0.0.2/32",
+    "Next_Hop": "interface Loopback0",
+    "Node": "spine2",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.1/32",
+    "Next_Hop": "ip 10.1.0.3",
+    "Node": "spine2",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.2/32",
+    "Next_Hop": "ip 10.1.0.19",
+    "Node": "spine2",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.3/32",
+    "Next_Hop": "ip 10.1.0.35",
+    "Node": "spine2",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 20,
+    "Metric": 0,
+    "Network": "10.0.1.4/32",
+    "Next_Hop": "ip 10.1.0.51",
+    "Node": "spine2",
+    "Protocol": "bgp",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.1.0.2/31",
+    "Next_Hop": "interface Ethernet0",
+    "Node": "spine2",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.1.0.18/31",
+    "Next_Hop": "interface Ethernet4",
+    "Node": "spine2",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.1.0.34/31",
+    "Next_Hop": "interface Ethernet8",
+    "Node": "spine2",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   },
+   {
+    "Admin_Distance": 0,
+    "Metric": 0,
+    "Network": "10.1.0.50/31",
+    "Next_Hop": "interface Ethernet12",
+    "Node": "spine2",
+    "Protocol": "connected",
+    "Tag": null,
+    "VRF": "default"
+   }
+  ],
+  "{\"name\": \"undefinedReferences\", \"params\": {}}": []
+ },
+ "batfish_version": "2026.08.27.3685"
+}

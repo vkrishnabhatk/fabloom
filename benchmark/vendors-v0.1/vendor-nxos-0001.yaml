@@ -1,0 +1,19 @@
+# Fabloom vendor benchmark v0.1. CC BY 4.0, see benchmark/LICENSE.
+id: vendor-nxos-0001
+family: vendor-nxos
+request: 'Cisco Nexus switches on NX-OS: 2 spines and 2 leaves, eBGP on numbered /31 links, one private
+  ASN per leaf, advertise the loopbacks.'
+intent:
+  platform: cisco_nxos
+  topology:
+    spines: 2
+    leaves: 2
+  bgp_mode: numbered
+  asn:
+    spine_asn: 65000
+    leaf_asn_base: 65101
+  addressing:
+    loopback_pool: 10.0.0.0/23
+    p2p_pool: 10.1.0.0/16
+  advertise_loopbacks: true
+  filters: []

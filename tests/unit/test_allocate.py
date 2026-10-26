@@ -149,3 +149,16 @@ def test_platform_port_names() -> None:
     assert spec(Platform.SONIC).port(1) == "Ethernet0"
     assert spec(Platform.SONIC).port(3) == "Ethernet8"
     assert spec(Platform.FRR).port(3) == "swp3"  # unchanged since v0.1
+
+
+def test_unsupported_vendors_are_named() -> None:
+    from fabloom.contracts.platforms import unsupported_message, unsupported_vendor  # noqa: PLC0415
+
+    assert unsupported_vendor("Nokia SR Linux fabric, 2 spines") == "Nokia"
+    assert unsupported_vendor("huawei CE switches please") == "Huawei"
+    assert unsupported_vendor("Cumulus NVUE config for 4 leaves") == "Cumulus Linux"
+    for supported in ["Juniper QFX on Junos", "Cisco Nexus NX-OS", "SONiC", "Arista EOS", "FRR"]:
+        assert unsupported_vendor(f"{supported}, 2 spines and 2 leaves") is None
+    # Words that merely contain a vendor-like fragment are not vendors.
+    assert unsupported_vendor("an extreme amount of users on these routers") is None
+    assert "Juniper Junos" in unsupported_message("Nokia")

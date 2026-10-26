@@ -24,7 +24,8 @@ FIXTURES = sorted((REPO_ROOT / "tests" / "fixtures" / "batfish").glob("*.json"))
 @pytest.mark.skipif(not FIXTURES, reason="no recorded Batfish fixtures yet (week-0 spike)")
 @pytest.mark.parametrize("fixture", FIXTURES, ids=lambda p: p.stem)
 def test_known_good_configs_pass_on_real_answers(fixture: Path) -> None:
-    sc = load_scenario(REPO_ROOT / "benchmark" / "v0.1" / f"{fixture.stem}.yaml")
+    folder = "vendors-v0.1" if fixture.stem.startswith("vendor-") else "v0.1"
+    sc = load_scenario(REPO_ROOT / "benchmark" / folder / f"{fixture.stem}.yaml")
     checks = compile_checks(sc.intent, allocate(sc.intent)).checks
     facts = run_checks(RecordedAnswerer.from_file(fixture), checks)
     assert [r.id for r in facts["checks"] if not r.passed] == []

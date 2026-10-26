@@ -1,0 +1,24 @@
+# Fabloom vendor benchmark v0.1. CC BY 4.0, see benchmark/LICENSE.
+id: vendor-junos-0004
+family: vendor-junos
+request: Juniper QFX switches running Junos, 2 spines and 2 leaves with eBGP. Block SSH to the leaves
+  from outside 10.0.0.0/8 and advertise loopbacks.
+intent:
+  platform: junos
+  topology:
+    spines: 2
+    leaves: 2
+  bgp_mode: numbered
+  asn:
+    spine_asn: 65000
+    leaf_asn_base: 65101
+  addressing:
+    loopback_pool: 10.0.0.0/23
+    p2p_pool: 10.1.0.0/16
+  advertise_loopbacks: true
+  filters:
+  - devices: leaf*
+    action: deny
+    protocol: tcp
+    dst_port: 22
+    src_not_in: 10.0.0.0/8

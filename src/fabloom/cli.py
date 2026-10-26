@@ -46,7 +46,12 @@ from fabloom.llm.grounding import DocGrounder, Grounder, TavilySearch
 from fabloom.llm.prompts import render_plan
 from fabloom.log import configure_logging
 from fabloom.provenance import git_sha
-from fabloom.scenarios import DEFAULT_BENCHMARK_DIR, load_scenario, load_scenarios
+from fabloom.scenarios import (
+    DEFAULT_BENCHMARK_DIR,
+    VENDOR_BENCHMARK_DIR,
+    load_scenario,
+    load_scenarios,
+)
 
 app = typer.Typer(no_args_is_help=True, add_completion=False, help=__doc__)
 scenarios_app = typer.Typer(no_args_is_help=True, help="Benchmark scenario tools.")
@@ -501,7 +506,12 @@ def serve(
     machine = build_web_machine(settings)
     if machine is None:
         typer.secho("No Token Factory key: serving the gallery read-only.", fg=typer.colors.YELLOW)
-    examples = load_scenarios(DEFAULT_BENCHMARK_DIR) if DEFAULT_BENCHMARK_DIR.is_dir() else []
+    examples = [
+        sc
+        for directory in (DEFAULT_BENCHMARK_DIR, VENDOR_BENCHMARK_DIR)
+        if directory.is_dir()
+        for sc in load_scenarios(directory)
+    ]
     app_ = create_app(settings, machine, examples=examples)
     # proxy_headers off: client_ip() decides when X-Forwarded-For is trusted.
     uvicorn.run(app_, host=host, port=port, proxy_headers=False, log_config=None)

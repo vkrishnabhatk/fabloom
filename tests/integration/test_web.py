@@ -126,6 +126,10 @@ def test_pages_ops_and_headers(live: TestClient) -> None:
     assert len(live.get("/api/v1/scenarios").json()) == 3
     assert live.get("/static/app.js").status_code == 200
     assert live.get("/static/favicon.svg").status_code == 200
+    # Link previews: absolute URLs, an image that exists, and every platform's example.
+    assert '<meta property="og:image" content="https://testserver/static/og.png">' in home.text
+    assert live.get("/static/og.png").status_code == 200
+    assert "Juniper, Cisco, Arista, SONiC or FRR" in home.text
 
 
 def test_api_docs_get_their_own_csp(live: TestClient) -> None:
@@ -277,3 +281,14 @@ def test_web_runs_fit_the_daily_cap(monkeypatch: pytest.MonkeyPatch, tmp_path: P
     assert machine.run_config.budget.max_usd == pytest.approx(0.05)
     monkeypatch.setenv("FABLOOM_TOKEN_FACTORY_API_KEY", "")
     assert cli.build_web_machine(_settings(tmp_path)) is None
+
+
+def test_home_shows_one_example_per_platform() -> None:
+    from fabloom.scenarios import VENDOR_BENCHMARK_DIR  # noqa: PLC0415
+    from fabloom.web.app import _one_per_platform  # noqa: PLC0415
+
+    examples = load_scenarios(DEFAULT_BENCHMARK_DIR) + load_scenarios(VENDOR_BENCHMARK_DIR)
+    picks = _one_per_platform(examples)
+    assert len(picks) == len(Platform)
+    assert any("Junos" in p for p in picks)
+    assert any("SONiC" in p for p in picks)

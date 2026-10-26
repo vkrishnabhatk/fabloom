@@ -10,6 +10,8 @@ from fabloom.config import REPO_ROOT
 from fabloom.contracts import Scenario
 
 DEFAULT_BENCHMARK_DIR = REPO_ROOT / "benchmark" / "v0.1"
+# Five scenarios per platform added after v0.1, measured separately (ADR-0009).
+VENDOR_BENCHMARK_DIR = REPO_ROOT / "benchmark" / "vendors-v0.1"
 
 
 def load_scenario(path: Path) -> Scenario:

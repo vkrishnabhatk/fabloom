@@ -4,7 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Fabloom · verified leaf-spine configs{% endblock %}</title>
-  <meta name="description" content="Describe a leaf-spine fabric in plain language. Nemotron writes the FRR or Arista EOS configs; Batfish verifies them.">
+  <meta name="description" content="Describe a leaf-spine data center fabric in plain language. NVIDIA Nemotron writes the configs for Juniper, Cisco, Arista, SONiC or FRR; Batfish verifies them.">
+  {# Link previews (LinkedIn, Slack, ...) need absolute URLs; Caddy passes the visitor's Host. #}
+  {% set site = "https://" ~ request.headers.get("host", "fabloom.dev") %}
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Fabloom">
+  <meta property="og:title" content="Fabloom: data center configs, verified by Batfish">
+  <meta property="og:description" content="Describe a leaf-spine fabric in plain language. NVIDIA Nemotron writes the configs for Juniper, Cisco, Arista, SONiC or FRR; Batfish verifies them.">
+  <meta property="og:url" content="{{ site }}{{ request.url.path }}">
+  <meta property="og:image" content="{{ site }}{{ url_for('static', path='og.png').path }}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="627">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="{{ url_for('static', path='favicon.svg').path }}" type="image/svg+xml">
   {# .path, not the full URL: behind Caddy the app sees plain http, and an http:// asset on an
      https page is blocked as mixed content. #}

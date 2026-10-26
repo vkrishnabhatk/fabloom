@@ -36,12 +36,14 @@ import httpx2
 
 from fabloom.config import GroundingConfig
 from fabloom.contracts import BgpMode, Intent, Platform, UnrecognizedLine
+from fabloom.contracts.platforms import spec
 from fabloom.scrub import scrub
 
 TAVILY_URL = "https://api.tavily.com/search"
 MAX_QUERY_TOKENS = 6
 
-_PLATFORM_NAME = {Platform.FRR: "FRRouting", Platform.ARISTA_EOS: "Arista EOS"}
+# Search terms, not display names: "FRRouting" finds the FRR docs better than "FRR".
+_PLATFORM_NAME = {**{p: spec(p).name for p in Platform}, Platform.FRR: "FRRouting"}
 # Addresses, prefixes, ASNs and other numbers say nothing about a command's syntax, and
 # keeping them out of the query keeps a user's addressing plan out of a third-party API.
 _VALUE = re.compile(r"^[\d.:/]+$|^[0-9a-f:]+::?[0-9a-f:/]*$", re.IGNORECASE)
@@ -125,7 +127,7 @@ def doc_queries(intent: Intent) -> list[str]:
     if intent.advertise_loopbacks:
         queries.append(f"{name} BGP network statement advertise prefix")
     # FRR filters are reported as not verifiable (ADR-0006); no doc link implies otherwise.
-    if intent.filters and intent.platform == Platform.ARISTA_EOS:
+    if intent.filters and spec(intent.platform).filters_verifiable:
         queries.append(f"{name} IP access list deny {intent.filters[0].protocol} apply interface")
     return queries
 

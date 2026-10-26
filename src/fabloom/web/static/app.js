@@ -17,7 +17,11 @@ function plural(n, word) {
   return n + " " + word + (n === 1 ? "" : "s");
 }
 
-const PLATFORMS = { frr: "FRR", arista_eos: "Arista EOS" };
+// Mirrors contracts/platforms.py; the run summary also carries the name as platform_name.
+const PLATFORMS = {
+  frr: "FRR", arista_eos: "Arista EOS", junos: "Juniper Junos", cisco_nxos: "Cisco NX-OS",
+  cisco_iosxe: "Cisco IOS-XE", cisco_iosxr: "Cisco IOS-XR", sonic: "SONiC",
+};
 
 function modelName(id) {
   const m = /nemotron-3-(nano|super|ultra)/i.exec(id || "");
@@ -276,7 +280,7 @@ function renderRun(run) {
   if (run.fabric) {
     const f = run.fabric;
     document.getElementById("fabric").replaceChildren(
-      el("span", PLATFORMS[f.platform] || f.platform, "badge badge-platform"),
+      el("span", f.platform_name || PLATFORMS[f.platform] || f.platform, "badge badge-platform"),
       el("span", f.spines + " spines · " + f.leaves + " leaves", "badge"),
       el("span", "verifier " + run.verifier, "badge"));
   }

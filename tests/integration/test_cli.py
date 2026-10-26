@@ -174,3 +174,9 @@ def test_build_verifier_wires_the_prelint_gate() -> None:
     verifier = cli.build_verifier(Settings())
     assert isinstance(verifier, PrelintGate)
     assert verifier.name == "batfish-local"
+
+
+def test_generate_refuses_unsupported_vendors() -> None:
+    result = runner.invoke(cli.app, ["generate", "Huawei CE fabric with 2 spines and 4 leaves"])
+    assert result.exit_code == 2
+    assert "can't verify Huawei" in result.output

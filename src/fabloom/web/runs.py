@@ -18,6 +18,7 @@ import structlog
 from fabloom.agent import RunMachine, RunRequest, read_events
 from fabloom.agent.events import EVENTS_FILE
 from fabloom.contracts import Platform
+from fabloom.contracts.platforms import spec
 from fabloom.contracts.run import DocsFound, IntentPlanned, RunFinished, RunStarted
 from fabloom.web.guards import SpendBreaker
 
@@ -129,8 +130,10 @@ def _fabric(planned: IntentPlanned | None) -> dict[str, Any] | None:
     if planned is None:
         return None
     topology = planned.intent.get("topology") or {}
+    platform = planned.intent.get("platform")
     return {
-        "platform": planned.intent.get("platform"),
+        "platform": platform,
+        "platform_name": spec(Platform(platform)).name if platform in set(Platform) else platform,
         "spines": topology.get("spines"),
         "leaves": topology.get("leaves"),
     }

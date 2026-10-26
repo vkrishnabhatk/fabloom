@@ -18,7 +18,7 @@ from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 import structlog
@@ -34,6 +34,13 @@ from fabloom import __version__
 from fabloom.agent import RunMachine, tail_events
 from fabloom.config import Settings
 from fabloom.contracts import ModelRole, Platform, Scenario
+from fabloom.contracts.platforms import (
+    PLATFORMS,
+    device_files,
+    spec,
+    unsupported_message,
+    unsupported_vendor,
+)
 from fabloom.provenance import git_sha
 from fabloom.web.guards import RateLimiter, SpendBreaker, spent_today
 from fabloom.web.runs import BusyError, ReadOnlyError, RunLocation, RunService, summarize
@@ -260,6 +267,10 @@ def _add_api_routes(app: FastAPI, w: _Web) -> None:
 
     @app.post("/api/v1/runs", status_code=202)
     async def create_run(body: RunCreate, request: Request) -> JSONResponse:
+        # Before the rate limit and any model call: a request Fabloom cannot verify costs
+        # the visitor nothing, not even a run from their allowance.
+        if (vendor := unsupported_vendor(body.request)) is not None:
+            raise HTTPException(422, unsupported_message(vendor))
         ip = client_ip(request, w.settings.web_trust_proxy)
         if (reason := w.service.read_only_reason) is not None:
             raise HTTPException(503, f"read-only: {reason}")
@@ -295,9 +306,16 @@ def _add_api_routes(app: FastAPI, w: _Web) -> None:
         if not run.get("configs"):
             raise HTTPException(404, "this run has no configs")
         buf = io.BytesIO()
+        platform = Platform((run.get("fabric") or {}).get("platform") or Platform.FRR)
         with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
             for device, text in run["configs"].items():
-                z.writestr(f"{run_id}/{device}.cfg", text)
+                files = device_files(platform, text)
+                if spec(platform).layout == "sonic":
+                    # The files as SONiC deploys them: one folder per switch.
+                    for name, body in files.items():
+                        z.writestr(f"{run_id}/{device}/{PurePosixPath(name).name}", body)
+                else:
+                    z.writestr(f"{run_id}/{device}.cfg", text)
             z.writestr(f"{run_id}/README.txt", _zip_readme(run))
         return Response(
             buf.getvalue(),
@@ -332,6 +350,7 @@ def _add_html_routes(app: FastAPI, w: _Web) -> None:
                 "info": w.info(),
                 "gallery": w.service.gallery(),
                 "examples": [s.request for s in w.examples[:6]],
+                "platforms": [(p.value, s.name) for p, s in PLATFORMS.items()],
                 "limits": {
                     "run_max_usd": w.settings.web_run_max_usd,
                     "runs_per_ip": w.settings.web_runs_per_ip,

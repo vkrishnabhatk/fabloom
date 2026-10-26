@@ -22,6 +22,7 @@ from fabloom.config import (
     run_config,
 )
 from fabloom.contracts import Platform, RunBudget, Verifier
+from fabloom.contracts.platforms import unsupported_message, unsupported_vendor
 from fabloom.contracts.run import RunEvent
 from fabloom.eval import (
     BenchAbortedError,
@@ -180,6 +181,9 @@ def generate(
     watch: Annotated[bool, typer.Option(help="Tail the run's event log.")] = True,
 ) -> None:
     """Plan, generate, verify and repair configs for REQUEST."""
+    if (vendor := unsupported_vendor(request)) is not None:
+        typer.secho(unsupported_message(vendor), fg=typer.colors.RED, err=True)
+        raise typer.Exit(2)
     settings = Settings()
     configure_logging(settings.log_level, settings.log_json)
     rc = run_config(settings.conf_dir)

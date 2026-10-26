@@ -350,3 +350,29 @@ def test_files_map_back_to_their_device() -> None:
     assert _device_of_file("configs/leaf1.cfg") == "leaf1"
     assert _device_of_file("sonic_configs/leaf1/config_db.json") == "leaf1"
     assert _device_of_file("sonic_configs/leaf1/frr.conf") == "leaf1"
+
+
+@pytest.mark.parametrize(
+    "config",
+    [
+        # As Nemotron wrote it (live run 2026-10-26): host-name not at the start of a line.
+        "system { host-name leaf1; }\nrouting-options {\n    autonomous-system 65101;\n}\n",
+        "system {\n    host-name leaf1;\n}\n"
+        "routing-options { router-id 10.0.1.1; autonomous-system 65101; }\n",
+        "set system host-name leaf1\nset routing-options autonomous-system 65101\n",
+    ],
+)
+def test_prelint_reads_junos_hostname_and_asn_in_any_layout(config: str) -> None:
+    fabric = allocate(Intent(platform=Platform.JUNOS, topology=TopologySpec(spines=1, leaves=1)))
+    [leaf] = [
+        r for r in prelint(fabric, {"spine1": "", "leaf1": config}) if r.id == "prelint:leaf1"
+    ]
+    assert leaf.passed, leaf.evidence
+
+
+def test_prelint_still_catches_a_wrong_junos_asn() -> None:
+    fabric = allocate(Intent(platform=Platform.JUNOS, topology=TopologySpec(spines=1, leaves=1)))
+    bad = "system { host-name leaf1; }\nrouting-options { autonomous-system 65999; }\n"
+    [leaf] = [r for r in prelint(fabric, {"leaf1": bad}) if r.id == "prelint:leaf1"]
+    assert not leaf.passed
+    assert "autonomous-system 65999, but the plan assigns AS65101" in leaf.evidence["issues"]

@@ -27,9 +27,11 @@ _TAG = re.compile(r"</?device\b", re.I)
 _PLACEHOLDER = re.compile(r"<[A-Z_][A-Z0-9_ -]*>|\bTODO\b|^\s*\.\.\.\s*$", re.M)
 _HOSTNAME = re.compile(r"^\s*hostname\s+(\S+)\s*$", re.M)
 _ROUTER_BGP = re.compile(r"^\s*router bgp\s+(\d+)\b", re.M)
-# Junos names the same two facts differently, hierarchical or in "set" form.
-_JUNOS_HOSTNAME = re.compile(r"^\s*(?:set system )?host-name\s+\"?([^\s;\"]+)", re.M)
-_JUNOS_ASN = re.compile(r"^\s*(?:set routing-options )?autonomous-system\s+(\d+)\b", re.M)
+# Junos names the same two facts differently, and they need not start a line: Nemotron wrote
+# "system { host-name leaf1; }" on one line, which a line-anchored pattern rejected for four
+# rounds (live run, 2026-10-26). Matches hierarchical, one-line and "set" forms.
+_JUNOS_HOSTNAME = re.compile(r"(?<![\w-])host-name\s+\"?([^\s;\"}]+)")
+_JUNOS_ASN = re.compile(r"(?<![\w-])autonomous-system\s+(\d+)\b")
 
 MAX_ISSUES_PER_DEVICE = 10
 

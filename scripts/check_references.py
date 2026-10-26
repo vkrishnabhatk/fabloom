@@ -1,8 +1,9 @@
-"""Check the checker: every scenario's known-good config must pass every check in live Batfish.
+"""Check the checker: every scenario's known-good config must pass the pre-lint gate and every
+check in live Batfish.
 
-A failure here means the reference renderer, the snapshot packaging or a check is wrong, not
-a model: nothing is generated. Run it after touching any of them, and before trusting a
-benchmark on a new platform.
+A failure here means the reference renderer, the pre-lint gate, the snapshot packaging or a
+check is wrong, not a model: nothing is generated. Run it after touching any of them, and
+before trusting a benchmark on a new platform.
 
     make batfish-up
     PYTHONPATH=. uv run python scripts/check_references.py [scenario dirs...]
@@ -20,6 +21,7 @@ from fabloom.checks import allocate, compile_checks
 from fabloom.config import REPO_ROOT, Settings
 from fabloom.contracts import Snapshot
 from fabloom.scenarios import load_scenarios
+from fabloom.verify import prelint
 from fabloom.verify.batfish_local import BatfishVerifier, PybatfishAnswerer
 
 DEFAULT_DIRS = [REPO_ROOT / "benchmark" / "v0.1", REPO_ROOT / "benchmark" / "vendors-v0.1"]
@@ -30,10 +32,18 @@ async def check(directory: Path, host: str) -> int:
     for sc in load_scenarios(directory):
         fabric = allocate(sc.intent)
         checks = compile_checks(sc.intent, fabric).checks
+        configs = render_good_configs(sc.intent, fabric)
+        # The gate runs before Batfish in every real run; a reference it rejects never
+        # reaches the verifier (Junos one-line host-name, 2026-10-26).
+        gated = [r.id for r in prelint(fabric, configs) if not r.passed]
+        if gated:
+            print(f"{sc.id:<34} {sc.intent.platform:<12} PRELINT FAIL: {gated[:4]}")
+            failures += 1
+            continue
         verifier = BatfishVerifier(lambda: PybatfishAnswerer(host), name="batfish-references")
         report = await verifier.verify(
             Snapshot(name=f"ref-{sc.id}", fabric=fabric),
-            render_good_configs(sc.intent, fabric),
+            configs,
             checks,
         )
         failed = [c.id for c in report.failed_checks]

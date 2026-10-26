@@ -81,6 +81,18 @@ works the same way:
 Without the key the same stack serves the gallery read-only, which is how to keep a demo up
 at no model cost.
 
+## Checking the checker
+
+Before trusting a benchmark on a platform, check that its known-good reference configs pass
+the pre-lint gate and every check in real Batfish; nothing is generated, so a failure is the
+checker's fault, not a model's:
+
+```bash
+make batfish-up
+PYTHONPATH=. uv run python scripts/check_references.py          # v0.1 and vendor scenarios
+PYTHONPATH=. uv run python scripts/record_batfish_fixtures.py   # refresh the CI fixtures
+```
+
 ## Configuration
 
 | File | Holds |

@@ -28,7 +28,8 @@ run:
       cisco_nxos: [cisco.com/c/en/us/td/docs/dcn/nx-os, cisco.com/c/en/us/td/docs/switches/datacenter]
       cisco_iosxe: [cisco.com/c/en/us/td/docs/ios-xml, cisco.com/c/en/us/td/docs/switches/lan]
       cisco_iosxr: [cisco.com/c/en/us/td/docs/iosxr, cisco.com/c/en/us/td/docs/routers]
-      sonic: [github.com/sonic-net/SONiC]
+      # The wiki holds the configuration reference; the repository root is mostly design docs.
+      sonic: [github.com/sonic-net/SONiC/wiki]
     max_results: 3
     max_excerpt_chars: 800
     min_interval_s: 1.0

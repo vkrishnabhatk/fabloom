@@ -384,3 +384,31 @@ async def test_repair_is_grounded_only_when_enabled(
         assert lookups == []
         assert search.queries == []
         assert GROUNDING_HEADER not in repair_prompt
+
+
+def test_vendor_doc_queries_use_each_vendors_terms() -> None:
+    ssh = FilterRule(devices="leaf*", dst_port=22, src_not_in="10.0.0.0/8")
+    junos = Intent(
+        platform=Platform.JUNOS, topology=TopologySpec(spines=2, leaves=2), filters=[ssh]
+    )
+    assert doc_queries(junos) == [
+        "Junos configure external BGP group neighbor peer-as",
+        "Junos routing policy export direct routes into BGP",
+        "Junos firewall filter discard term apply family inet input",
+    ]
+    # SONiC filters are not verified, so no filter doc link either.
+    sonic = Intent(
+        platform=Platform.SONIC, topology=TopologySpec(spines=2, leaves=2), filters=[ssh]
+    )
+    assert len(doc_queries(sonic)) == 2
+
+
+def test_wiki_revisions_are_the_same_page() -> None:
+    page = "https://github.com/sonic-net/SONiC/wiki/Configuration"
+    hits = [
+        Excerpt(
+            query="a", url=page + "/8ca83fdf38c2680d4e38ce7584e39362eb617b16", title="t", text=""
+        ),
+        Excerpt(query="b", url=page, title="t", text=""),
+    ]
+    assert len(best_links(hits, 6)) == 1

@@ -340,6 +340,14 @@ def _add_api_routes(app: FastAPI, w: _Web) -> None:
         )
 
 
+def _one_per_platform(examples: list[Scenario]) -> list[str]:
+    """The first example request for each platform, in the platform table's order."""
+    first: dict[Platform, str] = {}
+    for s in examples:
+        first.setdefault(s.intent.platform, s.request)
+    return [first[p] for p in PLATFORMS if p in first]
+
+
 def _add_html_routes(app: FastAPI, w: _Web) -> None:
     @app.get("/", response_class=HTMLResponse, include_in_schema=False)
     async def index(request: Request) -> HTMLResponse:
@@ -349,7 +357,7 @@ def _add_html_routes(app: FastAPI, w: _Web) -> None:
             {
                 "info": w.info(),
                 "gallery": w.service.gallery(),
-                "examples": [s.request for s in w.examples[:6]],
+                "examples": _one_per_platform(w.examples),
                 "platforms": [(p.value, s.name) for p, s in PLATFORMS.items()],
                 "limits": {
                     "run_max_usd": w.settings.web_run_max_usd,

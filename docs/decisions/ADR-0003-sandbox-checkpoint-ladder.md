@@ -2,7 +2,10 @@
 
 ## Status
 
-Accepted — 2026-09-30. Measurements pending the week-0 spike (`spikes/batfish_in_sandbox.py`).
+Accepted — 2026-09-30. **Deferred** — 2026-10-26: v0.1 and v0.2 verify with the local
+Batfish backend only; the Sandboxes backend is not built and its measurements were never
+taken (`spikes/batfish_in_sandbox.py` is ready). The verifier image and its AOT training jobs
+still cover FRR and EOS only. Revisit after judging (README roadmap).
 
 ## Context
 

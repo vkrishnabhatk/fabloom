@@ -1,7 +1,8 @@
 # Benchmark
 
-The v0.1 benchmark is 49 scenarios in 7 families (`benchmark/v0.1/`, CC BY 4.0), 23 of them
-on Arista EOS. Each arm in `conf/bench.yaml` runs every scenario through the real loop
+Two scenario sets, both CC BY 4.0: the frozen v0.1 benchmark, 49 scenarios in 7 families
+on FRR and Arista EOS (`benchmark/v0.1/`, 23 on EOS), and the vendor set, 5 scenarios each on
+Junos, NX-OS, IOS-XE, IOS-XR and SONiC (`benchmark/vendors-v0.1/`). Each arm in `conf/bench.yaml` runs every scenario through the real loop
 against the scenario's ground-truth intent, so arms differ only in who writes and repairs
 the configs ([ADR-0007](../decisions/ADR-0007-benchmark-harness.md)).
 

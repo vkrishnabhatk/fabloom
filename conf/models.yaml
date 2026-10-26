@@ -1,4 +1,4 @@
-# Model routing (ADR-0005). Week-0 findings are a config change here, never a code change.
+# Model routing (ADR-0005). Changing a model is a config change here, never a code change.
 #
 # IDs and prices confirmed against Token Factory on 22 Oct 2026: `/v1/models?verbose=true`
 # returns each model's per-token pricing, and spikes/nemotron_probe.py made a structured call
@@ -30,13 +30,6 @@ models:
     price_verified: true
     max_output_tokens: 12000
     temperature: 0.2
-  lightning:
-    # Optional step narration (not wired to a role yet): cheapest, 1M context.
-    id: nvidia/Nemotron-3_5-Lightning
-    usd_per_m_input: 0.06
-    usd_per_m_output: 0.24
-    price_verified: true
-    max_output_tokens: 512
 
 roles:
   planner: nano

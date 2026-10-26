@@ -9,8 +9,8 @@ does Super do on a first real generation?
 3. --generate: one real generator call for a pilot scenario, then deterministic pre-lint on
    the output: the first data point for "how often does Nemotron write working config".
 
-Prices are not in the API: confirm them on the Token Factory pricing page, update
-conf/models.yaml and set price_verified: true. Results go to spikes/results/.
+Prices come from `/v1/models?verbose=true`; copy them into conf/models.yaml and set
+price_verified: true. Results go to spikes/results/.
 """
 
 from __future__ import annotations

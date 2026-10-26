@@ -2,8 +2,9 @@
 
 ## Status
 
-Accepted — 2026-10-02. Built and tested offline only: no arm has run against Token Factory
-or a real Batfish yet, so nothing below is measured.
+Accepted — 2026-10-02. Run against Token Factory and live Batfish on benchmark v0.1
+(2026-10-23, 294 runs) and the vendor set (2026-10-26, 100 runs); results in
+`docs/benchmark/`. The `--nightly` subset exists but no workflow runs it yet.
 
 ## Context
 

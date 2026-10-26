@@ -35,6 +35,7 @@ jobs:
         run: uv run lint-imports
       - run: uv run codespell
       - run: uv run fabloom scenarios validate
+      - run: uv run fabloom scenarios validate benchmark/vendors-v0.1
 
   test:
     name: test (py${{ matrix.python }})
@@ -51,7 +52,7 @@ jobs:
           enable-cache: true
           cache-dependency-glob: uv.lock
       - run: uv sync --frozen --extra batfish --extra eval --extra web --python ${{ matrix.python }}
-      # Offline only: sandbox/llm markers need secrets and run in nightly.yml.
+      # Offline only: a test marked llm or sandbox needs secrets and stays out of CI.
       - run: uv run pytest -m "unit or integration" --cov --cov-report=xml
 
   docs:

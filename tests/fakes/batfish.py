@@ -1,8 +1,9 @@
 """Synthesize Batfish answers in the column shapes Batfish returns.
 
 These are *synthetic*: shaped after Batfish's documented answer columns, not recorded from a
-live server. ``scripts/record_batfish_fixtures.py`` replaces them with real recordings once
-the week-0 spike has Batfish running; the evaluator tests then run against both.
+live server. Real answers, recorded by ``scripts/record_batfish_fixtures.py``, are replayed by
+tests/integration/test_recorded_fixtures.py; these fakes cover the cases a recording cannot,
+such as a check failing on purpose.
 """
 
 from __future__ import annotations

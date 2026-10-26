@@ -1,6 +1,7 @@
 """Prometheus metrics. Module-level, ``fabloom_`` prefix, tiny label cardinality.
 
-Buckets are placeholders until week-2 benchmark runs measure p95; revisit them then.
+Bucket bounds checked against benchmarks v0.1 and vendors-v0.1: Batfish took 2 to 12 s per
+candidate and runs used 0 to 3 repair rounds.
 """
 
 from __future__ import annotations

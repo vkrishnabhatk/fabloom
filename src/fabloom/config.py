@@ -38,8 +38,8 @@ class Settings(BaseSettings):
     grounding_cache_dir: Path = Path(".cache/grounding")
     # Web demo (`fabloom serve`). The spend cap is per UTC day across all visitors; at the cap
     # the app turns read-only and serves the gallery instead of failing.
-    # $0.40 x ~52 days to the end of judging (15 Dec) is ~$21, inside the ~$27 balance left
-    # on 2026-10-24. A demo run costs ~$0.003-0.02 (benchmark v0.1).
+    # A conservative default for a public demo, which a deployment raises in its .env; a demo
+    # run costs ~$0.003-0.02 (benchmarks v0.1 and vendors-v0.1).
     web_spend_cap_usd: float = Field(default=0.40, ge=0)
     # Per-run budget for web runs. Each run reserves this against the daily cap before it
     # starts, so with the CLI's $0.25 no run could start once $0.15 was spent. The costliest

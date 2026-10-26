@@ -15,7 +15,7 @@ class Scenario(BaseModel):
     """``benchmark/v0.1/<id>.yaml``.
 
     Checks are compiled from ``intent`` (the ground truth), not from what the planner model
-    makes of ``request``. Planner accuracy is measured separately against ``intent``.
+    makes of ``request``. Planner accuracy against ``intent`` is not measured yet.
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")

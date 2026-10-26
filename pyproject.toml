@@ -54,7 +54,9 @@ fabloom = "fabloom.cli:app"
 fabloom-verify = "fabloom.verify.entrypoint:main"
 
 [project.urls]
+Homepage = "https://fabloom.dev"
 Repository = "https://github.com/vkrishnabhatk/fabloom"
+Changelog = "https://github.com/vkrishnabhatk/fabloom/releases"
 
 [dependency-groups]
 dev = [

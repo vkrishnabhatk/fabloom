@@ -81,6 +81,22 @@ works the same way:
 Without the key the same stack serves the gallery read-only, which is how to keep a demo up
 at no model cost.
 
+## Benchmark
+
+```bash
+uv run fabloom bench run --dry-run                                  # arms x scenarios, worst-case spend
+uv run fabloom bench run --arm super-repair --arm routed            # runs, report, gates, MLflow
+uv run fabloom bench run --scenarios-dir benchmark/vendors-v0.1 \
+    --arm routed --no-check-gates --out runs/bench/vendors          # the vendor scenario set
+uv run fabloom bench report runs/bench/<id> --report docs/benchmark/v0.1.md   # report only, no model
+```
+
+Runs are resumable: rerun with the same `--out` and finished runs are kept. A provider outage
+aborts the bench and discards the affected runs instead of counting them as failures
+([ADR-0007](decisions/ADR-0007-benchmark-harness.md)). `benchmark/v0.1` is the frozen
+FRR/EOS set with a baseline in `benchmark/baselines/`; `benchmark/vendors-v0.1` holds five
+scenarios per later platform.
+
 ## Checking the checker
 
 Before trusting a benchmark on a platform, check that its known-good reference configs pass

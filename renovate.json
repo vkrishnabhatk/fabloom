@@ -11,7 +11,7 @@
     },
     {
       "description": "Freeze during the judging window: the submitted build must not drift.",
-      "matchBaseBranches": ["release/v0.1-hackathon"],
+      "matchBaseBranches": ["release/v0.2-hackathon"],
       "enabled": false
     }
   ]

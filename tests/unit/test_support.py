@@ -160,7 +160,7 @@ def test_wait_for_port() -> None:
         entrypoint.wait_for_port("127.0.0.1", free, 0.1)
 
 
-# --- pybatfish adapter (fake Session; the real one is exercised by the week-0 spike) ----
+# --- pybatfish adapter (fake Session; the real one is exercised by check_references.py) ----
 
 
 class _Frame:

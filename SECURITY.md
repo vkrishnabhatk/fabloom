@@ -15,14 +15,17 @@ Please do not open a public issue. Expect an acknowledgement within 7 days.
 - User input is **never used as training data**. Phase-2 training data comes only from
   benchmark scenarios, which are public and CC BY 4.0.
 - Run directories (`runs/<run_id>/`) hold the request and generated configs on the machine
-  that ran them. On the hosted demo they are deleted on a retention schedule (set in week 3).
+  that ran them. On the public demo at fabloom.dev, anyone with a run's link can open it, and
+  runs are kept until the demo is shut down after judging. Do not enter confidential
+  addressing or names there; run Fabloom yourself for that.
 
 ## Deployment secrets
 
-Planned, not yet in place: the Token Factory key, Tavily key and GHCR
-token stored sops/age-encrypted in git, decrypted only at deploy time. Until then they live
-only in a local, git-ignored `.env` and in GitHub environment secrets. Rotation: on any suspected exposure
-immediately, otherwise every 90 days and after the judging window closes.
+API keys live only in a git-ignored `.env`: on a developer machine, and on the demo server
+readable only by its service user, with a key per deployment so each can be revoked alone.
+CI uses its own key in a GitHub environment restricted to `main`. Rotation: immediately on
+any suspected exposure, otherwise every 90 days and after the judging window closes.
+Encrypting deploy secrets in git (sops/age) is planned, not in place.
 
 ## Scope
 

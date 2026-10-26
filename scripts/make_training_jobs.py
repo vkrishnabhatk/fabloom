@@ -1,7 +1,9 @@
 """Regenerate docker/verifier/training/*.json: the jobs the verifier image's AOT bake replays.
 
-One job per platform/mode, rendered with the known-good test renderer, so the training run
-exercises every parser and question fabloom uses. Re-run after changing the check compiler.
+One job per FRR/EOS mode, rendered with the known-good test renderer, so the training run
+exercises those parsers and every question fabloom asks. The image backs the deferred
+Sandboxes backend (ADR-0003), so later platforms are not added yet. Re-run after changing
+the check compiler.
 
     PYTHONPATH=. uv run python scripts/make_training_jobs.py
 """

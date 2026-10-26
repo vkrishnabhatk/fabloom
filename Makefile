@@ -45,6 +45,7 @@ docs: ## Build the docs site strictly (prevents broken links reaching the publis
 .PHONY: scenarios
 scenarios: ## Validate every benchmark scenario compiles (prevents a broken benchmark file)
 	uv run fabloom scenarios validate
+	uv run fabloom scenarios validate benchmark/vendors-v0.1
 
 .PHONY: doctor
 doctor: ## Probe every configured model on Token Factory (prevents a retired model ID killing the demo)

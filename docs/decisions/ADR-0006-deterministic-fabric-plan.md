@@ -20,8 +20,8 @@ the model would influence what it is graded on (ADR-0001).
 - The generator is *told* the plan and must follow it. The checks are compiled from the same
   plan.
 - Benchmark scenarios pin a ground-truth `intent`. Arms that isolate generation and repair
-  pass it directly (`RunRequest.intent`), skipping the planner. Planner accuracy is measured
-  separately against the same ground truth.
+  pass it directly (`RunRequest.intent`), skipping the planner. Planner accuracy against the
+  same ground truth is not measured yet.
 - For FRR the snapshot builder declares which ports exist (cabling), but deliberately
   writes **no addresses** outside `frr.conf`. Addressing stays the model's job, so a wrong
   address still fails verification.
@@ -29,7 +29,8 @@ the model would influence what it is graded on (ADR-0001).
   SSH filtering on an FRR box lives in iptables/nftables, which Batfish's Cumulus/FRR model
   does not read. Filter scenarios therefore use Arista EOS. The report lists unverifiable
   intent explicitly instead of dropping it. This refines the original example scenario (FRR +
-  SSH filter) and is to be confirmed against a live Batfish in the week-0 spike.
+  SSH filter); live Batfish 2026.08.27 confirmed it (2026-10-23). ADR-0009 extends the same
+  rule to SONiC.
 
 ## Alternatives considered
 

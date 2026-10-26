@@ -117,7 +117,7 @@ runs read-only. Configuration, the benchmark commands and deployment are in
 
 ## Engineering
 
-- `make check`: ruff, strict mypy, import contracts and 245 offline tests (96% coverage);
+- `make check`: ruff, strict mypy, import contracts and 246 offline tests (96% coverage);
   nothing in CI needs a key or a network. CI also scans dependencies, secrets and images.
 - **The checker is checked first.** `scripts/check_references.py` runs a known-good config
   for all 74 scenarios through the pre-lint gate and live Batfish; recorded Batfish answers

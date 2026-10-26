@@ -12,7 +12,7 @@ Secrets are read from the environment or a `.env` file, never from YAML:
 | Variable | Needed for |
 |---|---|
 | `FABLOOM_TOKEN_FACTORY_API_KEY` (or `NEBIUS_API_KEY`) | any model call: `generate`, `doctor`, `bench run`, a live web demo |
-| `FABLOOM_TAVILY_API_KEY` (or `TAVILY_API_KEY`) | doc-grounded repair only |
+| `FABLOOM_TAVILY_API_KEY` (or `TAVILY_API_KEY`) | vendor documentation links on results, and doc-grounded repair; optional |
 
 A blank value counts as unset.
 
@@ -20,7 +20,8 @@ A blank value counts as unset.
 
 ```bash
 uv run fabloom plan benchmark/v0.1/leaf-spine-ebgp-0004.yaml   # fabric plan and compiled checks
-uv run fabloom scenarios validate                               # every scenario compiles
+uv run fabloom scenarios validate                               # every v0.1 scenario compiles
+uv run fabloom scenarios validate benchmark/vendors-v0.1        # and the vendor scenarios
 uv run fabloom bench run --dry-run                              # the matrix and its worst-case spend
 uv run fabloom serve                                            # web demo, read-only gallery
 make check                                                      # lint, types, contracts, tests
@@ -73,6 +74,8 @@ works the same way:
    ```bash
    FABLOOM_DOMAIN="example.org, www.example.org"
    FABLOOM_TOKEN_FACTORY_API_KEY=...   # a key for this deployment only, so it can be revoked alone
+   FABLOOM_TAVILY_API_KEY=...          # optional: vendor documentation links
+   FABLOOM_WEB_SPEND_CAP_USD=1.0       # optional: daily model spend cap, default 0.40
    ```
 
 4. `docker compose build --build-arg GIT_SHA=$(git rev-parse --short HEAD) app && docker compose up -d`.
@@ -114,5 +117,5 @@ PYTHONPATH=. uv run python scripts/record_batfish_fixtures.py   # refresh the CI
 | File | Holds |
 |---|---|
 | `conf/models.yaml` | model IDs, prices, role routing, escalation ([ADR-0005](decisions/ADR-0005-model-routing-in-config.md)) |
-| `conf/fabloom.yaml` | run budget, repair candidates, doc grounding ([ADR-0008](decisions/ADR-0008-doc-grounded-repair.md)) |
+| `conf/fabloom.yaml` | run budget, repair candidates, doc grounding ([ADR-0008](decisions/ADR-0008-doc-grounded-repair.md)), vendor doc links |
 | `conf/bench.yaml` | benchmark arms, gates, nightly subset ([ADR-0007](decisions/ADR-0007-benchmark-harness.md)) |

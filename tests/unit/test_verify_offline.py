@@ -316,3 +316,63 @@ def test_to_cell_renders_pybatfish_values() -> None:
     assert to_cell([iface, None, "x"]) == ["leaf1[swp1]", None, "x"]
     assert to_cell({"a": (1, 2)}) == {"a": [1, 2]}
     assert to_cell(object()).startswith("<object")
+
+
+def test_one_file_platforms_get_a_batfish_vendor_marker() -> None:
+    fabric = allocate(
+        Intent(platform=Platform.CISCO_NXOS, topology=TopologySpec(spines=1, leaves=1))
+    )
+    dev = fabric.devices[0]
+    text = render_device_file(Platform.CISCO_NXOS, dev, "hostname spine1\n")
+    assert text.startswith("!RANCID-CONTENT-TYPE: cisco-nx\nhostname spine1")
+    # Not doubled when the model already wrote it.
+    assert render_device_file(Platform.CISCO_NXOS, dev, text).count("RANCID") == 1
+
+
+def test_sonic_snapshot_is_two_files_per_device(tmp_path: Path) -> None:
+    fabric = allocate(Intent(platform=Platform.SONIC, topology=TopologySpec(spines=1, leaves=1)))
+    block = (
+        '<file name="config_db.json">\n{"DEVICE_METADATA": {}}\n</file>\n'
+        '<file name="frr.conf">\nhostname spine1\n</file>\n'
+        '<file name="../../escape">\nnope\n</file>\n'
+    )
+    write_snapshot(tmp_path, fabric, {"spine1": block})
+    folder = tmp_path / "sonic_configs" / "spine1"
+    assert sorted(p.name for p in folder.iterdir()) == ["config_db.json", "frr.conf"]
+    assert (folder / "frr.conf").read_text() == "hostname spine1\n"
+    assert not (tmp_path / "configs" / "spine1.cfg").exists()
+    assert not (tmp_path / "escape").exists()
+
+
+def test_files_map_back_to_their_device() -> None:
+    from fabloom.verify.batfish_questions import _device_of_file  # noqa: PLC0415
+
+    assert _device_of_file("configs/leaf1.cfg") == "leaf1"
+    assert _device_of_file("sonic_configs/leaf1/config_db.json") == "leaf1"
+    assert _device_of_file("sonic_configs/leaf1/frr.conf") == "leaf1"
+
+
+@pytest.mark.parametrize(
+    "config",
+    [
+        # As Nemotron wrote it (live run 2026-10-26): host-name not at the start of a line.
+        "system { host-name leaf1; }\nrouting-options {\n    autonomous-system 65101;\n}\n",
+        "system {\n    host-name leaf1;\n}\n"
+        "routing-options { router-id 10.0.1.1; autonomous-system 65101; }\n",
+        "set system host-name leaf1\nset routing-options autonomous-system 65101\n",
+    ],
+)
+def test_prelint_reads_junos_hostname_and_asn_in_any_layout(config: str) -> None:
+    fabric = allocate(Intent(platform=Platform.JUNOS, topology=TopologySpec(spines=1, leaves=1)))
+    [leaf] = [
+        r for r in prelint(fabric, {"spine1": "", "leaf1": config}) if r.id == "prelint:leaf1"
+    ]
+    assert leaf.passed, leaf.evidence
+
+
+def test_prelint_still_catches_a_wrong_junos_asn() -> None:
+    fabric = allocate(Intent(platform=Platform.JUNOS, topology=TopologySpec(spines=1, leaves=1)))
+    bad = "system { host-name leaf1; }\nrouting-options { autonomous-system 65999; }\n"
+    [leaf] = [r for r in prelint(fabric, {"leaf1": bad}) if r.id == "prelint:leaf1"]
+    assert not leaf.passed
+    assert "autonomous-system 65999, but the plan assigns AS65101" in leaf.evidence["issues"]

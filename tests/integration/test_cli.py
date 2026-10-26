@@ -63,7 +63,9 @@ def test_benchmark_scenarios_well_formed() -> None:
     assert 40 <= len(scenarios) <= 60  # the v0.1 target (ADR-0007)
     families = {s.family for s in scenarios}
     assert {"leaf-spine-ebgp", "leaf-spine-unnumbered", "leaf-spine-filters"} <= families
-    assert {s.intent.platform for s in scenarios} == set(Platform)
+    # v0.1 is frozen at the two platforms it was measured on; later platforms are measured
+    # in their own scenario set, so the v0.1 baseline stays comparable.
+    assert {s.intent.platform for s in scenarios} == {Platform.FRR, Platform.ARISTA_EOS}
     eos = [s for s in scenarios if s.intent.platform is Platform.ARISTA_EOS]
     assert len(eos) * 3 >= len(scenarios)  # EOS is a first-class platform, not a token one
 
@@ -172,3 +174,9 @@ def test_build_verifier_wires_the_prelint_gate() -> None:
     verifier = cli.build_verifier(Settings())
     assert isinstance(verifier, PrelintGate)
     assert verifier.name == "batfish-local"
+
+
+def test_generate_refuses_unsupported_vendors() -> None:
+    result = runner.invoke(cli.app, ["generate", "Huawei CE fabric with 2 spines and 4 leaves"])
+    assert result.exit_code == 2
+    assert "can't verify Huawei" in result.output

@@ -86,7 +86,7 @@ def test_a_run_end_to_end(live: TestClient) -> None:
     assert run["explanation"] == "All checks pass."
     assert run["level"] == "L2"
     assert {"spine1", "leaf1"} <= set(run["configs"])
-    assert run["fabric"] == {"platform": "frr", "spines": 2, "leaves": 2}
+    assert run["fabric"] == {"platform": "frr", "platform_name": "FRR", "spines": 2, "leaves": 2}
     assert run["docs"] == []  # no search configured
     assert all(c["passed"] for c in run["checks"])
 
@@ -152,6 +152,19 @@ def test_bad_input_and_unknown_runs(live: TestClient) -> None:
     assert live.get("/api/v1/runs/..%2F..%2Fetc").status_code == 404
     assert live.get("/runs/nope").status_code == 404
     assert live.get("/api/v1/runs/20261022T000000Z-abcdef/configs.zip").status_code == 404
+
+
+def test_unsupported_vendors_are_refused_before_any_model_call(live: TestClient) -> None:
+    resp = live.post(
+        "/api/v1/runs", json={"request": "Nokia SR Linux fabric, 2 spines and 2 leaves"}
+    )
+    assert resp.status_code == 422
+    assert "can't verify Nokia" in resp.json()["detail"]
+    assert "Juniper Junos" in resp.json()["detail"]
+    # Refused before the rate limiter: it cost the visitor nothing.
+    assert live.get("/info").json()["spend_today_usd"] == 0
+    home = live.get("/").text
+    assert '<option value="cisco_nxos">Cisco NX-OS</option>' in home
 
 
 def test_rate_limit_per_visitor(

@@ -8,6 +8,11 @@ from enum import StrEnum
 class Platform(StrEnum):
     FRR = "frr"
     ARISTA_EOS = "arista_eos"
+    JUNOS = "junos"
+    CISCO_NXOS = "cisco_nxos"
+    CISCO_IOSXE = "cisco_iosxe"
+    CISCO_IOSXR = "cisco_iosxr"
+    SONIC = "sonic"
 
 
 class VerificationLevel(StrEnum):

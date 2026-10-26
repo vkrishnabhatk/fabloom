@@ -30,12 +30,19 @@ SCENARIOS = [
     "leaf-spine-filters-0002",
     # Spine-only filter: leaf-to-leaf transit through the spines must stay open.
     "leaf-spine-filters-0006",
+    # One per later platform, with a filter wherever Batfish verifies it.
+    "vendor-junos-0004",
+    "vendor-nxos-0004",
+    "vendor-iosxe-0004",
+    "vendor-iosxr-0004",
+    "vendor-sonic-0002",
 ]
 OUT = REPO_ROOT / "tests" / "fixtures" / "batfish"
 
 
 async def record(sid: str, host: str) -> bool:
-    sc = load_scenario(REPO_ROOT / "benchmark" / "v0.1" / f"{sid}.yaml")
+    folder = "vendors-v0.1" if sid.startswith("vendor-") else "v0.1"
+    sc = load_scenario(REPO_ROOT / "benchmark" / folder / f"{sid}.yaml")
     fabric = allocate(sc.intent)
     checks = compile_checks(sc.intent, fabric).checks
     rec = RecordingAnswerer(PybatfishAnswerer(host))

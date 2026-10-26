@@ -36,18 +36,22 @@ import httpx2
 
 from fabloom.config import GroundingConfig
 from fabloom.contracts import BgpMode, Intent, Platform, UnrecognizedLine
+from fabloom.contracts.platforms import spec
 from fabloom.scrub import scrub
 
 TAVILY_URL = "https://api.tavily.com/search"
 MAX_QUERY_TOKENS = 6
 
-_PLATFORM_NAME = {Platform.FRR: "FRRouting", Platform.ARISTA_EOS: "Arista EOS"}
+# Search terms, not display names: "FRRouting" finds the FRR docs better than "FRR".
+_PLATFORM_NAME = {**{p: spec(p).name for p in Platform}, Platform.FRR: "FRRouting"}
 # Addresses, prefixes, ASNs and other numbers say nothing about a command's syntax, and
 # keeping them out of the query keeps a user's addressing plan out of a third-party API.
 _VALUE = re.compile(r"^[\d.:/]+$|^[0-9a-f:]+::?[0-9a-f:/]*$", re.IGNORECASE)
 _TRAILING_DIGITS = re.compile(r"(?<=[A-Za-z])[\d/.:]+$")
 # Versioned doc trees (docs.frrouting.org/en/stable-8.2/bgp.html) hold the same page per release.
 _DOC_VERSION = re.compile(r"/en/[^/]+/")
+# GitHub wiki pages also live at /wiki/<Page>/<commit>, one URL per revision.
+_WIKI_REVISION = re.compile(r"(/wiki/[^/]+)/[0-9a-f]{40}$")
 
 
 @dataclass(frozen=True)
@@ -110,12 +114,52 @@ def build_queries(platform: Platform, lines: Sequence[UnrecognizedLine]) -> list
     return list(seen)
 
 
+# (eBGP peering, advertising the loopback, filtering) in each vendor's own terms. The generic
+# wording found the right FRR and EOS pages but drifted on Junos ("auto-discovered
+# neighbors") and SONiC (design docs) in live searches on 2026-10-26.
+_VENDOR_TOPICS: dict[Platform, tuple[str, str, str]] = {
+    Platform.JUNOS: (
+        "Junos configure external BGP group neighbor peer-as",
+        "Junos routing policy export direct routes into BGP",
+        "Junos firewall filter discard term apply family inet input",
+    ),
+    Platform.CISCO_NXOS: (
+        "NX-OS configure eBGP neighbor remote-as address-family",
+        "NX-OS BGP network command advertise prefix",
+        "NX-OS IP ACL ip access-group interface in",
+    ),
+    Platform.CISCO_IOSXE: (
+        "IOS XE configure eBGP neighbor remote-as activate",
+        "IOS XE BGP network mask command",
+        "IOS XE extended IP access list ip access-group in",
+    ),
+    Platform.CISCO_IOSXR: (
+        "IOS XR configure eBGP neighbor route-policy",
+        "IOS XR BGP network command address-family",
+        "IOS XR ipv4 access-list access-group ingress",
+    ),
+    Platform.SONIC: (
+        "SONiC configuration database config_db.json BGP",
+        "SONiC config_db.json INTERFACE LOOPBACK_INTERFACE",
+        "SONiC ACL_TABLE ACL_RULE configuration",
+    ),
+}
+
+
 def doc_queries(intent: Intent) -> list[str]:
     """One query per feature the fabric uses, in a fixed order.
 
     Built from the intent's features alone, never from its addresses, ASNs or names, so
     nothing of the user's plan reaches the search API and repeat runs share the cache.
     """
+    if (topics := _VENDOR_TOPICS.get(intent.platform)) is not None:
+        peering, advertise, filtering = topics
+        queries = [peering]
+        if intent.advertise_loopbacks:
+            queries.append(advertise)
+        if intent.filters and spec(intent.platform).filters_verifiable:
+            queries.append(filtering)
+        return queries
     name = _PLATFORM_NAME[intent.platform]
     queries = [
         f"{name} BGP unnumbered interface neighbor configuration"
@@ -125,7 +169,7 @@ def doc_queries(intent: Intent) -> list[str]:
     if intent.advertise_loopbacks:
         queries.append(f"{name} BGP network statement advertise prefix")
     # FRR filters are reported as not verifiable (ADR-0006); no doc link implies otherwise.
-    if intent.filters and intent.platform == Platform.ARISTA_EOS:
+    if intent.filters and spec(intent.platform).filters_verifiable:
         queries.append(f"{name} IP access list deny {intent.filters[0].protocol} apply interface")
     return queries
 
@@ -140,7 +184,7 @@ def best_links(excerpts: Sequence[Excerpt], limit: int) -> list[Excerpt]:
     done: set[str] = set()
     out: list[Excerpt] = []
     for x in excerpts:
-        page = _DOC_VERSION.sub("/en/", x.url)
+        page = _WIKI_REVISION.sub(r"\1", _DOC_VERSION.sub("/en/", x.url))
         if x.query in done or page in pages or not x.url.startswith("https://"):
             continue
         pages.add(page)

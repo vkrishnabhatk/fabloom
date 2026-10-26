@@ -10,14 +10,21 @@ from hypothesis import strategies as st
 from fabloom.checks import AllocationError, allocate, allocate_fabric
 from fabloom.checks.allocate import default_names, natural_key
 from fabloom.contracts import AddressingSpec, BgpMode, Intent, Platform, Role, TopologySpec
+from fabloom.contracts.platforms import spec
 
 pytestmark = pytest.mark.unit
 
-intents = st.builds(
-    Intent,
-    platform=st.sampled_from(list(Platform)),
-    topology=st.builds(TopologySpec, spines=st.integers(1, 8), leaves=st.integers(1, 32)),
-    bgp_mode=st.sampled_from(list(BgpMode)),
+# Every platform with every BGP mode it supports (unnumbered is FRR-only).
+PLATFORM_MODES = [
+    (p, m) for p in Platform for m in BgpMode if m is BgpMode.NUMBERED or spec(p).unnumbered
+]
+intents = st.sampled_from(PLATFORM_MODES).flatmap(
+    lambda pm: st.builds(
+        Intent,
+        platform=st.just(pm[0]),
+        topology=st.builds(TopologySpec, spines=st.integers(1, 8), leaves=st.integers(1, 32)),
+        bgp_mode=st.just(pm[1]),
+    )
 )
 
 
@@ -126,3 +133,32 @@ def test_duplicate_names_rejected(frr_intent: Intent) -> None:
 
 def test_natural_key_orders_numbers() -> None:
     assert sorted(["leaf10", "leaf9", "leaf1"], key=natural_key) == ["leaf1", "leaf9", "leaf10"]
+
+
+@pytest.mark.parametrize("platform", list(Platform))
+def test_ports_follow_each_platforms_naming(platform: Platform) -> None:
+    plan = allocate(Intent(platform=platform, topology=TopologySpec(spines=2, leaves=2)))
+    leaf1 = plan.device("leaf1")
+    assert [i.name for i in leaf1.interfaces] == [spec(platform).port(1), spec(platform).port(2)]
+
+
+def test_platform_port_names() -> None:
+    assert spec(Platform.JUNOS).port(3) == "et-0/0/3"
+    assert spec(Platform.JUNOS).l3_interface("et-0/0/3") == "et-0/0/3.0"
+    assert spec(Platform.CISCO_NXOS).port(3) == "Ethernet1/3"
+    assert spec(Platform.SONIC).port(1) == "Ethernet0"
+    assert spec(Platform.SONIC).port(3) == "Ethernet8"
+    assert spec(Platform.FRR).port(3) == "swp3"  # unchanged since v0.1
+
+
+def test_unsupported_vendors_are_named() -> None:
+    from fabloom.contracts.platforms import unsupported_message, unsupported_vendor  # noqa: PLC0415
+
+    assert unsupported_vendor("Nokia SR Linux fabric, 2 spines") == "Nokia"
+    assert unsupported_vendor("huawei CE switches please") == "Huawei"
+    assert unsupported_vendor("Cumulus NVUE config for 4 leaves") == "Cumulus Linux"
+    for supported in ["Juniper QFX on Junos", "Cisco Nexus NX-OS", "SONiC", "Arista EOS", "FRR"]:
+        assert unsupported_vendor(f"{supported}, 2 spines and 2 leaves") is None
+    # Words that merely contain a vendor-like fragment are not vendors.
+    assert unsupported_vendor("an extreme amount of users on these routers") is None
+    assert "Juniper Junos" in unsupported_message("Nokia")

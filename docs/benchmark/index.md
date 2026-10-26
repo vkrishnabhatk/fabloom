@@ -73,3 +73,36 @@ Batfish 2026.08.27 running locally. Total spend was $2.04 at list prices.
   filters. Nothing was booted. FRR packet filters cannot be verified at all (ADR-0006).
 - A connection outage during the first attempt was discarded rather than counted, and the
   bench resumed from the runs that had finished (ADR-0007).
+
+## Vendor results (26 October 2026)
+
+The generated report is [vendors-v0.1.md](vendors-v0.1.md): 25 scenarios, 5 each on Juniper
+Junos, Cisco NX-OS, IOS-XE, IOS-XR and SONiC, through the same loop with the same grading,
+4 arms, one run each, $0.98 in total.
+
+| Arm | Final pass | $/scenario |
+|---|---|---|
+| Nemotron Super, one attempt | 15/25 (60%) | $0.0047 |
+| Nemotron Ultra, one attempt | 20/25 (80%) | $0.0186 |
+| Super + Batfish repair loop | 23/25 (92%) | $0.0077 |
+| **Fabloom routed** | **25/25 (100%)** | **$0.0081** |
+
+### What the numbers show
+
+- **The loop matters more on unfamiliar platforms.** On v0.1 (FRR, EOS) routed matched
+  Ultra; here it beats Ultra alone by five scenarios at under half its cost.
+- **NX-OS is where single attempts fail.** Super alone got 1/5 and Ultra 2/5; with repair,
+  4/5 and 5/5. Every platform reached 5/5 routed.
+- **The prompts were written before these runs and not tuned on them.** The scenarios were
+  generated from five templates per platform; the only fix made after a live run was in the
+  checker (Junos pre-lint), before the benchmark started.
+
+### How far to trust them
+
+- **Five scenarios per platform** is a small sample: the 95% interval for 25/25 is 87% to
+  100%, and per-platform differences of one scenario are noise.
+- **The checker was validated first.** Every vendor reference config passes the pre-lint
+  gate and every check in live Batfish (`scripts/check_references.py`); doing that found
+  that Junos needs `local-address` and that filter checks must ignore non-initial
+  fragments ([ADR-0009](../decisions/ADR-0009-more-platforms.md)).
+- **Numbered eBGP only on the new platforms**, and SONiC filters are not verified.

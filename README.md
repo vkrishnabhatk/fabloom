@@ -1,8 +1,9 @@
 # Fabloom
 
-Describe a data center fabric in plain language; get FRR or Arista EOS configs that NVIDIA
-Nemotron generates on Nebius Token Factory, **Batfish verifies**, and the model repairs until
-every check passes, or an honest report of what could not be fixed.
+Describe a data center fabric in plain language; get configs for **Juniper Junos, Cisco
+NX-OS, IOS-XE or IOS-XR, Arista EOS, SONiC or FRR** that NVIDIA Nemotron generates on Nebius
+Token Factory, **Batfish verifies**, and the model repairs until every check passes, or an
+honest report of what could not be fixed.
 
 **Live demo: [fabloom.dev](https://fabloom.dev)**. Type a request, watch the run, read the
 verified configs. The recorded runs cost between $0.002 and $0.013 each in model calls.
@@ -26,6 +27,24 @@ The generated report is [docs/benchmark/v0.1.md](docs/benchmark/v0.1.md) and the
 The repair loop lifts Super from 76% to 94% on the same runs. The routed product matches
 Ultra at about two-thirds of its cost. Doc grounding showed no gain and stays off. One run
 per arm and scenario, so the intervals are wide: see the report.
+
+### More platforms
+
+Vendor benchmark, 26 October 2026: 25 scenarios, 5 each on Juniper Junos, Cisco NX-OS,
+IOS-XE, IOS-XR and SONiC, same loop and grading
+([report](docs/benchmark/vendors-v0.1.md), [ADR-0009](docs/decisions/ADR-0009-more-platforms.md)).
+
+| Arm | Junos | NX-OS | IOS-XE | IOS-XR | SONiC | Final pass | $/scenario |
+|---|---|---|---|---|---|---|---|
+| Nemotron Super, one attempt | 4/5 | 1/5 | 4/5 | 4/5 | 2/5 | 15/25 (60%) | $0.0047 |
+| Nemotron Ultra, one attempt | 4/5 | 2/5 | 5/5 | 4/5 | 5/5 | 20/25 (80%) | $0.0186 |
+| Super + Batfish repair loop | 5/5 | 4/5 | 4/5 | 5/5 | 5/5 | 23/25 (92%) | $0.0077 |
+| **Fabloom routed** | **5/5** | **5/5** | **5/5** | **5/5** | **5/5** | **25/25 (100%)** | **$0.0081** |
+
+On the new platforms the routed product beats Ultra alone at under half its cost, and the
+repair loop matters most where a model is weakest: Super alone got 1 of 5 NX-OS fabrics
+right. Five scenarios per platform is a small sample; read these as "works on every
+platform", not as a ranking between vendors.
 
 ## The one rule
 
@@ -100,18 +119,19 @@ then serves the recorded gallery read-only. More in [docs/running.md](docs/runni
 
 ## What is built and tested
 
-`make check` runs lint, strict types, the import contracts and 213 offline tests (97%
+`make check` runs lint, strict types, the import contracts and 245 offline tests (97%
 coverage). Nothing in CI needs a key or a network.
 
 | Piece | State |
 |---|---|
-| Deterministic fabric plan + check compiler | 49 v0.1 scenarios in 7 families (23 on Arista EOS) compile; allocator property-tested (no overlaps, order-independent, never renumbers) |
+| Platforms | Juniper Junos, Cisco NX-OS, IOS-XE, IOS-XR, Arista EOS, SONiC, FRR, from one table of what differs (`contracts/platforms.py`, [ADR-0009](docs/decisions/ADR-0009-more-platforms.md)). Requests for vendors Batfish cannot parse (Nokia, Huawei, Cumulus NVUE, ...) are refused before any model call |
+| Deterministic fabric plan + check compiler | 49 v0.1 scenarios in 7 families (23 on Arista EOS) and 25 vendor scenarios (5 per new platform) compile; allocator property-tested (no overlaps, order-independent, never renumbers) |
 | Run state machine, budget, event log | Tested with scripted models and verifiers; golden path end to end |
 | Token Factory client | Strict JSON output, retries, refusal and truncation detection, cost accounting (failed calls are billed too), secret scrubbing |
-| Batfish verifier | Against live Batfish 2026.08.27, the known-good reference config of every one of the 49 scenarios passes every check. Recordings of 5 scenarios are replayed in CI |
+| Batfish verifier | Against live Batfish 2026.08.27, the known-good reference config of every one of the 74 scenarios, on all seven platforms, passes the pre-lint gate and every check (`scripts/check_references.py`). Recordings of 10 scenarios, at least one per platform, are replayed in CI |
 | Benchmark harness | Arms × scenarios through the real loop, resumable, aborts cleanly on provider outages; records derived from event logs only; MLflow tracking; regression and grounding gates; generated report |
 | Doc-grounded repair | Tavily search of vendor docs for unrecognised lines, cached, rate-limited and capped per run. Off: its benchmark arm failed the grounding gate ([ADR-0008](docs/decisions/ADR-0008-doc-grounded-repair.md)) |
-| Vendor doc links | After verification, Tavily finds the vendor's own page for each feature the fabric uses (BGP mode, loopbacks, filters), restricted to docs.frrouting.org and Arista's EOS manual; the best page per topic is linked beside the result. Queries use only feature names, never addresses or ASNs. Links never reach a prompt or a check. On in the demo, off in the benchmark |
+| Vendor doc links | After verification, Tavily finds the vendor's own page for each feature the fabric uses (BGP mode, loopbacks, filters), restricted to each vendor's documentation site (FRR, Arista, Juniper, Cisco, the SONiC wiki); the best page per topic is linked beside the result. Queries use only feature names, never addresses or ASNs. Links never reach a prompt or a check. On in the demo, off in the benchmark |
 | Web demo | Live at [fabloom.dev](https://fabloom.dev): JSON API ([/api/docs](https://fabloom.dev/api/docs)), live event stream, per-visitor rate limit, $0.40 daily spend cap, read-only gallery when there is no key or credit |
 | Nebius Sandboxes backend | Not built. Spike script ready (`spikes/batfish_in_sandbox.py`) |
 
@@ -123,11 +143,14 @@ anything to a device. Batfish checks what it can model; anything it cannot is re
 
 ## Known limitations
 
-- **Leaf-spine eBGP underlays only**: FRR and Arista EOS numbered, FRR unnumbered. The EOS
-  generator rules have no unnumbered peering yet, so no EOS scenario uses it.
-- **FRR traffic filters cannot be verified.** `frr.conf` has no packet filter and Batfish
-  does not model iptables, so "block SSH" on FRR is reported as *not verifiable* rather than
-  passed. Filter scenarios use Arista EOS ([ADR-0006](docs/decisions/ADR-0006-deterministic-fabric-plan.md)).
+- **Leaf-spine eBGP underlays only**, numbered on every platform; BGP unnumbered on FRR only.
+- **Seven platforms, only where Batfish can verify them.** Nokia, Huawei, Cumulus NVUE and
+  other systems Batfish does not parse are refused rather than generated unchecked
+  ([ADR-0009](docs/decisions/ADR-0009-more-platforms.md)).
+- **FRR and SONiC traffic filters are not verified.** `frr.conf` has no packet filter and
+  Batfish does not model iptables; SONiC ACL tables are not checked yet. "Block SSH" there is
+  reported as *not verifiable* rather than passed. Filters are verified on EOS, Junos, NX-OS,
+  IOS-XE and IOS-XR ([ADR-0006](docs/decisions/ADR-0006-deterministic-fabric-plan.md)).
 - **Doc grounding is off.** Measured on v0.1, it showed no gain (42/49 against 46/49
   without it, within noise). It searches for the line Batfish flags, which is often not the
   line that is wrong ([ADR-0008](docs/decisions/ADR-0008-doc-grounded-repair.md)).
@@ -144,6 +167,8 @@ anything to a device. Batfish checks what it can model; anything it cannot is re
 
 ## Roadmap
 
+- **Deeper platform coverage**: SONiC ACL tables, BGP unnumbered beyond FRR, and EVPN-VXLAN
+  overlays, each added only once Batfish verifies it.
 - **Downloadable containerlab lab**: a ready-to-run topology with the generated configs, so
   a run can be booted on the real network OS. Today the run page offers the configs as a
   `.zip`; the lab comes with the runtime verifier below.

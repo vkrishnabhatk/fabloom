@@ -1,0 +1,19 @@
+# Fabloom vendor benchmark v0.1. CC BY 4.0, see benchmark/LICENSE.
+id: vendor-nxos-0005
+family: vendor-nxos
+request: 'Larger fabric on Cisco Nexus switches on NX-OS: 4 spines and 6 leaves, eBGP numbered, spines
+  share AS 65000, each leaf its own ASN, advertise loopbacks.'
+intent:
+  platform: cisco_nxos
+  topology:
+    spines: 4
+    leaves: 6
+  bgp_mode: numbered
+  asn:
+    spine_asn: 65000
+    leaf_asn_base: 65101
+  addressing:
+    loopback_pool: 10.0.0.0/23
+    p2p_pool: 10.1.0.0/16
+  advertise_loopbacks: true
+  filters: []

@@ -1,11 +1,18 @@
 """Lay out a Batfish snapshot directory from a fabric plan and candidate configs.
 
-    <root>/configs/<device>.cfg
+    <root>/configs/<device>.cfg                      one-file platforms, FRR
+    <root>/sonic_configs/<device>/{config_db.json,frr.conf}   SONiC
     <root>/batfish/layer1_topology.json
 
-Two platform packagings:
+Platform packagings (``PlatformSpec.layout``):
 
 - Arista EOS: the candidate is the whole running-config, written as-is.
+- Junos, NX-OS, IOS-XE, IOS-XR: the running-config as-is, after a RANCID content-type line
+  when the model did not write one, so Batfish's vendor detection cannot guess wrong
+  between related Cisco dialects.
+- SONiC: the device block holds ``config_db.json`` and ``frr.conf`` as ``<file>`` sections;
+  each goes into the device's own directory under ``sonic_configs/``, which is where
+  Batfish looks for them (live Batfish 2026.08.27, 2026-10-26: 8/8 sessions established).
 - FRR: Batfish reads FRR through its Cumulus "concatenated" format: hostname line, then
   ``/etc/network/interfaces``, then a ``# ports.conf --`` section, then ``frr.conf``. The
   ports.conf marker is what ends the interfaces section: without it Batfish parsed every
@@ -36,6 +43,7 @@ from pathlib import Path
 from typing import Any
 
 from fabloom.contracts import Device, FabricPlan, Platform
+from fabloom.contracts.platforms import SONIC_FILES, device_files, spec
 
 FRR_VERSION_LINE = "frr version 8.4"
 PORTS_CONF_MARKER = "# ports.conf --"
@@ -55,7 +63,11 @@ def _frr_interfaces(device: Device) -> str:
 
 def render_device_file(platform: Platform, device: Device, config: str) -> str:
     body = config.strip("\n")
-    if platform is Platform.ARISTA_EOS:
+    layout = spec(platform)
+    if layout.layout == "single":
+        marker = layout.batfish_marker
+        if marker and not body.lstrip().startswith(marker):
+            body = f"{marker}\n{body}"
         return body + "\n"
     body = "\n".join(line for line in body.splitlines() if line.rstrip() not in FRR_NOOP_LINES)
     if not body.lstrip().startswith("frr version"):
@@ -78,6 +90,14 @@ def write_snapshot(root: Path, fabric: FabricPlan, configs: Mapping[str, str]) -
     (root / "batfish").mkdir(parents=True, exist_ok=True)
     for device in fabric.devices:
         if device.name not in configs:
+            continue
+        if spec(fabric.platform).layout == "sonic":
+            folder = root / "sonic_configs" / device.name
+            folder.mkdir(parents=True, exist_ok=True)
+            for name, text in device_files(fabric.platform, configs[device.name]).items():
+                # Only the two files Batfish reads; a model cannot write elsewhere.
+                if name in SONIC_FILES:
+                    (folder / name).write_text(text, encoding="utf-8")
             continue
         text = render_device_file(fabric.platform, device, configs[device.name])
         (root / config_filename(device.name)).write_text(text, encoding="utf-8")

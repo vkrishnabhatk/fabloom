@@ -1,12 +1,11 @@
 {% extends "base.html" %}
 {% block page %}index{% endblock %}
-{% macro platform_label(p) %}{{ {'frr': 'FRR', 'arista_eos': 'Arista EOS'}.get(p, p) }}{% endmacro %}
 {% block main %}
 <section class="hero">
   <span class="eyebrow">NVIDIA Nemotron on Nebius Token Factory · verified by Batfish</span>
   <h1>Describe a data-center fabric. Get configs that are <em>verified</em>, not just plausible.</h1>
-  <p class="lede">Fabloom turns a plain-language request into FRR or Arista EOS configs for a
-    leaf-spine fabric. Batfish then checks them against checks compiled from your request, and
+  <p class="lede">Fabloom turns a plain-language request into configs for a leaf-spine fabric on
+    Juniper Junos, Cisco NX-OS, IOS-XE or IOS-XR, Arista EOS, SONiC or FRR. Batfish then checks them against checks compiled from your request, and
     failed checks go back to the model to repair. The verdict comes from Batfish, never from the model.</p>
   <div class="stats">
     <div class="stat"><b>47 / 49</b><span>benchmark fabrics verified</span></div>
@@ -14,7 +13,8 @@
     <div class="stat"><b>37 → 46</b><span>fabrics passing after repair</span></div>
   </div>
   <p class="stats-note">Benchmark v0.1, 49 scenarios, every result checked by Batfish: routed models
-    for the first two, Nemotron Super first pass vs. after repair for the third.
+    for the first two, Nemotron Super first pass vs. after repair for the third. On Junos,
+    NX-OS, IOS-XE, IOS-XR and SONiC the routed product passed 25 of 25.
     <a href="https://github.com/vkrishnabhatk/fabloom/blob/main/docs/benchmark/index.md">How it was measured</a></p>
 </section>
 
@@ -41,8 +41,8 @@
         <label for="platform">Platform
           <select id="platform" name="platform" {% if info.read_only_reason %}disabled{% endif %}>
             <option value="">from the request</option>
-            <option value="frr">FRR</option>
-            <option value="arista_eos">Arista EOS</option>
+            {% for value, name in platforms %}<option value="{{ value }}">{{ name }}</option>
+            {% endfor %}
           </select>
         </label>
         <button class="btn" type="submit" {% if info.read_only_reason %}disabled{% endif %}>Generate and verify</button>
@@ -74,7 +74,7 @@
       <a class="run-card" href="/runs/{{ g.run_id }}">
         <div class="badges">
           {% if g.fabric %}
-          <span class="badge badge-platform">{{ platform_label(g.fabric.platform) }}</span>
+          <span class="badge badge-platform">{{ g.fabric.platform_name or g.fabric.platform }}</span>
           <span class="badge">{{ g.fabric.spines }} spines · {{ g.fabric.leaves }} leaves</span>
           {% endif %}
         </div>

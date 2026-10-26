@@ -55,7 +55,9 @@ class Answerer(Protocol):
 
 
 def _device_of_file(filename: str) -> str:
-    return PurePosixPath(str(filename)).stem
+    """``configs/leaf1.cfg`` -> leaf1; ``sonic_configs/leaf1/frr.conf`` -> leaf1."""
+    path = PurePosixPath(str(filename))
+    return path.parent.name if path.parent.parent.name == "sonic_configs" else path.stem
 
 
 MAX_PORT = 65535
@@ -289,6 +291,10 @@ class Evaluator:
                 "dstIps": p["dst_ip"],
                 "ipProtocols": [p["protocol"]],
                 "dstPorts": str(p["dst_port"]),
+                # Only packets that can open a connection. A non-initial fragment carries no
+                # ports, so no port-based deny can match it, on any vendor; Batfish picked
+                # one as NX-OS's "accepted" SSH flow (live Batfish 2026-10-26).
+                "fragmentOffsets": "0",
             },
             actions="ACCEPTED",
         )

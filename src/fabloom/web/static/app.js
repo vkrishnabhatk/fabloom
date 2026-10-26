@@ -17,7 +17,11 @@ function plural(n, word) {
   return n + " " + word + (n === 1 ? "" : "s");
 }
 
-const PLATFORMS = { frr: "FRR", arista_eos: "Arista EOS" };
+// Mirrors contracts/platforms.py; the run summary also carries the name as platform_name.
+const PLATFORMS = {
+  frr: "FRR", arista_eos: "Arista EOS", junos: "Juniper Junos", cisco_nxos: "Cisco NX-OS",
+  cisco_iosxe: "Cisco IOS-XE", cisco_iosxr: "Cisco IOS-XR", sonic: "SONiC",
+};
 
 function modelName(id) {
   const m = /nemotron-3-(nano|super|ultra)/i.exec(id || "");
@@ -242,7 +246,22 @@ function renderDocs(docs) {
   }));
 }
 
-function renderConfigs(configs) {
+// SONiC devices are two files, written as <file name="..."> sections in one config; show and
+// copy each as its own tab. Every other platform is one file per device.
+const FILE_SECTION = /<file\s+name="([^"]+)"\s*>\n?([\s\S]*?)<\/file>/g;
+
+function splitFiles(configs) {
+  const out = {};
+  for (const [device, text] of Object.entries(configs)) {
+    const files = [...text.matchAll(FILE_SECTION)];
+    if (!files.length) { out[device] = text; continue; }
+    for (const [, name, body] of files) out[device + " · " + name] = body;
+  }
+  return out;
+}
+
+function renderConfigs(raw) {
+  const configs = splitFiles(raw);
   const tabs = document.getElementById("tabs");
   const pre = document.getElementById("config");
   const names = Object.keys(configs);
@@ -276,7 +295,7 @@ function renderRun(run) {
   if (run.fabric) {
     const f = run.fabric;
     document.getElementById("fabric").replaceChildren(
-      el("span", PLATFORMS[f.platform] || f.platform, "badge badge-platform"),
+      el("span", f.platform_name || PLATFORMS[f.platform] || f.platform, "badge badge-platform"),
       el("span", f.spines + " spines · " + f.leaves + " leaves", "badge"),
       el("span", "verifier " + run.verifier, "badge"));
   }

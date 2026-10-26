@@ -16,6 +16,7 @@ from fabloom.contracts import (
     CheckKind,
     CheckResult,
     FabricPlan,
+    Platform,
     VerificationLevel,
     VerificationReport,
     score_checks,
@@ -26,6 +27,11 @@ _TAG = re.compile(r"</?device\b", re.I)
 _PLACEHOLDER = re.compile(r"<[A-Z_][A-Z0-9_ -]*>|\bTODO\b|^\s*\.\.\.\s*$", re.M)
 _HOSTNAME = re.compile(r"^\s*hostname\s+(\S+)\s*$", re.M)
 _ROUTER_BGP = re.compile(r"^\s*router bgp\s+(\d+)\b", re.M)
+# Junos names the same two facts differently, and they need not start a line: Nemotron wrote
+# "system { host-name leaf1; }" on one line, which a line-anchored pattern rejected for four
+# rounds (live run, 2026-10-26). Matches hierarchical, one-line and "set" forms.
+_JUNOS_HOSTNAME = re.compile(r"(?<![\w-])host-name\s+\"?([^\s;\"}]+)")
+_JUNOS_ASN = re.compile(r"(?<![\w-])autonomous-system\s+(\d+)\b")
 
 MAX_ISSUES_PER_DEVICE = 10
 
@@ -40,17 +46,20 @@ def _device_issues(fabric: FabricPlan, device: str, config: str) -> list[str]:
         issues.append("contains a <device> tag inside the device body")
     for m in _PLACEHOLDER.finditer(config):
         issues.append(f"contains a placeholder: {m.group(0).strip()!r}")
-    hostnames = _HOSTNAME.findall(config)
+    junos = fabric.platform is Platform.JUNOS
+    host_re, host_stmt = (_JUNOS_HOSTNAME, "host-name") if junos else (_HOSTNAME, "hostname")
+    asn_re, asn_stmt = (_JUNOS_ASN, "autonomous-system") if junos else (_ROUTER_BGP, "router bgp")
+    hostnames = host_re.findall(config)
     if not hostnames:
-        issues.append(f"missing 'hostname {device}'")
+        issues.append(f"missing '{host_stmt} {device}'")
     elif hostnames[0] != device:
-        issues.append(f"hostname is {hostnames[0]!r}, expected {device!r}")
-    asns = _ROUTER_BGP.findall(config)
+        issues.append(f"{host_stmt} is {hostnames[0]!r}, expected {device!r}")
+    asns = asn_re.findall(config)
     expected_asn = fabric.device(device).asn
     if not asns:
-        issues.append(f"missing 'router bgp {expected_asn}'")
+        issues.append(f"missing '{asn_stmt} {expected_asn}'")
     elif int(asns[0]) != expected_asn:
-        issues.append(f"router bgp {asns[0]}, but the plan assigns AS{expected_asn}")
+        issues.append(f"{asn_stmt} {asns[0]}, but the plan assigns AS{expected_asn}")
     return issues[:MAX_ISSUES_PER_DEVICE]
 
 

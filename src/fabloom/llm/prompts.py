@@ -21,6 +21,7 @@ from fabloom.contracts import (
     Platform,
     VerificationReport,
 )
+from fabloom.contracts.platforms import spec
 from fabloom.llm.grounding import Excerpt
 from fabloom.llm.schema import strict_json_schema
 
@@ -37,8 +38,14 @@ intent. Output only a JSON object matching this schema:
 Rules:
 - Use the defaults below for anything the request does not state. Never invent requirements.
   Defaults: {defaults}
-- platform: "frr" or "arista_eos". If the request does not say, use "{platform_hint}".
-- bgp_mode: "unnumbered" only if the request asks for unnumbered/interface BGP.
+- platform: one of "frr", "arista_eos", "junos", "cisco_nxos", "cisco_iosxe", "cisco_iosxr",
+  "sonic". Juniper, Junos, QFX, MX or EX -> "junos". Cisco Nexus or NX-OS -> "cisco_nxos";
+  Cisco Catalyst, IOS or IOS-XE -> "cisco_iosxe"; Cisco IOS-XR, ASR 9000 or NCS ->
+  "cisco_iosxr"; Cisco with no OS named -> "cisco_nxos". Arista or EOS -> "arista_eos".
+  FRR or FRRouting -> "frr". SONiC -> "sonic". If the request names no platform, use
+  "{platform_hint}".
+- bgp_mode: "unnumbered" only if the request asks for unnumbered/interface BGP. It exists on
+  "frr" only; on any other platform use "numbered".
 - filters: one entry per traffic-blocking requirement, e.g. "block SSH to the leaves from
   outside 10.0.0.0/8" -> {{"devices": "leaf*", "action": "deny", "protocol": "tcp",
   "dst_port": 22, "src_not_in": "10.0.0.0/8"}}.
@@ -82,6 +89,81 @@ Arista EOS rules:
   ends with "permit ip any any", applied with "ip access-group NAME in" on every fabric link
   of the matching devices. It must not block BGP (tcp/179) between fabric peers."""
 
+JUNOS_RULES = """\
+Juniper Junos rules:
+- Each block is a complete configuration in Junos curly-brace format, starting with
+  "system { host-name DEVICE; }".
+- Each fabric link: "interfaces { PORT { unit 0 { family inet { address A.B.C.D/31; } } }
+  }"; the loopback is "lo0 { unit 0 { family inet { address LOOPBACK/32; } } }".
+- "routing-options { router-id LOOPBACK-IP; autonomous-system ASN; }".
+- BGP: "protocols { bgp { group FABRIC { type external; neighbor PEER-IP { peer-as PEER-ASN;
+  local-address LOCAL-LINK-IP; } } } }", one neighbor per session, local-address always set.
+- Advertise the loopback with a "policy-options policy-statement" whose term matches
+  "from { protocol direct; route-filter LOOPBACK/32 exact; }" and "then accept", exported
+  with "export POLICY;" in the BGP group.
+- Traffic filters: a "firewall { family inet { filter NAME { ... } } }" whose terms first
+  accept the allowed source, then discard exactly what the intent says to the device's own
+  addresses, and end with "term rest { then accept; }"; apply it as "filter input NAME;"
+  under "family inet" on every fabric link of the matching devices. It must not block BGP
+  (tcp/179) between fabric peers."""
+
+NXOS_RULES = """\
+Cisco NX-OS rules:
+- Each block is a complete running-config: "hostname DEVICE", "feature bgp".
+- Loopback: "interface loopback0" / "  ip address LOOPBACK/32".
+- Each fabric link: "interface PORT" / "  no switchport" / "  ip address A.B.C.D/31" /
+  "  no shutdown".
+- "router bgp ASN" / "  router-id LOOPBACK-IP" / "  address-family ipv4 unicast" /
+  "    network LOOPBACK/32"; then per session "  neighbor PEER-IP" / "    remote-as PEER-ASN" /
+  "    address-family ipv4 unicast".
+- Traffic filters: an "ip access-list NAME" with numbered entries that permit the allowed
+  source first, deny exactly what the intent says to each of the device's own addresses
+  (A.B.C.D/32), and end with "permit ip any any"; apply "ip access-group NAME in" on every
+  fabric link of the matching devices. It must not block BGP (tcp/179) between fabric peers."""
+
+IOSXE_RULES = """\
+Cisco IOS-XE rules:
+- Each block is a complete running-config: "hostname DEVICE", "ip routing".
+- Loopback: "interface Loopback0" / " ip address LOOPBACK-IP 255.255.255.255".
+- Each fabric link: "interface PORT" / " no switchport" / " ip address A.B.C.D 255.255.255.254".
+- "router bgp ASN" / " bgp router-id LOOPBACK-IP" / " neighbor PEER-IP remote-as PEER-ASN" for
+  each session, then " address-family ipv4" / "  network LOOPBACK-IP mask 255.255.255.255" /
+  "  neighbor PEER-IP activate" for each session / " exit-address-family".
+- Traffic filters: an "ip access-list extended NAME" that permits the allowed source first
+  (wildcard masks), denies exactly what the intent says to each of the device's own addresses
+  ("deny tcp any host A.B.C.D eq PORT") and ends with "permit ip any any"; apply
+  "ip access-group NAME in" on every fabric link of the matching devices. It must not block
+  BGP (tcp/179) between fabric peers."""
+
+IOSXR_RULES = """\
+Cisco IOS-XR rules:
+- Each block is a complete running-config starting with "hostname DEVICE".
+- Loopback: "interface Loopback0" / " ipv4 address LOOPBACK-IP 255.255.255.255".
+- Each fabric link: "interface PORT" / " ipv4 address A.B.C.D 255.255.255.254".
+- IOS-XR drops eBGP routes without a policy: define "route-policy PASS" / "  pass" /
+  "end-policy" and use it in and out on every neighbor.
+- "router bgp ASN" / " bgp router-id LOOPBACK-IP" / " address-family ipv4 unicast" /
+  "  network LOOPBACK/32"; then per session " neighbor PEER-IP" / "  remote-as PEER-ASN" /
+  "  address-family ipv4 unicast" / "   route-policy PASS in" / "   route-policy PASS out".
+- Traffic filters: an "ipv4 access-list NAME" with numbered entries that permit the allowed
+  source first, deny exactly what the intent says to each of the device's own addresses
+  ("deny tcp any host A.B.C.D eq PORT") and end with "permit ipv4 any any"; apply
+  "ipv4 access-group NAME ingress" on every fabric link of the matching devices. It must not
+  block BGP (tcp/179) between fabric peers."""
+
+SONIC_RULES = """\
+SONiC rules:
+- A SONiC device is two files. Inside each device block write exactly two sections and
+  nothing else: <file name="config_db.json">...</file> then <file name="frr.conf">...</file>.
+- config_db.json is one JSON object: "DEVICE_METADATA": {"localhost": {"hostname": "DEVICE",
+  "bgp_asn": "ASN"}}; "PORT" with one entry per fabric port, e.g. "Ethernet0":
+  {"admin_status": "up", "lanes": "0", "speed": "100000"}; "INTERFACE" with "PORT": {} and
+  "PORT|A.B.C.D/31": {} for each link; "LOOPBACK_INTERFACE" with "Loopback0": {} and
+  "Loopback0|LOOPBACK/32": {}. All addresses go here, not in frr.conf.
+- frr.conf: "frr version 8.4", "frr defaults datacenter", "hostname DEVICE", "router bgp ASN",
+  " bgp router-id LOOPBACK-IP", " neighbor PEER-IP remote-as PEER-ASN" for each session,
+  " address-family ipv4 unicast" / "  network LOOPBACK/32" / " exit-address-family"."""
+
 REPAIR_SYSTEM = (
     GENERATOR_SYSTEM
     + """
@@ -112,12 +194,23 @@ _LEVEL_MEANING = {
 }
 
 
+_RULES = {
+    Platform.FRR: FRR_RULES,
+    Platform.ARISTA_EOS: EOS_RULES,
+    Platform.JUNOS: JUNOS_RULES,
+    Platform.CISCO_NXOS: NXOS_RULES,
+    Platform.CISCO_IOSXE: IOSXE_RULES,
+    Platform.CISCO_IOSXR: IOSXR_RULES,
+    Platform.SONIC: SONIC_RULES,
+}
+
+
 def _platform_name(platform: Platform) -> str:
-    return {Platform.FRR: "FRR", Platform.ARISTA_EOS: "Arista EOS"}[platform]
+    return spec(platform).name
 
 
 def _platform_rules(platform: Platform) -> str:
-    return {Platform.FRR: FRR_RULES, Platform.ARISTA_EOS: EOS_RULES}[platform]
+    return _RULES[platform]
 
 
 def render_plan(intent: Intent, fabric: FabricPlan) -> str:

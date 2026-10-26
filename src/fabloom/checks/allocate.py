@@ -24,15 +24,10 @@ from fabloom.contracts import (
     Intent,
     Interface,
     Link,
-    Platform,
     Role,
 )
 from fabloom.contracts.intent import MAX_SPINES
-
-_INTERFACE_PREFIX: dict[Platform, str] = {
-    Platform.FRR: "swp",
-    Platform.ARISTA_EOS: "Ethernet",
-}
+from fabloom.contracts.platforms import spec
 
 
 class AllocationError(ValueError):
@@ -74,7 +69,7 @@ def allocate_fabric(intent: Intent, *, spines: Sequence[str], leaves: Sequence[s
     if numbered and len(leaves) * MAX_SPINES * 2 > p2p_pool.num_addresses:
         raise AllocationError(f"p2p pool {p2p_pool} is too small for {len(leaves)} leaves")
 
-    prefix = _INTERFACE_PREFIX[intent.platform]
+    port = spec(intent.platform).port
 
     def loopback(role: Role, index: int) -> IPv4Interface:
         offset = index if role is Role.SPINE else half + index
@@ -88,7 +83,7 @@ def allocate_fabric(intent: Intent, *, spines: Sequence[str], leaves: Sequence[s
     for li, leaf in enumerate(leaves, start=1):
         leaf_asn = intent.asn.leaf_asn_base + li - 1
         for si, spine in enumerate(spines, start=1):
-            leaf_if, spine_if = f"{prefix}{si}", f"{prefix}{li}"
+            leaf_if, spine_if = port(si), port(li)
             subnet: IPv4Network | None = None
             spine_addr: IPv4Interface | None = None
             leaf_addr: IPv4Interface | None = None

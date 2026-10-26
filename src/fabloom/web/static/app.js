@@ -246,7 +246,22 @@ function renderDocs(docs) {
   }));
 }
 
-function renderConfigs(configs) {
+// SONiC devices are two files, written as <file name="..."> sections in one config; show and
+// copy each as its own tab. Every other platform is one file per device.
+const FILE_SECTION = /<file\s+name="([^"]+)"\s*>\n?([\s\S]*?)<\/file>/g;
+
+function splitFiles(configs) {
+  const out = {};
+  for (const [device, text] of Object.entries(configs)) {
+    const files = [...text.matchAll(FILE_SECTION)];
+    if (!files.length) { out[device] = text; continue; }
+    for (const [, name, body] of files) out[device + " · " + name] = body;
+  }
+  return out;
+}
+
+function renderConfigs(raw) {
+  const configs = splitFiles(raw);
   const tabs = document.getElementById("tabs");
   const pre = document.getElementById("config");
   const names = Object.keys(configs);

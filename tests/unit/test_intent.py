@@ -17,6 +17,7 @@ from fabloom.contracts import (
     Scenario,
     TopologySpec,
 )
+from fabloom.contracts.platforms import spec
 
 pytestmark = pytest.mark.unit
 
@@ -27,13 +28,18 @@ filters = st.builds(
     dst_port=st.integers(1, 65535),
     src_not_in=st.one_of(st.none(), st.just(IPv4Network("10.0.0.0/8"))),
 )
-intents = st.builds(
-    Intent,
-    platform=st.sampled_from(list(Platform)),
-    topology=st.builds(TopologySpec, spines=st.integers(1, 8), leaves=st.integers(1, 32)),
-    bgp_mode=st.sampled_from(list(BgpMode)),
-    advertise_loopbacks=st.booleans(),
-    filters=st.lists(filters, max_size=3),
+PLATFORM_MODES = [
+    (p, m) for p in Platform for m in BgpMode if m is BgpMode.NUMBERED or spec(p).unnumbered
+]
+intents = st.sampled_from(PLATFORM_MODES).flatmap(
+    lambda pm: st.builds(
+        Intent,
+        platform=st.just(pm[0]),
+        topology=st.builds(TopologySpec, spines=st.integers(1, 8), leaves=st.integers(1, 32)),
+        bgp_mode=st.just(pm[1]),
+        advertise_loopbacks=st.booleans(),
+        filters=st.lists(filters, max_size=3),
+    )
 )
 
 
@@ -76,3 +82,10 @@ def test_extra_fields_forbidden() -> None:
 def test_scenario_id_shape(frr_intent: Intent) -> None:
     with pytest.raises(ValidationError, match="must look like"):
         Scenario(id="Bad_ID", family="f", request="a long enough request", intent=frr_intent)
+
+
+def test_unnumbered_only_where_supported() -> None:
+    topo = TopologySpec(spines=2, leaves=2)
+    Intent(platform=Platform.FRR, topology=topo, bgp_mode=BgpMode.UNNUMBERED)
+    with pytest.raises(ValueError, match="unnumbered is supported on FRR only"):
+        Intent(platform=Platform.JUNOS, topology=topo, bgp_mode=BgpMode.UNNUMBERED)

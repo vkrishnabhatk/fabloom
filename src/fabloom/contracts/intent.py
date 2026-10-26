@@ -14,6 +14,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from fabloom.contracts.enums import BgpMode, Platform
+from fabloom.contracts.platforms import spec
 
 PRIVATE_ASN_MIN = 64512
 PRIVATE_ASN_MAX = 65534
@@ -83,6 +84,12 @@ class Intent(_Frozen):
     addressing: AddressingSpec = AddressingSpec()
     advertise_loopbacks: bool = True
     filters: list[FilterRule] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _unnumbered_where_supported(self) -> Intent:
+        if self.bgp_mode is BgpMode.UNNUMBERED and not spec(self.platform).unnumbered:
+            raise ValueError(f"BGP unnumbered is supported on FRR only, not {self.platform}")
+        return self
 
     @model_validator(mode="after")
     def _asns_fit(self) -> Intent:

@@ -51,7 +51,7 @@ def run_checks(answerer: Answerer, checks: Sequence[Check]) -> dict[str, Any]:
 
 class BatfishVerifier:
     level = VerificationLevel.L2
-    platforms = frozenset({Platform.FRR, Platform.ARISTA_EOS})
+    platforms = frozenset(Platform)
 
     def __init__(self, answerer_factory: Callable[[], SnapshotAnswerer], name: str) -> None:
         self._factory = answerer_factory

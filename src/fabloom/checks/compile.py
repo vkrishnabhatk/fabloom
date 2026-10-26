@@ -20,10 +20,10 @@ from fabloom.contracts import (
     FabricPlan,
     FilterRule,
     Intent,
-    Platform,
     Role,
     Severity,
 )
+from fabloom.contracts.platforms import spec
 
 SEVERITY: dict[CheckKind, Severity] = {
     CheckKind.PRELINT: Severity.CRITICAL,
@@ -63,10 +63,6 @@ REMEDIATION: dict[CheckKind, str] = {
 # All ordered leaf pairs up to this size; above it, a hub-and-ring sample keeps the number of
 # reachability queries linear in fabric size.
 FULL_MESH_REACHABILITY_MAX_LEAVES = 6
-
-# Platforms whose filter semantics Batfish models from the config Fabloom generates. FRR's
-# frr.conf has no packet filter; SSH filtering there lives in iptables/nftables, outside it.
-_FILTER_PLATFORMS = frozenset({Platform.ARISTA_EOS})
 
 
 def _check(kind: CheckKind, suffix: str, description: str, **params: object) -> Check:
@@ -120,14 +116,15 @@ def _device_checks(fabric: FabricPlan) -> list[Check]:
 
 
 def _session_checks(fabric: FabricPlan) -> list[Check]:
+    l3 = spec(fabric.platform).l3_interface
     out: list[Check] = []
     for s in fabric.sessions:
         pair = f"{s.a_device}--{s.b_device}"
         common = {
             "a_device": s.a_device,
             "b_device": s.b_device,
-            "a_interface": s.a_interface,
-            "b_interface": s.b_interface,
+            "a_interface": l3(s.a_interface),
+            "b_interface": l3(s.b_interface),
             "a_ip": str(s.a_ip) if s.a_ip else None,
             "b_ip": str(s.b_ip) if s.b_ip else None,
         }
@@ -154,6 +151,7 @@ def _session_checks(fabric: FabricPlan) -> list[Check]:
 def _link_checks(fabric: FabricPlan) -> list[Check]:
     if fabric.bgp_mode is not BgpMode.NUMBERED:
         return []  # unnumbered links carry no IPv4 addresses, so there is no L3 edge to check
+    l3 = spec(fabric.platform).l3_interface
     return [
         _check(
             CheckKind.L3_EDGES,
@@ -161,9 +159,9 @@ def _link_checks(fabric: FabricPlan) -> list[Check]:
             f"{link.a_device} {link.a_interface} and {link.b_device} {link.b_interface} "
             f"form a layer-3 edge on {link.subnet}",
             a_device=link.a_device,
-            a_interface=link.a_interface,
+            a_interface=l3(link.a_interface),
             b_device=link.b_device,
-            b_interface=link.b_interface,
+            b_interface=l3(link.b_interface),
         )
         for link in fabric.links
     ]
@@ -225,24 +223,25 @@ def _loopback_checks(fabric: FabricPlan, filters: Sequence[FilterRule] = ()) -> 
 
 
 def _filter_checks(intent: Intent, fabric: FabricPlan) -> tuple[list[Check], list[str]]:
+    platform = spec(fabric.platform)
     out: list[Check] = []
     unverifiable: list[str] = []
     for rule in intent.filters:
         src = f" from outside {rule.src_not_in}" if rule.src_not_in else ""
         label = f"deny {rule.protocol}/{rule.dst_port} to {rule.devices}{src}"
         targets = [d for d in fabric.devices if fnmatchcase(d.name, rule.devices)]
-        if fabric.platform not in _FILTER_PLATFORMS:
+        if not platform.filters_verifiable:
             unverifiable.append(f"{label}: {fabric.platform} filters are not modelled by Batfish")
         elif not targets:
             unverifiable.append(f"{label}: no device matches {rule.devices!r}")
-        for d in targets if fabric.platform in _FILTER_PLATFORMS else []:
+        for d in targets if platform.filters_verifiable else []:
             out.append(
                 _check(
                     CheckKind.FILTER_DENIES,
                     f"{d.name}:{rule.protocol}/{rule.dst_port}",
                     f"{d.name} drops {rule.protocol}/{rule.dst_port} to itself{src}",
                     device=d.name,
-                    ingress_interfaces=[i.name for i in d.interfaces],
+                    ingress_interfaces=[platform.l3_interface(i.name) for i in d.interfaces],
                     dst_ip=str(d.loopback.ip),
                     protocol=rule.protocol,
                     dst_port=rule.dst_port,

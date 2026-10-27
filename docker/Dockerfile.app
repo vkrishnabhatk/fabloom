@@ -29,7 +29,15 @@ LABEL org.opencontainers.image.source="https://github.com/vkrishnabhatk/fabloom"
       org.opencontainers.image.description="Fabloom web demo"
 WORKDIR /app
 COPY --from=build /app /app
-RUN useradd --uid 10001 --no-create-home --home-dir /app fabloom \
+# The app's TLS calls (Token Factory, Tavily) trust the system store via truststore. Private
+# keys of eight eMudhra intermediates under these two roots were compromised (Oct 2026);
+# Mozilla dropped them and certifi 2026.10.23 removed them, Debian has not yet. Distrust
+# them here, and fail the build if either is still trusted.
+RUN sed -i -E 's#^(mozilla/(emSign_ECC_Root_CA_-_C3|emSign_Root_CA_-_C1)\.crt)$#!\1#' \
+      /etc/ca-certificates.conf \
+ && update-ca-certificates --fresh >/dev/null \
+ && ! ls /etc/ssl/certs | grep -E 'emSign_(ECC_Root_CA_-_C3|Root_CA_-_C1)' \
+ && useradd --uid 10001 --no-create-home --home-dir /app fabloom \
  && mkdir -p /data/runs /data/cache && chown -R fabloom /data
 USER 10001
 ENV PATH=/app/.venv/bin:$PATH \

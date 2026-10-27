@@ -19,3 +19,7 @@ CVE-2026-91776
 CVE-2026-91777
 # lz4-java 1.11.2 (fixed in 1.11.4)
 CVE-2026-106451
+# guava 33.6.0-jre (fixed in 33.7.2): memory exhaustion while deserializing, the same class
+# as the jackson entries and fed by the same single client. Added to Trivy's database on
+# 2026-10-27; recorded the same day.
+CVE-2026-102554

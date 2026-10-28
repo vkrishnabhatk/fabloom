@@ -207,7 +207,10 @@ class TokenFactoryClient:
         class Probe(BaseModel):
             ok: bool
 
-        probe_spec = spec.model_copy(update={"max_output_tokens": 256, "temperature": 0.0})
+        # Reasoning models think before they answer, and the thinking counts against the cap:
+        # at 256 Super once ran out before writing the JSON (nightly, 28 Oct 2026), a false
+        # alarm. 2048 leaves room for it and costs at most ~$0.002 per probe.
+        probe_spec = spec.model_copy(update={"max_output_tokens": 2048, "temperature": 0.0})
         messages = [
             {"role": "system", "content": 'Reply with the JSON object {"ok": true} only.'},
             {"role": "user", "content": json.dumps({"ok": True})},

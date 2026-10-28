@@ -293,3 +293,14 @@ async def test_models_and_probe() -> None:
     assert await client.probe(SPEC) is None
     bad = _client(lambda req: httpx2.Response(200, json=_chat("not json")))
     assert "LlmOutputError" in (await bad.probe(SPEC) or "")
+
+
+async def test_probe_leaves_room_for_reasoning() -> None:
+    sent: list[dict[str, Any]] = []
+
+    def handler(req: httpx2.Request) -> httpx2.Response:
+        sent.append(json.loads(req.content))
+        return httpx2.Response(200, json=_chat("<think>" + "x " * 300 + '</think>{"ok": true}'))
+
+    assert await _client(handler).probe(SPEC) is None
+    assert sent[0]["max_tokens"] == 2048

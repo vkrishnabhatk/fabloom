@@ -14,13 +14,13 @@ verified configs. A run costs about one cent in model calls.
 ## How it works
 
 ```
-request ──► planner (Nemotron Nano) ──► intent JSON
+request ──► planner (Nemotron Lightning) ──► intent JSON
             deterministic allocator  ──► fabric plan (addresses, ASNs, sessions)
             deterministic compiler   ──► checks
-            generator (Nemotron Super) ──► per-device configs
+            generator (Nemotron Super-VL) ──► per-device configs
             pre-lint gate ──► Batfish ──► report ──┐
-            repairer (Super, escalating to Ultra) ◄┘ until pass or budget/rounds exhausted
-            explainer (Nano) ──► plain-language summary
+            repairer (Super-VL, escalating to Ultra) ◄┘ until pass or budget/rounds exhausted
+            explainer (Lightning) ──► plain-language summary
 ```
 
 - **The model cannot influence what it is graded on.** Checks are compiled from the intent
@@ -36,7 +36,23 @@ request ──► planner (Nemotron Nano) ──► intent JSON
 Every result below is graded by Batfish against checks compiled from each scenario's
 ground-truth intent, one run per arm and scenario, at Token Factory list prices.
 
-**Benchmark v0.1** (FRR and Arista EOS, 49 scenarios, 23 Oct 2026):
+**Nemotron 3.5, from v0.2.4.** Token Factory retires Nemotron 3 Nano and Super on 9 Nov
+2026, so Fabloom now runs Nemotron 3.5 Lightning (planner, explainer) and Super-VL
+(generator, repairer), with Ultra unchanged. Both benchmarks were re-run on 4 Nov
+([ADR-0010](docs/decisions/ADR-0010-nemotron-3.5-migration.md)):
+
+| Arm | v0.1, first pass → final | Vendors, first pass → final | $/scenario (v0.1 / vendors) |
+|---|---|---|---|
+| Super-VL + Batfish repair loop | 44 → 49/49 (100%) | 19 → 25/25 (100%) | $0.0087 / $0.0107 |
+| **Fabloom routed** (Super-VL, escalating to Ultra) | 41 → **49/49 (100%)** | 20 → **25/25 (100%)** | $0.0096 / $0.0109 |
+
+Reports: [v0.1](docs/benchmark/v0.1-nemotron35.md), [vendors](docs/benchmark/vendors-v0.1-nemotron35.md).
+Getting there took two tries: with the old 12,000-token output cap Super-VL's reasoning
+truncated every 10-device fabric (routed 20/25 on the vendor set), and with its reasoning
+switched off it lost every SONiC repair. The tables below measured the retired models and
+stay as they were.
+
+**Benchmark v0.1** (FRR and Arista EOS, 49 scenarios, 23 Oct 2026, Nemotron 3):
 
 | Arm | Final pass | $/scenario |
 |---|---|---|
@@ -47,7 +63,7 @@ ground-truth intent, one run per arm and scenario, at Token Factory list prices.
 | Super + repair + Tavily doc grounding | 42/49 (86%) | $0.0081 |
 | **Fabloom routed** (Super, escalating to Ultra) | **47/49 (96%)** | **$0.0082** |
 
-**Vendor benchmark** (5 scenarios per platform, 26 Oct 2026):
+**Vendor benchmark** (5 scenarios per platform, 26 Oct 2026, Nemotron 3):
 
 | Arm | Junos | NX-OS | IOS-XE | IOS-XR | SONiC | Final pass | $/scenario |
 |---|---|---|---|---|---|---|---|
@@ -82,19 +98,20 @@ request, such as a filter on FRR, are reported as *not verifiable*, never as pas
 
 | Piece | Where it runs |
 |---|---|
-| All model calls: Nemotron 3 Nano, Super and Ultra | [Nebius Token Factory](https://tokenfactory.nebius.com), OpenAI-compatible API; model IDs, prices and routing in `conf/models.yaml` |
+| All model calls: Nemotron 3.5 Lightning and Super-VL, Nemotron 3 Ultra | [Nebius Token Factory](https://tokenfactory.nebius.com), OpenAI-compatible API; model IDs, prices and routing in `conf/models.yaml` |
 | The live demo: Caddy, the app and Batfish | One CPU VM on Nebius AI Cloud with `docker compose` |
 | Vendor documentation links | [Tavily](https://tavily.com), searching only the vendors' own documentation sites |
 
-A run makes three model calls when the first draft passes (Nano plans, Super writes, Nano
-explains) and one more per repair round, up to three, with Ultra taking over a repair that
-Super could not finish. Where Token Factory made the difference:
+A run makes three model calls when the first draft passes (Lightning plans, Super-VL writes,
+Lightning explains) and one more per repair round, up to three, with Ultra taking over a
+repair that Super-VL could not finish. Where Token Factory made the difference:
 
 - **Three Nemotron sizes behind one endpoint**, so each step gets the model it needs and
   routing is configuration, not code. The benchmarks measured that choice.
 - **Strict JSON-schema output** for the planner, so its intent is parsed, never scraped.
 - **Model IDs and prices from the API**; `fabloom doctor` checks every configured model
-  nightly, so a retired ID is caught before a visitor finds it.
+  nightly, so a retired ID is caught before a visitor finds it. When two models were
+  retired in November, the swap was a config change, measured on both benchmarks first.
 - **Cheap enough to measure honestly**: both benchmarks, 394 runs through the real loop,
   cost about $3.
 
@@ -136,7 +153,7 @@ runs read-only. Configuration, the benchmark commands and deployment are in
 - Benchmark samples are small (one run per arm and scenario, five scenarios per new
   platform); differences of a scenario or two are noise.
 - Reported spend is tokens × the list prices in `conf/models.yaml`, confirmed against Token
-  Factory on 22 Oct 2026, not an invoice.
+  Factory on 22 Oct and 4 Nov 2026, not an invoice.
 
 ## Roadmap
 
@@ -144,7 +161,7 @@ runs read-only. Configuration, the benchmark commands and deployment are in
   scenarios against Nemotron, for a local mode where configs never leave the network.
 - **Routed by verification**: the small model writes first; when Batfish rejects its
   configs, a larger model repairs them. The verifier decides when to escalate, as it does
-  from Super to Ultra today.
+  from Super-VL to Ultra today.
 - **Any provider**: per-model endpoints for any OpenAI-compatible server (vLLM, Ollama,
   Hugging Face) and a bring-your-own-key option for hosted models such as Claude or GPT, with
   the key used for one run and never stored.

@@ -1,0 +1,775 @@
+{
+  "at": "2026-11-04T20:15:06.055041+00:00",
+  "summary": {
+    "lightning-think": {
+      "exact": "72/74",
+      "errors": 1,
+      "median_completion_tokens": 2458,
+      "max_completion_tokens": 11645,
+      "cost_usd": 0.0569,
+      "wrong_fields": {
+        "filters": 1
+      }
+    }
+  },
+  "rows": [
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-custom-asn-0001",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 11645,
+      "cost": 0.0028726199999999998,
+      "ms": 138740,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-custom-asn-0002",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 1854,
+      "cost": 0.0005230799999999999,
+      "ms": 16635,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-custom-asn-0003",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 1519,
+      "cost": 0.00044214,
+      "ms": 20190,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-custom-asn-0004",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 4289,
+      "cost": 0.00110766,
+      "ms": 31200,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-custom-asn-0005",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 2319,
+      "cost": 0.00063408,
+      "ms": 29931,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-custom-pools-0001",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 3241,
+      "cost": 0.00085692,
+      "ms": 45134,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-custom-pools-0002",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 2296,
+      "cost": 0.0006303,
+      "ms": 18022,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-custom-pools-0003",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 2652,
+      "cost": 0.0007156800000000001,
+      "ms": 36435,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-custom-pools-0004",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 3457,
+      "cost": 0.00090882,
+      "ms": 21765,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-custom-pools-0005",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 3363,
+      "cost": 0.00088536,
+      "ms": 45418,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-ebgp-0001",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 3190,
+      "cost": 0.000843,
+      "ms": 42832,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-ebgp-0002",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 1433,
+      "cost": 0.00042173999999999993,
+      "ms": 21047,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-ebgp-0003",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 2038,
+      "cost": 0.0005665199999999999,
+      "ms": 28073,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-ebgp-0004",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 5218,
+      "cost": 0.00132978,
+      "ms": 70103,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-ebgp-0005",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 1171,
+      "cost": 0.00035873999999999997,
+      "ms": 16442,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-ebgp-0006",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 3234,
+      "cost": 0.00085392,
+      "ms": 44953,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-ebgp-0007",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 1455,
+      "cost": 0.0004275,
+      "ms": 23727,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-ebgp-0008",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 2508,
+      "cost": 0.00068016,
+      "ms": 12451,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-ebgp-0009",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 3992,
+      "cost": 0.0010355999999999998,
+      "ms": 54974,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-ebgp-0010",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 1307,
+      "cost": 0.00039126,
+      "ms": 17819,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-ebgp-0011",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 5000,
+      "cost": 0.00127812,
+      "ms": 61039,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-eos-0001",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 2207,
+      "cost": 0.0006076199999999999,
+      "ms": 11185,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-eos-0002",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 6774,
+      "cost": 0.00170352,
+      "ms": 70519,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-eos-0003",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 2242,
+      "cost": 0.00061602,
+      "ms": 18530,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-eos-0004",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 2637,
+      "cost": 0.0007103400000000001,
+      "ms": 24218,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-eos-0005",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 6074,
+      "cost": 0.00153594,
+      "ms": 69446,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-eos-0006",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 2458,
+      "cost": 0.00066726,
+      "ms": 29661,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-eos-0007",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 1852,
+      "cost": 0.0005225999999999999,
+      "ms": 23396,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-eos-0008",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 2429,
+      "cost": 0.0006605999999999999,
+      "ms": 36302,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-eos-0009",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 2173,
+      "cost": 0.0005987400000000001,
+      "ms": 29425,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-eos-0010",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 2737,
+      "cost": 0.0007347,
+      "ms": 36916,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-filters-0001",
+      "platform": "arista_eos",
+      "ok": false,
+      "error": "LlmOutputError: output truncated at max_output_tokens"
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-filters-0002",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 2177,
+      "cost": 0.00059946,
+      "ms": 36415,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-filters-0003",
+      "platform": "arista_eos",
+      "ok": false,
+      "completion_tokens": 3262,
+      "cost": 0.0008613,
+      "ms": 44064,
+      "diff": {
+        "filters": {
+          "got": [
+            {
+              "devices": "spines*",
+              "action": "deny",
+              "protocol": "udp",
+              "dst_port": 161,
+              "src_not_in": "10.0.0.0/8"
+            }
+          ],
+          "want": [
+            {
+              "devices": "spine*",
+              "action": "deny",
+              "protocol": "udp",
+              "dst_port": 161,
+              "src_not_in": "10.0.0.0/8"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-filters-0004",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 5049,
+      "cost": 0.0012897,
+      "ms": 81216,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-filters-0005",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 3088,
+      "cost": 0.00081942,
+      "ms": 57528,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-filters-0006",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 1879,
+      "cost": 0.00052848,
+      "ms": 42997,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-filters-0007",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 4347,
+      "cost": 0.0011210999999999999,
+      "ms": 74384,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-filters-0008",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 5577,
+      "cost": 0.00141822,
+      "ms": 83851,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-filters-0009",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 3030,
+      "cost": 0.0008056199999999998,
+      "ms": 62100,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-unnumbered-0001",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 5985,
+      "cost": 0.0015137399999999997,
+      "ms": 79030,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-unnumbered-0002",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 2642,
+      "cost": 0.0007114799999999999,
+      "ms": 34268,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-unnumbered-0003",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 1105,
+      "cost": 0.00034308,
+      "ms": 14570,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-unnumbered-0004",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 2644,
+      "cost": 0.0007117199999999999,
+      "ms": 36493,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-unnumbered-0005",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 1536,
+      "cost": 0.00044639999999999995,
+      "ms": 20388,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-unnumbered-0006",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 2615,
+      "cost": 0.00070512,
+      "ms": 35410,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-unnumbered-0007",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 2705,
+      "cost": 0.0007271999999999999,
+      "ms": 43240,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-unnumbered-0008",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 2763,
+      "cost": 0.0007407000000000001,
+      "ms": 46112,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "leaf-spine-unverifiable-0001",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 1555,
+      "cost": 0.00045072,
+      "ms": 28714,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-iosxe-0001",
+      "platform": "cisco_iosxe",
+      "ok": true,
+      "completion_tokens": 7826,
+      "cost": 0.00195582,
+      "ms": 55889,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-iosxe-0002",
+      "platform": "cisco_iosxe",
+      "ok": true,
+      "completion_tokens": 1906,
+      "cost": 0.0005348400000000001,
+      "ms": 12862,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-iosxe-0003",
+      "platform": "cisco_iosxe",
+      "ok": true,
+      "completion_tokens": 1305,
+      "cost": 0.00039132,
+      "ms": 10847,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-iosxe-0004",
+      "platform": "cisco_iosxe",
+      "ok": true,
+      "completion_tokens": 1958,
+      "cost": 0.0005478,
+      "ms": 13966,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-iosxe-0005",
+      "platform": "cisco_iosxe",
+      "ok": true,
+      "completion_tokens": 5183,
+      "cost": 0.0013219199999999999,
+      "ms": 40504,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-iosxr-0001",
+      "platform": "cisco_iosxr",
+      "ok": true,
+      "completion_tokens": 2862,
+      "cost": 0.0007643400000000001,
+      "ms": 40075,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-iosxr-0002",
+      "platform": "cisco_iosxr",
+      "ok": true,
+      "completion_tokens": 1754,
+      "cost": 0.0004982400000000001,
+      "ms": 30966,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-iosxr-0003",
+      "platform": "cisco_iosxr",
+      "ok": true,
+      "completion_tokens": 1048,
+      "cost": 0.00032952,
+      "ms": 22329,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-iosxr-0004",
+      "platform": "cisco_iosxr",
+      "ok": true,
+      "completion_tokens": 1873,
+      "cost": 0.00052728,
+      "ms": 32477,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-iosxr-0005",
+      "platform": "cisco_iosxr",
+      "ok": true,
+      "completion_tokens": 4291,
+      "cost": 0.0011077199999999998,
+      "ms": 39596,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-junos-0001",
+      "platform": "junos",
+      "ok": true,
+      "completion_tokens": 1765,
+      "cost": 0.00050094,
+      "ms": 16047,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-junos-0002",
+      "platform": "junos",
+      "ok": true,
+      "completion_tokens": 1525,
+      "cost": 0.00044315999999999995,
+      "ms": 19327,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-junos-0003",
+      "platform": "junos",
+      "ok": true,
+      "completion_tokens": 4642,
+      "cost": 0.00119196,
+      "ms": 53797,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-junos-0004",
+      "platform": "junos",
+      "ok": true,
+      "completion_tokens": 1424,
+      "cost": 0.0004194,
+      "ms": 17656,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-junos-0005",
+      "platform": "junos",
+      "ok": true,
+      "completion_tokens": 2142,
+      "cost": 0.0005918399999999999,
+      "ms": 26498,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-nxos-0001",
+      "platform": "cisco_nxos",
+      "ok": true,
+      "completion_tokens": 1727,
+      "cost": 0.0004919999999999999,
+      "ms": 21755,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-nxos-0002",
+      "platform": "cisco_nxos",
+      "ok": true,
+      "completion_tokens": 2987,
+      "cost": 0.00079422,
+      "ms": 38259,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-nxos-0003",
+      "platform": "cisco_nxos",
+      "ok": true,
+      "completion_tokens": 2641,
+      "cost": 0.0007119000000000001,
+      "ms": 39655,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-nxos-0004",
+      "platform": "cisco_nxos",
+      "ok": true,
+      "completion_tokens": 1978,
+      "cost": 0.0005525399999999999,
+      "ms": 26872,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-nxos-0005",
+      "platform": "cisco_nxos",
+      "ok": true,
+      "completion_tokens": 2351,
+      "cost": 0.0006421800000000001,
+      "ms": 33519,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-sonic-0001",
+      "platform": "sonic",
+      "ok": true,
+      "completion_tokens": 3309,
+      "cost": 0.0008711999999999999,
+      "ms": 16685,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-sonic-0002",
+      "platform": "sonic",
+      "ok": true,
+      "completion_tokens": 1174,
+      "cost": 0.00035874,
+      "ms": 6005,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-sonic-0003",
+      "platform": "sonic",
+      "ok": true,
+      "completion_tokens": 1284,
+      "cost": 0.00038574,
+      "ms": 6833,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-sonic-0004",
+      "platform": "sonic",
+      "ok": true,
+      "completion_tokens": 2110,
+      "cost": 0.0005832,
+      "ms": 10901,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-think",
+      "scenario": "vendor-sonic-0005",
+      "platform": "sonic",
+      "ok": true,
+      "completion_tokens": 1656,
+      "cost": 0.00047502,
+      "ms": 8002,
+      "diff": {}
+    }
+  ]
+}

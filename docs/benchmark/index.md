@@ -17,6 +17,47 @@ Every number in a report is derived from run event logs. `fabloom bench report` 
 report from a bench directory without a model call. Pass rates carry 95% Wilson intervals,
 percentiles are nearest-rank, and negative results are published.
 
+## Nemotron 3.5 results (4 November 2026)
+
+Token Factory retires Nemotron 3 Nano and Super on 9 November 2026. Both sets were re-run with
+their replacements, Nemotron 3.5 Lightning (planner, explainer, thinking off) and Super-VL
+(generator, repairer, thinking on, 32,000-token output cap), on the `super-repair` and
+`routed` arms only ([ADR-0010](../decisions/ADR-0010-nemotron-3.5-migration.md)). Generated
+reports: [v0.1-nemotron35.md](v0.1-nemotron35.md) and
+[vendors-v0.1-nemotron35.md](vendors-v0.1-nemotron35.md). Same Batfish, prompts and
+scenario sets as below.
+
+| Arm | v0.1 first → final | Vendors first → final | $/scenario (v0.1 / vendors) | Nemotron 3, final (v0.1 / vendors) |
+|---|---|---|---|---|
+| `super-repair` | 44 → 49/49 | 19 → 25/25 | $0.0087 / $0.0107 | 46/49 / 23/25 |
+| `routed` | 41 → 49/49 | 20 → 25/25 | $0.0096 / $0.0109 | 47/49 / 25/25 |
+
+### What the numbers show
+
+*Hand-written reading of the two reports and the runs that led to them.*
+
+- **No regression; every gate against the frozen v0.1 baseline passed.** Both arms passed
+  every scenario on both sets, and first-pass rates rose (super-repair 76% → 90% on v0.1).
+- **About 20–35% more per scenario**, still about one cent: Super-VL writes more reasoning
+  tokens than Super did, at the same list price.
+- **Super-VL needs room to think.** With the old 12,000-token cap it truncated every
+  10-device vendor fabric (routed 20/25): about 9,300 reasoning tokens plus 4,000 of config.
+  With thinking off the configs fit, but `super-repair` failed all five SONiC scenarios and
+  `routed` reached 23/25 by paying for Ultra. Both negative runs are in ADR-0010.
+- **The planner is now measured too.** The benchmark grades against ground-truth intent, so
+  `spikes/planner_sweep.py` checks the planner separately: Lightning with thinking off read
+  69 of 74 requests exactly in ~2 s, against 65 of 74 in ~12 s for Nano. Two of its misses
+  chose BGP unnumbered for a request that said "/31", an error this benchmark cannot see.
+
+### How far to trust them
+
+- One run per arm and scenario. 49/49 has a 95% interval of 93–100% and 46/49 one of
+  83–98%: the overlap means "did not get worse", not "got better".
+- The reports name commit `c5ffba1`; the routing change was uncommitted at the time. The
+  routing they list per arm is the one in `conf/models.yaml` from v0.2.4.
+- One call timed out four times during a slow spell on Token Factory; the harness stopped on
+  the infrastructure error and the resumed bench re-ran only the unfinished runs.
+
 ## v0.1 results (23 October 2026)
 
 The full generated report is [v0.1.md](v0.1.md). It comes from the event logs of 294 runs

@@ -5,24 +5,34 @@
 # to every model (ADR-0005). A model added later starts `price_verified: false` with a
 # pessimistic price until it is checked the same way.
 # `fabloom doctor` asserts every ID below exists on Token Factory and answers in JSON mode.
+#
+# 4 Nov 2026: Token Factory retires Nemotron 3 Nano and Super on 9 Nov. The slots keep their
+# names; Nano became Nemotron 3.5 Lightning and Super became Nemotron 3.5 Super-VL, both
+# re-checked the same way (same base URL, same prices, 1M context).
 
 models:
   nano:
-    id: nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B
+    id: nvidia/Nemotron-3_5-Lightning
     usd_per_m_input: 0.06
     usd_per_m_output: 0.24
     price_verified: true
-    # 262k context and no separate output cap advertised. 4096 truncated ~9 of the 49 v0.1
-    # scenarios, so nano-raw measured the cap, not the model; matched to Super instead.
     max_output_tokens: 12000
     temperature: 0.0        # planner output is structured; no creativity wanted
+    # With thinking on, Lightning matched 72/74 benchmark intents but reasoned 2.5k tokens at
+    # the median (31 s), and once ran past 12000 and truncated. Off, it matched 69/74 in ~2 s;
+    # the retiring Nano matched 65/74 in ~12 s.
+    extra_body:
+      chat_template_kwargs: {enable_thinking: false}
   super:
-    id: nvidia/nemotron-3-super-120b-a12b
+    id: nvidia/Nemotron-3.5-Super-VL
     usd_per_m_input: 0.30
     usd_per_m_output: 0.90
     price_verified: true
-    max_output_tokens: 12000  # a 20-device fabric is ~10k tokens of config
-    temperature: 0.2
+    # Super-VL reasons before it writes: on a 10-device fabric ~9.3k thinking tokens plus ~4k
+    # of config, so 12000 truncated every *-0005 vendor scenario. Thinking off fits, but then
+    # super-repair failed all five SONiC scenarios; thinking on with room passed 25/25.
+    max_output_tokens: 32000
+    temperature: 0.2          # Super-VL advertises no sampling parameters; likely ignored
   ultra:
     id: nvidia/Nemotron-3-Ultra-550b-a55b
     usd_per_m_input: 1.00

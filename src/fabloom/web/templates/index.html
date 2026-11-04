@@ -20,12 +20,12 @@
 
 <section class="section" id="how">
   <ol class="pipeline">
-    <li class="step"><strong>Plan</strong><p>Reads your request into a structured intent.</p><span class="who">Nemotron Nano</span></li>
+    <li class="step"><strong>Plan</strong><p>Reads your request into a structured intent.</p><span class="who">Nemotron Lightning</span></li>
     <li class="step step-det"><strong>Compile checks</strong><p>Derives the checks from the intent. No model can change them.</p><span class="who">deterministic</span></li>
-    <li class="step"><strong>Generate</strong><p>Writes the config for every device.</p><span class="who">Nemotron Super</span></li>
+    <li class="step"><strong>Generate</strong><p>Writes the config for every device.</p><span class="who">Nemotron Super-VL</span></li>
     <li class="step step-verify"><strong>Verify</strong><p>Parses the configs and simulates the fabric.</p><span class="who">Batfish</span></li>
-    <li class="step"><strong>Repair</strong><p>Fixes what failed, escalating if needed.</p><span class="who">Super → Ultra</span></li>
-    <li class="step"><strong>Explain</strong><p>Summarises what was built and checked.</p><span class="who">Nemotron Nano</span></li>
+    <li class="step"><strong>Repair</strong><p>Fixes what failed, escalating if needed.</p><span class="who">Super-VL → Ultra</span></li>
+    <li class="step"><strong>Explain</strong><p>Summarises what was built and checked.</p><span class="who">Nemotron Lightning</span></li>
   </ol>
   <p class="loop-note">Verify and repair loop until every check passes or the run's budget is used up.</p>
 </section>

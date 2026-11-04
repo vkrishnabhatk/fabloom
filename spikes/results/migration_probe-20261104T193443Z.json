@@ -1,0 +1,362 @@
+{
+  "at": "2026-11-04T19:32:26.381309+00:00",
+  "base_url": "https://api.tokenfactory.nebius.com/v1/",
+  "listing": {
+    "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B": {
+      "id": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+      "name": "Nemotron-3-Nano-30B-A3B",
+      "created": 1793820736,
+      "description": "Compact MoE model optimized for efficient reasoning, chat, and coding with strong multilingual support and long-context RAG/agent workflows.",
+      "context_length": 262144,
+      "architecture": {
+        "modality": "text->text",
+        "tokenizer": "Other"
+      },
+      "quantization": "fp8",
+      "pricing": {
+        "prompt": "0.00000006",
+        "input_cache_read": "0.000000012",
+        "completion": "0.00000024",
+        "image": "0",
+        "price_per_video_second": "0",
+        "request": "0",
+        "price_per_minute": "0"
+      },
+      "per_request_limits": {
+        "tokens_per_minute": 800000.0,
+        "requests_per_minute": 100.0,
+        "burst_ratio": 1.0
+      },
+      "object": "model",
+      "owned_by": "system",
+      "regions": [
+        {
+          "country_code": "FI",
+          "name": "eu-north1"
+        }
+      ],
+      "supported_features": [
+        "tools",
+        "reasoning"
+      ],
+      "supported_sampling_parameters": [
+        "temperature",
+        "top_p",
+        "top_k",
+        "repetition_penalty",
+        "frequency_penalty",
+        "presence_penalty"
+      ]
+    },
+    "nvidia/Nemotron-3_5-Lightning": {
+      "id": "nvidia/Nemotron-3_5-Lightning",
+      "name": "Nemotron-3.5-Lightning",
+      "created": 1786406400,
+      "description": "NVIDIA's 30B-parameter hybrid MoE model with 3B active parameters per token, designed for efficient agentic reasoning, tool use, coding, and long-context workflows.",
+      "context_length": 1048576,
+      "architecture": {
+        "modality": "text->text",
+        "tokenizer": "Other"
+      },
+      "quantization": "bf16",
+      "pricing": {
+        "prompt": "0.00000006",
+        "input_cache_read": "0.00000003",
+        "completion": "0.00000024",
+        "image": "0",
+        "price_per_video_second": "0",
+        "request": "0",
+        "price_per_minute": "0"
+      },
+      "per_request_limits": {
+        "tokens_per_minute": 2000000.0,
+        "requests_per_minute": 1000.0,
+        "burst_ratio": 1.0
+      },
+      "object": "model",
+      "owned_by": "system",
+      "regions": [
+        {
+          "country_code": "FI",
+          "name": "eu-north1"
+        }
+      ],
+      "supported_features": [
+        "tools",
+        "reasoning"
+      ],
+      "supported_sampling_parameters": [
+        "temperature",
+        "top_p",
+        "top_k",
+        "repetition_penalty",
+        "frequency_penalty",
+        "presence_penalty"
+      ]
+    },
+    "nvidia/Nemotron-3-Ultra-550b-a55b": {
+      "id": "nvidia/Nemotron-3-Ultra-550b-a55b",
+      "name": "Nemotron-3-Ultra-550b-a55b",
+      "created": 1780531200,
+      "description": "Nemotron 3 Ultra is a 550B hybrid MoE model from NVIDIA, optimized for the most demanding multi-agent AI and complex reasoning tasks.",
+      "context_length": 1048576,
+      "architecture": {
+        "modality": "text->text",
+        "tokenizer": "Other"
+      },
+      "quantization": "fp4",
+      "pricing": {
+        "prompt": "0.000001",
+        "input_cache_read": "0.00000012",
+        "completion": "0.000003",
+        "image": "0",
+        "price_per_video_second": "0",
+        "request": "0",
+        "price_per_minute": "0"
+      },
+      "per_request_limits": {
+        "tokens_per_minute": 2000000.0,
+        "requests_per_minute": 1000.0,
+        "burst_ratio": 1.0
+      },
+      "object": "model",
+      "owned_by": "system",
+      "regions": [
+        {
+          "country_code": "US",
+          "name": "us-central1"
+        }
+      ],
+      "supported_features": [
+        "tools",
+        "reasoning"
+      ],
+      "supported_sampling_parameters": [
+        "temperature",
+        "top_p",
+        "top_k",
+        "repetition_penalty",
+        "frequency_penalty",
+        "presence_penalty"
+      ]
+    },
+    "nvidia/nemotron-3-super-120b-a12b": {
+      "id": "nvidia/nemotron-3-super-120b-a12b",
+      "name": "Nemotron-3-Super-120b-a12b",
+      "created": 1773187200,
+      "description": "Nemotron 3 Super is a 120B hybrid MoE model optimized for efficient multi-agent AI and complex reasoning tasks.",
+      "context_length": 262144,
+      "architecture": {
+        "modality": "text->text",
+        "tokenizer": "Other"
+      },
+      "quantization": "fp4",
+      "pricing": {
+        "prompt": "0.0000003",
+        "input_cache_read": "0.00000006",
+        "completion": "0.0000009",
+        "image": "0",
+        "price_per_video_second": "0",
+        "request": "0",
+        "price_per_minute": "0"
+      },
+      "per_request_limits": {
+        "tokens_per_minute": 1000000.0,
+        "requests_per_minute": 1000.0,
+        "burst_ratio": 1.0
+      },
+      "object": "model",
+      "owned_by": "system",
+      "regions": [
+        {
+          "country_code": "US",
+          "name": "us-central1"
+        }
+      ],
+      "supported_features": [
+        "tools",
+        "reasoning"
+      ],
+      "supported_sampling_parameters": [
+        "temperature",
+        "top_p",
+        "top_k",
+        "repetition_penalty",
+        "frequency_penalty",
+        "presence_penalty"
+      ]
+    },
+    "nvidia/Nemotron-3.5-Super-VL": {
+      "id": "nvidia/Nemotron-3.5-Super-VL",
+      "name": "Nemotron 3.5 Super VL",
+      "created": 1791841710,
+      "description": "NVIDIA's multimodal model for visual understanding, coding, reasoning, and tool use. It processes text, images, and video to generate text responses.",
+      "context_length": 1048576,
+      "architecture": {
+        "modality": "text+image->text",
+        "tokenizer": "Other"
+      },
+      "quantization": "bf16",
+      "pricing": {
+        "prompt": "0.0000003",
+        "input_cache_read": "0.00000006",
+        "completion": "0.0000009",
+        "image": "0",
+        "price_per_video_second": "0",
+        "request": "0",
+        "price_per_minute": "0"
+      },
+      "per_request_limits": {
+        "tokens_per_minute": 2000000.0,
+        "requests_per_minute": 1000.0,
+        "burst_ratio": 1.0
+      },
+      "object": "model",
+      "owned_by": "system",
+      "regions": [
+        {
+          "country_code": "US",
+          "name": "us-north1"
+        }
+      ],
+      "supported_features": [
+        "tools",
+        "reasoning"
+      ],
+      "supported_sampling_parameters": []
+    }
+  },
+  "nemotron_ids": [
+    "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+    "nvidia/Nemotron-3-Ultra-550b-a55b",
+    "nvidia/Nemotron-3.5-Super-VL",
+    "nvidia/Nemotron-3_5-Lightning",
+    "nvidia/nemotron-3-super-120b-a12b"
+  ],
+  "probe": {
+    "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B": {
+      "ok": true,
+      "error": null,
+      "ms": 2320
+    },
+    "nvidia/Nemotron-3_5-Lightning": {
+      "ok": true,
+      "error": null,
+      "ms": 764
+    },
+    "nvidia/nemotron-3-super-120b-a12b": {
+      "ok": true,
+      "error": null,
+      "ms": 2074
+    },
+    "nvidia/Nemotron-3.5-Super-VL": {
+      "ok": true,
+      "error": null,
+      "ms": 540
+    }
+  },
+  "planner": [
+    {
+      "scenario": "leaf-spine-ebgp-0002",
+      "model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+      "intent_matches": true,
+      "diff": {},
+      "prompt_tokens": 1297,
+      "completion_tokens": 502,
+      "cost_usd_at_old_price": 0.0002,
+      "ms": 5940
+    },
+    {
+      "scenario": "leaf-spine-ebgp-0002",
+      "model": "nvidia/Nemotron-3_5-Lightning",
+      "intent_matches": true,
+      "diff": {},
+      "prompt_tokens": 1297,
+      "completion_tokens": 2662,
+      "cost_usd_at_old_price": 0.00072,
+      "ms": 9021
+    },
+    {
+      "scenario": "vendor-nxos-0001",
+      "model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+      "intent_matches": true,
+      "diff": {},
+      "prompt_tokens": 1292,
+      "completion_tokens": 727,
+      "cost_usd_at_old_price": 0.00025,
+      "ms": 8339
+    },
+    {
+      "scenario": "vendor-nxos-0001",
+      "model": "nvidia/Nemotron-3_5-Lightning",
+      "error": "LlmOutputError: output truncated at max_output_tokens"
+    }
+  ],
+  "generator": [
+    {
+      "scenario": "leaf-spine-ebgp-0002",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "devices": [
+        "leaf1",
+        "leaf2",
+        "spine1",
+        "spine2"
+      ],
+      "prelint": "4/4",
+      "prelint_failures": {},
+      "prompt_tokens": 852,
+      "completion_tokens": 3318,
+      "cost_usd_at_old_price": 0.00324,
+      "ms": 15448
+    },
+    {
+      "scenario": "leaf-spine-ebgp-0002",
+      "model": "nvidia/Nemotron-3.5-Super-VL",
+      "devices": [
+        "leaf1",
+        "leaf2",
+        "spine1",
+        "spine2"
+      ],
+      "prelint": "4/4",
+      "prelint_failures": {},
+      "prompt_tokens": 852,
+      "completion_tokens": 4320,
+      "cost_usd_at_old_price": 0.00414,
+      "ms": 9901
+    },
+    {
+      "scenario": "vendor-nxos-0001",
+      "model": "nvidia/nemotron-3-super-120b-a12b",
+      "devices": [
+        "leaf1",
+        "leaf2",
+        "spine1",
+        "spine2"
+      ],
+      "prelint": "4/4",
+      "prelint_failures": {},
+      "prompt_tokens": 947,
+      "completion_tokens": 5227,
+      "cost_usd_at_old_price": 0.00499,
+      "ms": 23123
+    },
+    {
+      "scenario": "vendor-nxos-0001",
+      "model": "nvidia/Nemotron-3.5-Super-VL",
+      "devices": [
+        "leaf1",
+        "leaf2",
+        "spine1",
+        "spine2"
+      ],
+      "prelint": "4/4",
+      "prelint_failures": {},
+      "prompt_tokens": 947,
+      "completion_tokens": 4646,
+      "cost_usd_at_old_price": 0.00447,
+      "ms": 10506
+    }
+  ],
+  "total_cost_usd_at_old_prices": 0.018
+}

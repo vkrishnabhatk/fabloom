@@ -109,9 +109,10 @@ the frozen baseline passed.
 - Better pass rates on both sets, at about 20–35% more per scenario (still about a cent).
   One run per arm and scenario: the 95% intervals overlap the old results, so this shows the
   migration did not regress, not that Super-VL is better.
-- The client timeout is 180 s per attempt (`llm/client.py`). At ~140 tokens/s a response near
-  the new 32000 cap would need about 230 s. The longest seen was 17,704 tokens in 128 s, so
-  ordinary fabrics fit; a very large fabric on a slow day might not. Not changed here.
+- The client timeout rose from 180 s to 240 s per attempt (`llm/client.py`). A non-streamed
+  answer arrives all at once, and at ~140 tokens/s a response at the new 32000 cap needs
+  about 230 s; the longest seen was 17,704 tokens in 128 s. Four attempts plus backoff
+  (~1,020 s) still end before the web app drops the event stream at 1,200 s.
 - The old benchmark reports stay as they are, dated, with the models they measured.
 
 ## Alternatives considered

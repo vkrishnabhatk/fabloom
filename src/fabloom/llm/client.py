@@ -94,7 +94,10 @@ class TokenFactoryClient:
         http_client: httpx2.AsyncClient | None = None,
         max_attempts: int = 4,
         max_backoff_s: float = 20.0,
-        timeout_s: float = 180.0,
+        # A non-streamed answer arrives all at once, so this bounds generation time. Super-VL
+        # writes ~140 tokens/s: 32000 tokens (its cap, ADR-0010) need ~230 s. All attempts
+        # plus backoff (~4 x 240 + 60 s) stay under the web app's SSE_TIMEOUT_S of 1200 s.
+        timeout_s: float = 240.0,
     ) -> None:
         self._client = AsyncOpenAI(
             api_key=api_key,

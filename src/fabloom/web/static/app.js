@@ -23,9 +23,13 @@ const PLATFORMS = {
   cisco_iosxe: "Cisco IOS-XE", cisco_iosxr: "Cisco IOS-XR", sonic: "SONiC",
 };
 
+// Keeps the version: gallery runs from before 9 Nov 2026 used Nemotron 3 Nano and Super,
+// newer runs Nemotron 3.5 Lightning and Super-VL (ADR-0010).
 function modelName(id) {
-  const m = /nemotron-3-(nano|super|ultra)/i.exec(id || "");
-  return m ? "Nemotron " + m[1][0].toUpperCase() + m[1].slice(1).toLowerCase() : id;
+  const m = /nemotron-(3(?:[._]5)?)-(nano|super|ultra|lightning)(-vl)?/i.exec(id || "");
+  if (!m) return id;
+  const size = m[2][0].toUpperCase() + m[2].slice(1).toLowerCase();
+  return "Nemotron " + m[1].replace("_", ".") + " " + size + (m[3] ? "-VL" : "");
 }
 
 // Check kinds as compiled in checks/compile.py, in the order a reader would follow them.

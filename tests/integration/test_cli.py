@@ -150,7 +150,9 @@ def _chat(content: str) -> dict[str, Any]:
 
 
 def test_doctor(monkeypatch: pytest.MonkeyPatch) -> None:
-    listed = {"nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B", "nvidia/nemotron-3-super-120b-a12b"}
+    # Read from the config, so swapping a model ID does not break this test.
+    models = models_config().models
+    listed = {models["nano"].id, models["super"].id}
 
     def handler(req: httpx2.Request) -> httpx2.Response:
         if req.url.path.endswith("/models"):
@@ -164,7 +166,7 @@ def test_doctor(monkeypatch: pytest.MonkeyPatch) -> None:
     )  # fmt: skip
     monkeypatch.setattr(cli, "build_client", lambda s: client)
     result = runner.invoke(cli.app, ["doctor"])
-    assert result.exit_code == 1  # ultra and lightning are not in the listing
+    assert result.exit_code == 1  # ultra is not in the listing
     assert "ok   nano" in result.output
     assert "FAIL ultra" in result.output
     assert "not listed by /v1/models" in result.output

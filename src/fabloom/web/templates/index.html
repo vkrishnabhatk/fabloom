@@ -8,24 +8,24 @@
     Juniper Junos, Cisco NX-OS, IOS-XE or IOS-XR, Arista EOS, SONiC or FRR. Batfish then checks them against checks compiled from your request, and
     failed checks go back to the model to repair. The verdict comes from Batfish, never from the model.</p>
   <div class="stats">
-    <div class="stat"><b>47 / 49</b><span>benchmark fabrics verified</span></div>
-    <div class="stat"><b>$0.008</b><span>average model cost per fabric</span></div>
-    <div class="stat"><b>37 → 46</b><span>fabrics passing after repair</span></div>
+    <div class="stat"><b>49 / 49</b><span>benchmark fabrics verified</span></div>
+    <div class="stat"><b>$0.010</b><span>average model cost per fabric</span></div>
+    <div class="stat"><b>44 → 49</b><span>fabrics passing after repair</span></div>
   </div>
-  <p class="stats-note">Benchmark v0.1, 49 scenarios, every result checked by Batfish: routed models
-    for the first two, Nemotron Super first pass vs. after repair for the third. On Junos,
-    NX-OS, IOS-XE, IOS-XR and SONiC the routed product passed 25 of 25.
+  <p class="stats-note">Benchmark v0.1, 49 scenarios, every result checked by Batfish, Nemotron 3.5
+    (4 Nov 2026): routed models for the first two, Nemotron Super-VL first pass vs. after repair
+    for the third. On Junos, NX-OS, IOS-XE, IOS-XR and SONiC the routed product passed 25 of 25.
     <a href="https://github.com/vkrishnabhatk/fabloom/blob/main/docs/benchmark/index.md">How it was measured</a></p>
 </section>
 
 <section class="section" id="how">
   <ol class="pipeline">
-    <li class="step"><strong>Plan</strong><p>Reads your request into a structured intent.</p><span class="who">Nemotron Nano</span></li>
+    <li class="step"><strong>Plan</strong><p>Reads your request into a structured intent.</p><span class="who">Nemotron Lightning</span></li>
     <li class="step step-det"><strong>Compile checks</strong><p>Derives the checks from the intent. No model can change them.</p><span class="who">deterministic</span></li>
-    <li class="step"><strong>Generate</strong><p>Writes the config for every device.</p><span class="who">Nemotron Super</span></li>
+    <li class="step"><strong>Generate</strong><p>Writes the config for every device.</p><span class="who">Nemotron Super-VL</span></li>
     <li class="step step-verify"><strong>Verify</strong><p>Parses the configs and simulates the fabric.</p><span class="who">Batfish</span></li>
-    <li class="step"><strong>Repair</strong><p>Fixes what failed, escalating if needed.</p><span class="who">Super → Ultra</span></li>
-    <li class="step"><strong>Explain</strong><p>Summarises what was built and checked.</p><span class="who">Nemotron Nano</span></li>
+    <li class="step"><strong>Repair</strong><p>Fixes what failed, escalating if needed.</p><span class="who">Super-VL → Ultra</span></li>
+    <li class="step"><strong>Explain</strong><p>Summarises what was built and checked.</p><span class="who">Nemotron Lightning</span></li>
   </ol>
   <p class="loop-note">Verify and repair loop until every check passes or the run's budget is used up.</p>
 </section>

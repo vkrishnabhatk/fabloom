@@ -17,13 +17,13 @@ enforces this in CI ([ADR-0001](decisions/ADR-0001-verification-independence.md)
 ## How a run works
 
 ```
-request ──► planner (Nemotron Nano) ──► intent JSON
+request ──► planner (Nemotron Lightning) ──► intent JSON
             deterministic allocator  ──► fabric plan (addresses, ASNs, sessions)
             deterministic compiler   ──► checks
-            generator (Nemotron Super) ──► per-device configs
+            generator (Nemotron Super-VL) ──► per-device configs
             pre-lint gate ──► Batfish ──► report ──┐
-            repairer (Super, escalating to Ultra) ◄┘ until pass or budget/rounds exhausted
-            explainer (Nano) ──► plain-language summary
+            repairer (Super-VL, escalating to Ultra) ◄┘ until pass or budget/rounds exhausted
+            explainer (Lightning) ──► plain-language summary
 ```
 
 Every step is an event in `runs/<run_id>/events.jsonl` ([ADR-0004](decisions/ADR-0004-run-event-log.md)).
@@ -44,4 +44,5 @@ alone passed 20. How that was measured, and how far to trust it, is in
 - [Running Fabloom](running.md): install, CLI, benchmark, web demo, deployment
 - [Benchmark](benchmark/index.md): what is measured, the results and their limits
 - [Decisions](decisions/ADR-0001-verification-independence.md): the architecture decision records,
-  including [more platforms](decisions/ADR-0009-more-platforms.md)
+  including [more platforms](decisions/ADR-0009-more-platforms.md) and the
+  [Nemotron 3.5 migration](decisions/ADR-0010-nemotron-3.5-migration.md)

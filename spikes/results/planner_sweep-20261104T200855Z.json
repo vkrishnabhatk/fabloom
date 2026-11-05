@@ -1,0 +1,1619 @@
+{
+  "at": "2026-11-04T20:08:55.425154+00:00",
+  "summary": {
+    "nano": {
+      "exact": "65/74",
+      "errors": 0,
+      "median_completion_tokens": 776,
+      "max_completion_tokens": 1489,
+      "cost_usd": 0.0201,
+      "wrong_fields": {
+        "asn": 7,
+        "addressing": 1,
+        "filters": 1
+      }
+    },
+    "lightning-nothink": {
+      "exact": "69/74",
+      "errors": 3,
+      "median_completion_tokens": 122,
+      "max_completion_tokens": 203,
+      "cost_usd": 0.0077,
+      "wrong_fields": {
+        "bgp_mode": 2
+      }
+    }
+  },
+  "rows": [
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-custom-asn-0001",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 657,
+      "cost": 0.0002355,
+      "ms": 13995,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-custom-asn-0002",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 735,
+      "cost": 0.00025452,
+      "ms": 14045,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-custom-asn-0003",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 608,
+      "cost": 0.0002235,
+      "ms": 12766,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-custom-asn-0004",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 749,
+      "cost": 0.00025806,
+      "ms": 15144,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-custom-asn-0005",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 669,
+      "cost": 0.00023808,
+      "ms": 13885,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-custom-pools-0001",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 824,
+      "cost": 0.00027684,
+      "ms": 15348,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-custom-pools-0002",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 727,
+      "cost": 0.00025373999999999997,
+      "ms": 13869,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-custom-pools-0003",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 911,
+      "cost": 0.00029783999999999995,
+      "ms": 16305,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-custom-pools-0004",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 882,
+      "cost": 0.00029082,
+      "ms": 11989,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-custom-pools-0005",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 889,
+      "cost": 0.0002916,
+      "ms": 11200,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-ebgp-0001",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 745,
+      "cost": 0.0002562,
+      "ms": 10355,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-ebgp-0002",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 606,
+      "cost": 0.00022326,
+      "ms": 8492,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-ebgp-0003",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 666,
+      "cost": 0.00023724,
+      "ms": 8408,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-ebgp-0004",
+      "platform": "frr",
+      "ok": false,
+      "completion_tokens": 776,
+      "cost": 0.0002637,
+      "ms": 10629,
+      "diff": {
+        "asn": {
+          "got": {
+            "spine_asn": 65000,
+            "leaf_asn_base": 65001
+          },
+          "want": {
+            "spine_asn": 65000,
+            "leaf_asn_base": 65101
+          }
+        }
+      }
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-ebgp-0005",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 534,
+      "cost": 0.00020586,
+      "ms": 8104,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-ebgp-0006",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 693,
+      "cost": 0.00024407999999999998,
+      "ms": 8579,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-ebgp-0007",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 473,
+      "cost": 0.00019182,
+      "ms": 7992,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-ebgp-0008",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 550,
+      "cost": 0.00021024000000000002,
+      "ms": 10471,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-ebgp-0009",
+      "platform": "frr",
+      "ok": false,
+      "completion_tokens": 827,
+      "cost": 0.000276,
+      "ms": 12219,
+      "diff": {
+        "asn": {
+          "got": {
+            "spine_asn": 65000,
+            "leaf_asn_base": 65001
+          },
+          "want": {
+            "spine_asn": 65000,
+            "leaf_asn_base": 65101
+          }
+        }
+      }
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-ebgp-0010",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 757,
+      "cost": 0.00025926,
+      "ms": 10981,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-ebgp-0011",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 756,
+      "cost": 0.00025956,
+      "ms": 10860,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-eos-0001",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 865,
+      "cost": 0.00028554,
+      "ms": 12643,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-eos-0002",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 1024,
+      "cost": 0.00032352,
+      "ms": 14424,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-eos-0003",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 780,
+      "cost": 0.00026513999999999997,
+      "ms": 10764,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-eos-0004",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 696,
+      "cost": 0.0002445,
+      "ms": 10808,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-eos-0005",
+      "platform": "arista_eos",
+      "ok": false,
+      "completion_tokens": 1083,
+      "cost": 0.00033810000000000003,
+      "ms": 15540,
+      "diff": {
+        "addressing": {
+          "got": {
+            "loopback_pool": "10.0.0.0/23",
+            "p2p_pool": "10.1.0.0/31"
+          },
+          "want": {
+            "loopback_pool": "10.0.0.0/23",
+            "p2p_pool": "10.1.0.0/16"
+          }
+        }
+      }
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-eos-0006",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 850,
+      "cost": 0.00028134000000000004,
+      "ms": 14275,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-eos-0007",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 863,
+      "cost": 0.00028524,
+      "ms": 14359,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-eos-0008",
+      "platform": "arista_eos",
+      "ok": false,
+      "completion_tokens": 906,
+      "cost": 0.00029508,
+      "ms": 14002,
+      "diff": {
+        "asn": {
+          "got": {
+            "spine_asn": 65000,
+            "leaf_asn_base": 65001
+          },
+          "want": {
+            "spine_asn": 65000,
+            "leaf_asn_base": 65101
+          }
+        }
+      }
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-eos-0009",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 686,
+      "cost": 0.00024186,
+      "ms": 9463,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-eos-0010",
+      "platform": "arista_eos",
+      "ok": false,
+      "completion_tokens": 1124,
+      "cost": 0.00034758,
+      "ms": 15879,
+      "diff": {
+        "asn": {
+          "got": {
+            "spine_asn": 65000,
+            "leaf_asn_base": 65001
+          },
+          "want": {
+            "spine_asn": 65000,
+            "leaf_asn_base": 65101
+          }
+        }
+      }
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-filters-0001",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 1227,
+      "cost": 0.0003733799999999999,
+      "ms": 16160,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-filters-0002",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 1028,
+      "cost": 0.0003237,
+      "ms": 14589,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-filters-0003",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 1059,
+      "cost": 0.00033257999999999996,
+      "ms": 15197,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-filters-0004",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 1489,
+      "cost": 0.0004353,
+      "ms": 30793,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-filters-0005",
+      "platform": "arista_eos",
+      "ok": false,
+      "completion_tokens": 994,
+      "cost": 0.00031686,
+      "ms": 15033,
+      "diff": {
+        "filters": {
+          "got": [
+            {
+              "devices": "switch*",
+              "action": "deny",
+              "protocol": "tcp",
+              "dst_port": 443,
+              "src_not_in": "192.168.0.0/16"
+            }
+          ],
+          "want": [
+            {
+              "devices": "*",
+              "action": "deny",
+              "protocol": "tcp",
+              "dst_port": 443,
+              "src_not_in": "192.168.0.0/16"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-filters-0006",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 1109,
+      "cost": 0.00034367999999999996,
+      "ms": 17313,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-filters-0007",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 926,
+      "cost": 0.00030005999999999994,
+      "ms": 13389,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-filters-0008",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 1355,
+      "cost": 0.00040494,
+      "ms": 20388,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-filters-0009",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 846,
+      "cost": 0.00028146,
+      "ms": 19403,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-unnumbered-0001",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 848,
+      "cost": 0.00028086,
+      "ms": 23855,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-unnumbered-0002",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 593,
+      "cost": 0.00021971999999999996,
+      "ms": 9160,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-unnumbered-0003",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 777,
+      "cost": 0.00026436,
+      "ms": 12446,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-unnumbered-0004",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 1073,
+      "cost": 0.00033467999999999996,
+      "ms": 16552,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-unnumbered-0005",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 898,
+      "cost": 0.00029328,
+      "ms": 15301,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-unnumbered-0006",
+      "platform": "frr",
+      "ok": false,
+      "completion_tokens": 1300,
+      "cost": 0.00038951999999999997,
+      "ms": 20086,
+      "diff": {
+        "asn": {
+          "got": {
+            "spine_asn": 65000,
+            "leaf_asn_base": 65001
+          },
+          "want": {
+            "spine_asn": 65000,
+            "leaf_asn_base": 65101
+          }
+        }
+      }
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-unnumbered-0007",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 925,
+      "cost": 0.0003,
+      "ms": 13489,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-unnumbered-0008",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 776,
+      "cost": 0.00026382,
+      "ms": 14771,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "leaf-spine-unverifiable-0001",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 810,
+      "cost": 0.00027192000000000004,
+      "ms": 12487,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-iosxe-0001",
+      "platform": "cisco_iosxe",
+      "ok": true,
+      "completion_tokens": 800,
+      "cost": 0.00026958,
+      "ms": 13713,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-iosxe-0002",
+      "platform": "cisco_iosxe",
+      "ok": true,
+      "completion_tokens": 647,
+      "cost": 0.00023268,
+      "ms": 9007,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-iosxe-0003",
+      "platform": "cisco_iosxe",
+      "ok": true,
+      "completion_tokens": 541,
+      "cost": 0.00020795999999999998,
+      "ms": 12501,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-iosxe-0004",
+      "platform": "cisco_iosxe",
+      "ok": true,
+      "completion_tokens": 599,
+      "cost": 0.00022164,
+      "ms": 9812,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-iosxe-0005",
+      "platform": "cisco_iosxe",
+      "ok": true,
+      "completion_tokens": 676,
+      "cost": 0.00024024,
+      "ms": 11252,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-iosxr-0001",
+      "platform": "cisco_iosxr",
+      "ok": true,
+      "completion_tokens": 871,
+      "cost": 0.0002865,
+      "ms": 12672,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-iosxr-0002",
+      "platform": "cisco_iosxr",
+      "ok": true,
+      "completion_tokens": 644,
+      "cost": 0.00023184,
+      "ms": 10183,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-iosxr-0003",
+      "platform": "cisco_iosxr",
+      "ok": true,
+      "completion_tokens": 593,
+      "cost": 0.00022032,
+      "ms": 10506,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-iosxr-0004",
+      "platform": "cisco_iosxr",
+      "ok": true,
+      "completion_tokens": 974,
+      "cost": 0.00031151999999999997,
+      "ms": 14363,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-iosxr-0005",
+      "platform": "cisco_iosxr",
+      "ok": true,
+      "completion_tokens": 646,
+      "cost": 0.00023291999999999999,
+      "ms": 10298,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-junos-0001",
+      "platform": "junos",
+      "ok": false,
+      "completion_tokens": 1139,
+      "cost": 0.00035070000000000007,
+      "ms": 15342,
+      "diff": {
+        "asn": {
+          "got": {
+            "spine_asn": 65000,
+            "leaf_asn_base": 65001
+          },
+          "want": {
+            "spine_asn": 65000,
+            "leaf_asn_base": 65101
+          }
+        }
+      }
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-junos-0002",
+      "platform": "junos",
+      "ok": true,
+      "completion_tokens": 608,
+      "cost": 0.00022307999999999999,
+      "ms": 9324,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-junos-0003",
+      "platform": "junos",
+      "ok": true,
+      "completion_tokens": 448,
+      "cost": 0.00018539999999999998,
+      "ms": 8525,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-junos-0004",
+      "platform": "junos",
+      "ok": true,
+      "completion_tokens": 731,
+      "cost": 0.00025308,
+      "ms": 10817,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-junos-0005",
+      "platform": "junos",
+      "ok": true,
+      "completion_tokens": 708,
+      "cost": 0.00024767999999999996,
+      "ms": 11092,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-nxos-0001",
+      "platform": "cisco_nxos",
+      "ok": true,
+      "completion_tokens": 586,
+      "cost": 0.00021815999999999996,
+      "ms": 8914,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-nxos-0002",
+      "platform": "cisco_nxos",
+      "ok": true,
+      "completion_tokens": 656,
+      "cost": 0.00023478,
+      "ms": 9714,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-nxos-0003",
+      "platform": "cisco_nxos",
+      "ok": true,
+      "completion_tokens": 531,
+      "cost": 0.0002055,
+      "ms": 8139,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-nxos-0004",
+      "platform": "cisco_nxos",
+      "ok": true,
+      "completion_tokens": 713,
+      "cost": 0.00024894,
+      "ms": 11255,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-nxos-0005",
+      "platform": "cisco_nxos",
+      "ok": true,
+      "completion_tokens": 903,
+      "cost": 0.00029466,
+      "ms": 16777,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-sonic-0001",
+      "platform": "sonic",
+      "ok": false,
+      "completion_tokens": 1205,
+      "cost": 0.00036624,
+      "ms": 14804,
+      "diff": {
+        "asn": {
+          "got": {
+            "spine_asn": 65000,
+            "leaf_asn_base": 65010
+          },
+          "want": {
+            "spine_asn": 65000,
+            "leaf_asn_base": 65101
+          }
+        }
+      }
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-sonic-0002",
+      "platform": "sonic",
+      "ok": true,
+      "completion_tokens": 701,
+      "cost": 0.00024522,
+      "ms": 9807,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-sonic-0003",
+      "platform": "sonic",
+      "ok": true,
+      "completion_tokens": 635,
+      "cost": 0.00022998000000000002,
+      "ms": 9416,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-sonic-0004",
+      "platform": "sonic",
+      "ok": true,
+      "completion_tokens": 671,
+      "cost": 0.00023783999999999999,
+      "ms": 10013,
+      "diff": {}
+    },
+    {
+      "arm": "nano",
+      "scenario": "vendor-sonic-0005",
+      "platform": "sonic",
+      "ok": true,
+      "completion_tokens": 697,
+      "cost": 0.00024486,
+      "ms": 10379,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-custom-asn-0001",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 120,
+      "cost": 0.00010661999999999999,
+      "ms": 2620,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-custom-asn-0002",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 122,
+      "cost": 0.0001074,
+      "ms": 1749,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-custom-asn-0003",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 120,
+      "cost": 0.00010638,
+      "ms": 949,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-custom-asn-0004",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 122,
+      "cost": 0.00010758,
+      "ms": 2125,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-custom-asn-0005",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 121,
+      "cost": 0.00010656,
+      "ms": 1636,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-custom-pools-0001",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 124,
+      "cost": 0.00010884000000000001,
+      "ms": 753,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-custom-pools-0002",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 126,
+      "cost": 0.00010949999999999999,
+      "ms": 831,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-custom-pools-0003",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 125,
+      "cost": 0.0001092,
+      "ms": 2484,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-custom-pools-0004",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 122,
+      "cost": 0.00010842,
+      "ms": 2307,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-custom-pools-0005",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 125,
+      "cost": 0.00010824,
+      "ms": 2327,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-ebgp-0001",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 120,
+      "cost": 0.00010619999999999999,
+      "ms": 4692,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-ebgp-0002",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 120,
+      "cost": 0.00010661999999999999,
+      "ms": 787,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-ebgp-0003",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 120,
+      "cost": 0.00010619999999999999,
+      "ms": 2058,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-ebgp-0004",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 120,
+      "cost": 0.00010625999999999999,
+      "ms": 1955,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-ebgp-0005",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 120,
+      "cost": 0.0001065,
+      "ms": 1223,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-ebgp-0006",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 120,
+      "cost": 0.00010655999999999998,
+      "ms": 1221,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-ebgp-0007",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 120,
+      "cost": 0.00010709999999999999,
+      "ms": 1144,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-ebgp-0008",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 121,
+      "cost": 0.00010728,
+      "ms": 3141,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-ebgp-0009",
+      "platform": "frr",
+      "ok": false,
+      "completion_tokens": 121,
+      "cost": 0.00010656,
+      "ms": 3451,
+      "diff": {
+        "bgp_mode": {
+          "got": "unnumbered",
+          "want": "numbered"
+        }
+      }
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-ebgp-0010",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 120,
+      "cost": 0.00010638,
+      "ms": 4401,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-ebgp-0011",
+      "platform": "frr",
+      "ok": false,
+      "completion_tokens": 122,
+      "cost": 0.0001074,
+      "ms": 5144,
+      "diff": {
+        "bgp_mode": {
+          "got": "unnumbered",
+          "want": "numbered"
+        }
+      }
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-eos-0001",
+      "platform": "arista_eos",
+      "ok": false,
+      "error": "LlmOutputError: Intent did not validate: 1 validation error for Intent\n  Value error, BGP unnumbered is supported on FRR only, not arista_eos [type=value_error, input_value={'platform': 'arista_eos'...s': True, 'filters': []}, input_type=dict]\n    For further information visit https://errors.pydanti"
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-eos-0002",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 122,
+      "cost": 0.00010703999999999999,
+      "ms": 1504,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-eos-0003",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 122,
+      "cost": 0.00010722,
+      "ms": 2289,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-eos-0004",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 122,
+      "cost": 0.00010674,
+      "ms": 2087,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-eos-0005",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 122,
+      "cost": 0.00010745999999999999,
+      "ms": 3037,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-eos-0006",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 122,
+      "cost": 0.00010662,
+      "ms": 3345,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-eos-0007",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 122,
+      "cost": 0.0001074,
+      "ms": 1818,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-eos-0008",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 123,
+      "cost": 0.00010716,
+      "ms": 3117,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-eos-0009",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 122,
+      "cost": 0.0001065,
+      "ms": 1776,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-eos-0010",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 123,
+      "cost": 0.00010733999999999999,
+      "ms": 1577,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-filters-0001",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 167,
+      "cost": 0.00011897999999999999,
+      "ms": 3727,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-filters-0002",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 156,
+      "cost": 0.00011442,
+      "ms": 2334,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-filters-0003",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 169,
+      "cost": 0.00011897999999999999,
+      "ms": 2519,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-filters-0004",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 201,
+      "cost": 0.00012618,
+      "ms": 5609,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-filters-0005",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 171,
+      "cost": 0.00011934,
+      "ms": 2421,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-filters-0006",
+      "platform": "arista_eos",
+      "ok": false,
+      "error": "LlmOutputError: Intent did not validate: 1 validation error for Intent\nfilters.0.src_not_in\n  Input is not a valid IPv4 network [type=ip_v4_network, input_value='::/0', input_type=str]"
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-filters-0007",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 168,
+      "cost": 0.00011813999999999999,
+      "ms": 5574,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-filters-0008",
+      "platform": "arista_eos",
+      "ok": false,
+      "error": "LlmOutputError: Intent did not validate: 1 validation error for Intent\nfilters.2.src_not_in\n  Input is not a valid IPv4 network [type=ip_v4_network, input_value='any', input_type=str]"
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-filters-0009",
+      "platform": "arista_eos",
+      "ok": true,
+      "completion_tokens": 203,
+      "cost": 0.00012714,
+      "ms": 1866,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-unnumbered-0001",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 121,
+      "cost": 0.00010638,
+      "ms": 1511,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-unnumbered-0002",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 121,
+      "cost": 0.00010644,
+      "ms": 1584,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-unnumbered-0003",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 121,
+      "cost": 0.00010691999999999999,
+      "ms": 1492,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-unnumbered-0004",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 121,
+      "cost": 0.00010619999999999999,
+      "ms": 2647,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-unnumbered-0005",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 121,
+      "cost": 0.00010679999999999998,
+      "ms": 3091,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-unnumbered-0006",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 121,
+      "cost": 0.00010656,
+      "ms": 2110,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-unnumbered-0007",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 121,
+      "cost": 0.00010703999999999999,
+      "ms": 2071,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-unnumbered-0008",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 121,
+      "cost": 0.00010662,
+      "ms": 2010,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "leaf-spine-unverifiable-0001",
+      "platform": "frr",
+      "ok": true,
+      "completion_tokens": 165,
+      "cost": 0.00011712,
+      "ms": 3858,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-iosxe-0001",
+      "platform": "cisco_iosxe",
+      "ok": true,
+      "completion_tokens": 123,
+      "cost": 0.00010709999999999999,
+      "ms": 3916,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-iosxe-0002",
+      "platform": "cisco_iosxe",
+      "ok": true,
+      "completion_tokens": 123,
+      "cost": 0.00010691999999999999,
+      "ms": 2268,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-iosxe-0003",
+      "platform": "cisco_iosxe",
+      "ok": true,
+      "completion_tokens": 123,
+      "cost": 0.00010763999999999999,
+      "ms": 1817,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-iosxe-0004",
+      "platform": "cisco_iosxe",
+      "ok": true,
+      "completion_tokens": 168,
+      "cost": 0.00011819999999999999,
+      "ms": 1921,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-iosxe-0005",
+      "platform": "cisco_iosxe",
+      "ok": true,
+      "completion_tokens": 123,
+      "cost": 0.00010752,
+      "ms": 1832,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-iosxr-0001",
+      "platform": "cisco_iosxr",
+      "ok": true,
+      "completion_tokens": 124,
+      "cost": 0.00010722,
+      "ms": 1462,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-iosxr-0002",
+      "platform": "cisco_iosxr",
+      "ok": true,
+      "completion_tokens": 124,
+      "cost": 0.00010703999999999999,
+      "ms": 954,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-iosxr-0003",
+      "platform": "cisco_iosxr",
+      "ok": true,
+      "completion_tokens": 124,
+      "cost": 0.00010775999999999998,
+      "ms": 1026,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-iosxr-0004",
+      "platform": "cisco_iosxr",
+      "ok": true,
+      "completion_tokens": 169,
+      "cost": 0.00011831999999999999,
+      "ms": 1198,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-iosxr-0005",
+      "platform": "cisco_iosxr",
+      "ok": true,
+      "completion_tokens": 124,
+      "cost": 0.00010763999999999999,
+      "ms": 1075,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-junos-0001",
+      "platform": "junos",
+      "ok": true,
+      "completion_tokens": 120,
+      "cost": 0.00010614,
+      "ms": 5553,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-junos-0002",
+      "platform": "junos",
+      "ok": true,
+      "completion_tokens": 120,
+      "cost": 0.00010596,
+      "ms": 3552,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-junos-0003",
+      "platform": "junos",
+      "ok": true,
+      "completion_tokens": 120,
+      "cost": 0.00010667999999999999,
+      "ms": 5361,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-junos-0004",
+      "platform": "junos",
+      "ok": true,
+      "completion_tokens": 165,
+      "cost": 0.00011724000000000001,
+      "ms": 6588,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-junos-0005",
+      "platform": "junos",
+      "ok": true,
+      "completion_tokens": 120,
+      "cost": 0.00010655999999999998,
+      "ms": 4504,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-nxos-0001",
+      "platform": "cisco_nxos",
+      "ok": true,
+      "completion_tokens": 123,
+      "cost": 0.00010703999999999999,
+      "ms": 2514,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-nxos-0002",
+      "platform": "cisco_nxos",
+      "ok": true,
+      "completion_tokens": 123,
+      "cost": 0.00010686,
+      "ms": 2040,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-nxos-0003",
+      "platform": "cisco_nxos",
+      "ok": true,
+      "completion_tokens": 123,
+      "cost": 0.00010758,
+      "ms": 1736,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-nxos-0004",
+      "platform": "cisco_nxos",
+      "ok": true,
+      "completion_tokens": 168,
+      "cost": 0.00011813999999999999,
+      "ms": 2931,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-nxos-0005",
+      "platform": "cisco_nxos",
+      "ok": true,
+      "completion_tokens": 123,
+      "cost": 0.00010745999999999999,
+      "ms": 2990,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-sonic-0001",
+      "platform": "sonic",
+      "ok": true,
+      "completion_tokens": 120,
+      "cost": 0.00010583999999999999,
+      "ms": 3953,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-sonic-0002",
+      "platform": "sonic",
+      "ok": true,
+      "completion_tokens": 120,
+      "cost": 0.00010578000000000001,
+      "ms": 4076,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-sonic-0003",
+      "platform": "sonic",
+      "ok": true,
+      "completion_tokens": 120,
+      "cost": 0.00010638,
+      "ms": 1008,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-sonic-0004",
+      "platform": "sonic",
+      "ok": true,
+      "completion_tokens": 120,
+      "cost": 0.00010559999999999999,
+      "ms": 2025,
+      "diff": {}
+    },
+    {
+      "arm": "lightning-nothink",
+      "scenario": "vendor-sonic-0005",
+      "platform": "sonic",
+      "ok": true,
+      "completion_tokens": 120,
+      "cost": 0.00010638,
+      "ms": 2179,
+      "diff": {}
+    }
+  ]
+}

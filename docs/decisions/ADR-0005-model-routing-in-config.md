@@ -3,7 +3,8 @@
 ## Status
 
 Accepted — 2026-09-30. IDs and prices confirmed against Token Factory on 2026-10-22 (see
-Findings).
+Findings). The `nano` and `super` models changed on 2026-11-05, when Token Factory retired
+them: see [ADR-0010](ADR-0010-nemotron-3.5-migration.md).
 
 ## Context
 
